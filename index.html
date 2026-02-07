@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Dashboard</title>
+    <!-- Mosque Icon Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'%3E%3Cpath d='M12 2C9.5 2 7.5 3.5 7.5 6V10H6C4.9 10 4 10.9 4 12V21H9V17H15V21H20V12C20 10.9 19.1 10 18 10H16.5V6C16.5 3.5 14.5 2 12 2M12 4C13.1 4 14 4.9 14 6V10H10V6C10 4.9 10.9 4 12 4Z'/%3E%3C/svg%3E">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Load Google Font: Amiri -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#059669', // Emerald 600
+                        'primary-dark': '#047857', // Emerald 700
+                        'accent': '#d97706', // Amber 600 (Gold-ish)
+                        'secondary': '#f8fafc', // Slate 50
+                        'card-bg': '#ffffff',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Amiri', 'serif'],
+                    },
+                    backgroundImage: {
+                        'islamic-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23059669' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+                    },
+                    animation: {
+                        'bounce-slight': 'bounce-slight 1s infinite',
+                    },
+                    keyframes: {
+                        'bounce-slight': {
+                            '0%, 100%': { transform: 'translateY(-2%)' },
+                            '50%': { transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            min-height: 100vh;
+        }
+        /* Islamic Arch Shape */
+        .arch-top {
+            border-top-left-radius: 3rem;
+            border-top-right-radius: 3rem;
+        }
+        .widget-wrapper {
+            background-color: #ffffff;
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        /* Double Border Effect for Cards */
+        .islamic-card {
+            position: relative;
+            border: 2px solid #e2e8f0;
+        }
+        .islamic-card::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid #059669;
+            border-radius: 2.5rem 2.5rem 0.5rem 0.5rem;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .islamic-card-simple::after {
+             border-radius: 0.5rem;
+        }
+
+        /* RTL Specific Adjustments */
+        [dir="rtl"] .font-sans {
+            font-family: 'Inter', 'sans-serif'; 
+        }
+        [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] p, [dir="rtl"] span, [dir="rtl"] label, [dir="rtl"] select, [dir="rtl"] option, [dir="rtl"] div {
+            font-family: 'Amiri', 'serif';
+        }
+        [dir="rtl"] .font-mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        [dir="rtl"] .text-left {
+            text-align: right;
+        }
+        [dir="rtl"] .border-r {
+            border-right: none;
+            border-left: 1px solid #f3f4f6; 
+        }
+        [dir="rtl"] .mr-1 { margin-right: 0; margin-left: 0.25rem; }
+        [dir="rtl"] .ml-1 { margin-left: 0; margin-right: 0.25rem; }
+        [dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 1;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+
+        /* Loading Overlay for Selects */
+        .select-loading {
+            position: relative;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            @page {
+                margin: 0;
+                size: A4 portrait;
+            }
+            body {
+                background-color: white !important;
+                background-image: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-family: 'Amiri', 'serif' !important;
+            }
+
+            /* Hide UI elements */
+            #sidebar, #controls-container, .no-print, button, input, select, #lang-select, #daily-location, #notification-btn, #alarm-modal {
+                display: none !important;
+            }
+
+            /* Main Layout - Frame Effect */
+            .w-full.max-w-7xl {
+                max-width: none !important;
+                width: 100% !important;
+                border: 6px double #059669; 
+                margin: 10px !important;
+                width: calc(100% - 20px) !important;
+                min-height: calc(100vh - 20px);
+                box-sizing: border-box;
+                padding: 10px !important;
+                position: relative;
+            }
+
+            /* Header Styling */
+            #site-header {
+                margin-top: 5px !important;
+                margin-bottom: 15px !important;
+                text-align: center !important;
+                border-bottom: 2px solid #d97706; /* Amber/Gold underline */
+                padding-bottom: 10px;
+            }
+            #site-header h1 {
+                font-size: 28pt !important;
+                color: #047857 !important; /* Dark Emerald */
+                margin-bottom: 5px !important;
+            }
+            #site-header p {
+                display: block !important;
+                font-size: 11pt !important;
+                color: #555 !important;
+                font-style: italic;
+            }
+
+            #main-grid {
+                display: block !important;
+            }
+            #main-content {
+                width: 100% !important;
+            }
+            
+            .widget-wrapper {
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+            }
+            .widget-wrapper::after {
+                display: none !important; 
+            }
+
+            #monthly-title {
+                text-align: center !important;
+                font-size: 20pt !important;
+                font-weight: bold !important;
+                color: #d97706 !important; 
+                margin-bottom: 15px !important;
+                display: block !important;
+                width: 100%;
+            }
+            .p-6.border-b { 
+                padding: 0 !important;
+                border: none !important;
+                background: none !important;
+            }
+
+            /* Table Styling */
+            .overflow-x-auto {
+                overflow: visible !important;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 10pt !important;
+                table-layout: fixed; 
+            }
+            thead {
+                background-color: #059669 !important;
+                color: white !important;
+                display: table-header-group;
+            }
+            thead th {
+                color: white !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                padding: 6px 2px !important;
+                border: 1px solid #047857 !important;
+            }
+            tbody tr:nth-child(even) {
+                background-color: #ecfdf5 !important; 
+            }
+            tbody tr:nth-child(odd) {
+                background-color: #ffffff !important;
+            }
+            tbody td {
+                border: 1px solid #cbd5e1 !important;
+                padding: 4px 2px !important;
+                text-align: center !important;
+                height: auto !important;
+            }
+            .text-primary {
+                color: #047857 !important;
+                font-weight: bold !important;
+            }
+            
+            .bg-gray-50.p-4 {
+                position: absolute;
+                bottom: 5px;
+                left: 0;
+                width: 100%;
+                border-top: 1px solid #eee !important;
+                background: none !important;
+                color: #888 !important;
+                font-size: 8pt !important;
+                padding: 5px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary bg-islamic-pattern flex flex-col items-center font-sans p-4 text-gray-800 transition-all duration-300">
+    <!-- Alarm Modal (In-Page Popup) -->
+    <div id="alarm-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform scale-100 animate-bounce-slight border-4 border-primary relative">
+            <button id="modal-close-x" class="absolute top-4 right-4 text-gray-400 hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="text-6xl mb-4">🕌</div>
+            <h3 class="text-2xl font-bold text-gray-500 mb-1" data-key="timeForPrayer">It is time for</h3>
+            <h2 id="modal-prayer-name" class="text-5xl font-serif text-primary font-bold mb-3">--</h2>
+            <p id="modal-prayer-time" class="text-xl text-gray-800 font-mono font-bold mb-8 bg-gray-100 inline-block px-4 py-1 rounded-lg">--:--</p>
+            <button id="dismiss-alarm-btn" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 px-6 rounded-xl transition-all text-lg shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                <span class="bilingual-text">Dismiss / إغلاق</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-7xl relative">
+        
+        <!-- Notification Button (Top Right) -->
+        <button id="notification-btn" class="absolute top-0 right-0 z-30 p-2 text-gray-400 hover:text-primary transition-colors no-print" title="Enable Notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span id="notif-status-dot" class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-400 border-2 border-white"></span>
+        </button>
+
+        <!-- Header -->
+        <header id="site-header" class="text-center mb-10 mt-6 relative z-10">
+            <div class="inline-block relative">
+                <div class="text-accent text-3xl mb-1 opacity-80">﷽</div>
+                <h1 class="text-5xl font-bold text-gray-800 mb-2 font-serif tracking-wide">
+                    <span class="text-primary" data-key="titlePrefix">Islamic</span> <span data-key="titleSuffix">Dashboard</span>
+                </h1>
+            </div>
+            <p class="text-lg text-gray-600 font-serif italic mt-2" data-key="quranQuote">
+                "Indeed, prayer has been decreed upon the believers a decree of specified times."
+            </p>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Daily Widgets -->
+            <div id="sidebar" class="lg:col-span-4 flex flex-col gap-6 items-center lg:items-stretch">
+                
+                <!-- 1. Daily Prayer Times Widget -->
+                <div class="widget-wrapper islamic-card arch-top bg-white relative">
+                    <div class="bg-primary/5 p-6 pb-2 text-center pt-8">
+                        <h2 class="text-2xl font-bold text-primary-dark font-serif" data-key="dailyPrayersTitle">Daily Prayers</h2>
+                        <div id="daily-location" class="text-xs text-gray-500 mt-2 font-medium truncate px-4 min-h-[16px]"><span class="animate-pulse">Detecting Location...</span></div>
+                        <!-- New Local Time Display -->
+                        <div id="daily-local-time" class="text-lg font-mono text-accent font-bold mt-1 min-h-[28px]">--:--:--</div>
+                        <div id="daily-date-gregorian" class="text-sm text-gray-600 font-medium mt-1">--</div>
+                        <div id="daily-date-hijri" class="text-sm text-accent font-serif mt-0.5">--</div>
+                    </div>
+                    <div class="p-6 pt-2">
+                        <div id="daily-loading" class="text-center py-4 text-gray-500 text-sm" data-key="loadingDaily">Loading today's times...</div>
+                        <ul id="daily-list" class="space-y-3 mt-4 hidden">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 2. Upcoming Special Days Widget -->
+                <div class="widget-wrapper islamic-card arch-top bg-white">
+                    <div class="bg-accent/5 p-6 pb-2 text-center pt-8">
+                        <h2 class="text-2xl font-bold text-accent font-serif" data-key="upcomingEventsTitle">Upcoming Events</h2>
+                        <p class="text-xs text-gray-500 uppercase tracking-widest mt-1" id="events-year-label" data-key="hijriCalendarLabel">Hijri Calendar</p>
+                    </div>
+                    <div class="p-6 pt-2">
+                        <div id="events-loading" class="text-center py-4 text-gray-500 text-sm" data-key="calculatingDates">Calculating dates...</div>
+                        <div id="events-list" class="space-y-4 mt-4 hidden max-h-[400px] overflow-y-auto custom-scroll pr-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Monthly Prayer Times -->
+            <div id="main-content" class="lg:col-span-8 w-full">
+                <div class="widget-wrapper islamic-card islamic-card-simple p-0 bg-white min-h-[600px]">
+                    
+                    <!-- Card Header -->
+                    <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+                        <h2 class="text-3xl font-bold text-gray-800 font-serif" id="monthly-title" data-key="monthlyScheduleTitle">Monthly Schedule</h2>
+                        <div class="text-xs font-bold text-primary border border-primary/30 bg-primary/5 px-3 py-1 rounded-full mt-2 md:mt-0 no-print" data-key="poweredBy">
+                            Powered by Aladhan API
+                        </div>
+                    </div>
+
+                    <!-- Controls Section -->
+                    <div id="controls-container" class="p-6 bg-gray-50 border-b border-gray-200">
+                        
+                        <!-- Favorites Section -->
+                        <div class="flex items-center space-x-2 rtl:space-x-reverse mb-4 p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <span class="text-primary font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                            </span>
+                            <select id="favorites-select" class="flex-grow p-1.5 text-sm border-none bg-transparent focus:ring-0 text-gray-700 font-medium cursor-pointer bilingual-text">
+                                <option value="" selected data-key="selectFavorite">Load Favorite City... / تحميل مفضلة</option>
+                            </select>
+                            
+                            <!-- Save Button -->
+                            <button id="add-favorite-btn" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 p-2 rounded-md transition-colors" title="Save">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Delete Button -->
+                            <button id="delete-favorite-btn" class="bg-gray-100 hover:bg-red-500 hover:text-white text-gray-600 p-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Delete" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Location Dropdowns -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <!-- Country -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelCountry">Country / الدولة</label>
+                                <select id="country-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm">
+                                    <option value="" disabled selected data-key="loading">Loading...</option>
+                                </select>
+                            </div>
+                            <!-- State -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelState">State / المنطقة</label>
+                                <select id="state-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm disabled:bg-gray-100 disabled:text-gray-400">
+                                    <option value="" selected data-key="selectStatePlaceholder">Select / اختر</option>
+                                </select>
+                            </div>
+                            <!-- City Input with Datalist (Changed from Select) -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelCity">City / المدينة</label>
+                                <div class="relative">
+                                    <input type="text" id="city-input" list="cities-datalist" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm disabled:bg-gray-100 disabled:text-gray-400" placeholder="Type or select city..." autocomplete="off">
+                                    <datalist id="cities-datalist"></datalist>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                             <!-- Calendar Type -->
+                             <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelCalendar">Calendar / التقويم</label>
+                                <select id="calendar-type-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm font-medium">
+                                    <option value="gregorian" data-key="optGregorian">Gregorian / ميلادي</option>
+                                    <option value="hijri" data-key="optHijri">Hijri / هجري</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Calculation Method -->
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelMethod">Method / طريقة الحساب</label>
+                                <select id="method-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm font-medium">
+                                    <!-- Options populated manually for clarity -->
+                                    <option value="2">ISNA (N. America) / الجمعية الإسلامية</option>
+                                    <option value="3">Muslim World League / رابطة العالم الإسلامي</option>
+                                    <option value="5">Egyptian Authority / الهيئة المصرية العامة</option>
+                                    <option value="4">Umm al-Qura, Makkah / أم القرى مكة</option>
+                                    <option value="1">Karachi / كراتشي</option>
+                                    <option value="7">Tehran / طهران</option>
+                                    <option value="0">Shia Ithna-Ashari / الشيعة</option>
+                                    <option value="8">Gulf Region / الخليج</option>
+                                    <option value="9">Kuwait / الكويت</option>
+                                    <option value="10">Qatar / قطر</option>
+                                    <option value="11">Singapore / سنغافورة</option>
+                                    <option value="12">France (UOIF) / فرنسا</option>
+                                    <option value="13">Turkey (Diyanet) / تركيا</option>
+                                    <option value="14">Russia / روسيا</option>
+                                    <option value="16">Dubai / دبي</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Date Selection -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Month -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelMonth">Month / الشهر</label>
+                                <select id="month-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm"></select>
+                            </div>
+                            <!-- Year -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelYear">Year / السنة</label>
+                                <select id="year-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm"></select>
+                            </div>
+                            <!-- Start Day -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelStartDay">Start / من</label>
+                                <select id="start-day-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm"></select>
+                            </div>
+                            <!-- End Day -->
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 bilingual-text" data-key="labelEndDay">End / إلى</label>
+                                <select id="end-day-select" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white shadow-sm"></select>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 mt-5 flex-wrap items-center">
+                            <button id="load-schedule-btn" class="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-200 flex justify-center items-center gap-2 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
+                                <span class="bilingual-text" data-key="btnUpdate">Update / تحديث</span>
+                            </button>
+                            <!-- Excel Button -->
+                            <button id="excel-btn" type="button" class="flex-none bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-200 flex justify-center items-center gap-2 transform active:scale-[0.99]">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="bilingual-text" data-key="btnExcel">Excel / إكسل</span>
+                            </button>
+                            <!-- Print Button -->
+                            <button id="print-btn" type="button" class="flex-none bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 flex justify-center items-center gap-2 transform active:scale-[0.99]">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                <span class="bilingual-text" data-key="btnPrint">Print / طباعة</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Popup Checkbox Option -->
+                        <div class="flex items-center gap-2 mt-4 pt-2 border-t border-gray-200">
+                            <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" id="use-popup-window" class="sr-only peer">
+                                <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                <span class="ms-2 text-xs font-medium text-gray-500">Open separate window / فتح نافذة منفصلة</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="error-container" class="hidden m-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm flex items-center bilingual-text">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span id="error-message"></span>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="overflow-x-auto custom-scroll p-0">
+                        <table class="w-full text-sm text-left text-gray-600" id="prayer-schedule-table">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider bilingual-text" data-key="headerDate">Date / التاريخ</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-primary bilingual-text" data-key="Fajr">Fajr / الفجر</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider bilingual-text" data-key="Sunrise">Sunrise / الشروق</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-primary bilingual-text" data-key="Dhuhr">Dhuhr / الظهر</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-primary bilingual-text" data-key="Asr">Asr / العصر</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-primary bilingual-text" data-key="Maghrib">Maghrib / المغرب</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-primary bilingual-text" data-key="Isha">Isha / العشاء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prayer-table-body" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="7" class="px-6 py-12 text-center text-gray-400 italic bilingual-text" data-key="selectLocationFirst">
+                                        Please select a City... / الرجاء اختيار المدينة
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 p-4 text-center text-xs text-gray-400 border-t border-gray-100 rounded-b-lg bilingual-text" id="method-footer">
+                        Method / الطريقة: ISNA
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- Constants ---
+    const API_BASE = "https://countriesnow.space/api/v0.1";
+    let currentPrayerData = null; 
+    let countdownInterval = null;
+    let isAutoDetecting = false; 
+    let titleFlashInterval = null;
+    let originalTitle = "Islamic Dashboard";
+    let notifiedPrayers = new Set(); // Tracks unique notifications for the current day
+    let nextEventTitleString = ""; // Stores "Next: EventName (x days)"
+
+    // Combined Labels
+    const LABELS = {
+        loading: "Loading... / جاري التحميل...",
+        selectCountryPlaceholder: "Select Country / اختر الدولة",
+        selectStatePlaceholder: "Select State / اختر المنطقة",
+        selectCityPlaceholder: "Type or select city... / أدخل أو اختر المدينة...",
+        loadingDaily: "Loading... / جاري التحميل...",
+        calculatingDates: "Calculating... / جاري الحساب...",
+        selectLocationFirst: "Select City to load schedule... / اختر المدينة لعرض الجدول",
+        errorFetch: "Check location / تحقق من الموقع",
+        errorNetwork: "Network Error / خطأ في الشبكة",
+        noData: "No Data / لا توجد بيانات",
+        noEvents: "No Events / لا توجد أحداث",
+        endOfMonth: "End of Month / نهاية الشهر",
+        validationError: "Please select/type a City / يرجى إدخال المدينة",
+        selectFavorite: "Load Favorite... / تحميل مفضلة",
+        addedFavorite: "Saved! / تم الحفظ",
+        updatedFavorite: "Updated! / تم التحديث",
+        deletedFavorite: "Deleted! / تم الحذف",
+        confirmDelete: "Delete this favorite? / هل أنت متأكد؟",
+        calcMethodPrefix: "Method / الطريقة:"
+    };
+
+    const COUNTRY_METHOD_DEFAULTS = {
+        "United States": 2, "Canada": 2, "United Kingdom": 2, "Saudi Arabia": 4, 
+        "Pakistan": 1, "India": 1, "Egypt": 5, "Turkey": 13, "Indonesia": 5, 
+        "Malaysia": 5, "Kuwait": 9, "Qatar": 10, "United Arab Emirates": 16, 
+        "Singapore": 11, "France": 12, "Russia": 14, "Iran": 7, "Libya": 9
+    };
+
+    const GREGORIAN_MONTHS = ["January / يناير", "February / فبراير", "March / مارس", "April / أبريل", "May / مايو", "June / يونيو", "July / يوليو", "August / أغسطس", "September / سبتمبر", "October / أكتوبر", "November / نوفمبر", "December / ديسمبر"];    
+    const HIJRI_MONTHS = ["Muharram / محرم", "Safar / صفر", "Rabi' I / ربيع الأول", "Rabi' II / ربيع الآخر", "Jumada I / جمادى الأولى", "Jumada II / جمادى الآخرة", "Rajab / رجب", "Sha'ban / شعبان", "Ramadan / رمضان", "Shawwal / شوال", "Dhu al-Qi'dah / ذو القعدة", "Dhu al-Hijjah / ذو الحجة"];
+
+    const ISLAMIC_EVENTS = [
+        { m: 1, d: 1, name: "Islamic New Year / رأس السنة الهجرية" }, 
+        { m: 1, d: 10, name: "Ashura / عاشوراء" },
+        { m: 3, d: 12, name: "Mawlid al-Nabi / المولد النبوي" }, 
+        { m: 7, d: 27, name: "Isra and Mi'raj / الإسراء والمعراج" },
+        { m: 9, d: 1, name: "Start of Ramadan / بداية رمضان" }, 
+        { m: 9, d: 21, name: "Laylat al-Qadr / ليلة القدر" },
+        { m: 10, d: 1, name: "Eid al-Fitr / عيد الفطر" }, 
+        { m: 12, d: 9, name: "Day of Arafah / يوم عرفة" },
+        { m: 12, d: 10, name: "Eid al-Adha / عيد الأضحى" }
+    ];
+
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth(); 
+    const currentDay = currentDate.getDate();
+
+    const hijriFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    const hijriParts = hijriFormatter.formatToParts(currentDate);
+    const getHijriPart = (type) => hijriParts.find(p => p.type === type).value;
+    
+    const currentHijriDay = parseInt(getHijriPart('day'));
+    const currentHijriMonth = parseInt(getHijriPart('month'));
+    const currentHijriYear = parseInt(getHijriPart('year').replace(/[^0-9]/g, ''));
+
+    // --- HELPER FUNCTIONS ---
+    function t(key) { return LABELS[key] || key; }
+
+    function updateTitle() {
+        const cityInput = document.getElementById('city-input');
+        const city = cityInput.value || "";
+        const country = document.getElementById('country-select').value || "";
+        const month = document.getElementById('month-select').value;
+        const year = document.getElementById('year-select').value;
+        const calendarType = document.getElementById('calendar-type-select').value;
+        const titleElement = document.getElementById('monthly-title');
+        
+        if(month && year && city) { 
+             const monthsArr = calendarType === 'gregorian' ? GREGORIAN_MONTHS : HIJRI_MONTHS; 
+             const monthName = monthsArr[parseInt(month) - 1] || ""; 
+             titleElement.textContent = `${monthName} ${year} — ${city}, ${country}`;
+        }
+    }
+
+    function updateFooterText() {
+        const footer = document.getElementById('method-footer');
+        const methodSelect = document.getElementById('method-select');
+        const methodName = methodSelect.options[methodSelect.selectedIndex].text;
+        footer.textContent = `${t('calcMethodPrefix')} ${methodName}`;
+    }
+
+    function cleanTime(timeStr) { return timeStr.split(' ')[0]; }
+
+    function formatTime12(timeStr) {
+        let raw = timeStr.split(' ')[0];
+        let [h, m] = raw.split(':');
+        let hour = parseInt(h);
+        let suffix = hour >= 12 ? 'PM/م' : 'AM/ص';
+        hour = hour % 12 || 12;
+        return `${hour}:${m} <span class="text-xs text-gray-400">${suffix}</span>`;
+    }
+
+    function formatTime12Plain(timeStr) {
+        let raw = timeStr.split(' ')[0];
+        let [h, m] = raw.split(':');
+        let hour = parseInt(h);
+        let suffix = hour >= 12 ? 'PM/م' : 'AM/ص';
+        hour = hour % 12 || 12;
+        return `${hour}:${m} ${suffix}`;
+    }
+
+    function getOrdinal(n) { return n; }
+
+    function populateDaySelectors() {
+        const startDaySelect = document.getElementById('start-day-select');
+        const endDaySelect = document.getElementById('end-day-select');
+        const prevStart = startDaySelect.value;
+        const prevEnd = endDaySelect.value;
+
+        startDaySelect.innerHTML = '';
+        for (let i = 1; i <= 31; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            startDaySelect.appendChild(option);
+        }
+        if(prevStart) startDaySelect.value = prevStart;
+
+        endDaySelect.innerHTML = '';
+        const endDefault = document.createElement('option');
+        endDefault.value = 32; 
+        endDefault.textContent = t('endOfMonth');
+        endDaySelect.appendChild(endDefault);
+
+        for (let i = 1; i <= 31; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            endDaySelect.appendChild(option);
+        }
+        endDaySelect.value = prevEnd || 32;
+    }
+
+    function updateMonthYearOptions(forceCurrent = false) {
+        const calendarTypeSelect = document.getElementById('calendar-type-select');
+        const monthSelect = document.getElementById('month-select');
+        const yearSelect = document.getElementById('year-select');
+        const startDaySelect = document.getElementById('start-day-select');
+        
+        const prevMonth = monthSelect.value;
+        const prevYear = yearSelect.value;
+        
+        const type = calendarTypeSelect.value;
+        monthSelect.innerHTML = '';
+        yearSelect.innerHTML = '';
+
+        const monthNames = type === 'gregorian' ? GREGORIAN_MONTHS : HIJRI_MONTHS;
+        
+        monthNames.forEach((name, index) => {
+            const opt = document.createElement('option');
+            opt.value = index + 1; 
+            opt.textContent = name; 
+            monthSelect.appendChild(opt);
+        });
+
+        if (!forceCurrent && prevMonth && prevMonth <= 12) {
+            monthSelect.value = prevMonth;
+        } else { 
+             monthSelect.value = type === 'gregorian' ? currentMonth + 1 : currentHijriMonth; 
+             if (forceCurrent) startDaySelect.value = type === 'gregorian' ? currentDay : currentHijriDay;
+        }
+
+        const centerYear = type === 'gregorian' ? currentYear : currentHijriYear;
+        for (let y = centerYear - 5; y <= centerYear + 10; y++) {
+            const opt = document.createElement('option');
+            opt.value = y; 
+            opt.textContent = y; 
+            yearSelect.appendChild(opt);
+        }
+        
+        if (!forceCurrent && prevYear && prevYear >= centerYear - 5 && prevYear <= centerYear + 10) { 
+             yearSelect.value = prevYear;
+        } else { 
+             yearSelect.value = centerYear;
+        }
+    }
+
+    // --- Special Days Logic ---
+    async function calculateSpecialDays() {
+        const loadingEl = document.getElementById('events-loading');
+        const listEl = document.getElementById('events-list');
+        const yearLabel = document.getElementById('events-year-label');
+        
+        loadingEl.textContent = t('calculatingDates');
+        listEl.classList.add('hidden');
+        loadingEl.classList.remove('hidden');
+
+        const calendarType = document.getElementById('calendar-type-select').value;
+        const selectedYear = parseInt(document.getElementById('year-select').value);
+        let hijriYearContext;
+
+        if (calendarType === 'hijri') {
+            hijriYearContext = selectedYear;
+        } else {
+            hijriYearContext = parseInt((selectedYear - 622) * 1.0307);
+        }
+        
+        yearLabel.textContent = `Hijri / هجري: ${hijriYearContext}`;
+
+        // Construct Promises
+        const promises = ISLAMIC_EVENTS.map(e => {
+            const url = `https://api.aladhan.com/v1/hToG?date=${e.d}-${e.m}-${hijriYearContext}`;
+            return fetch(url).then(res => res.json()).then(data => ({
+                ...e,
+                gregorian: data.data.gregorian.date, // DD-MM-YYYY
+                gregorianObj: new Date(data.data.gregorian.date.split('-').reverse().join('-')),
+                hijriStr: `${e.d} ${HIJRI_MONTHS[e.m - 1]}`
+            })).catch(err => ({...e, gregorian: '?', gregorianObj: new Date(8640000000000000)}));
+        });
+
+        try {
+            const eventsWithDates = await Promise.all(promises);
+            eventsWithDates.sort((a, b) => a.gregorianObj - b.gregorianObj);
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            
+            let nextEventIndex = -1;
+            for(let i=0; i<eventsWithDates.length; i++) {
+                if(eventsWithDates[i].gregorianObj >= now) {
+                    nextEventIndex = i;
+                    break;
+                }
+            }
+
+            // Populate Global Next Event String
+            if (nextEventIndex !== -1) {
+                const e = eventsWithDates[nextEventIndex];
+                const diffTime = Math.abs(e.gregorianObj - now);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Clean name: remove "Start of" or "Day of"
+                let cleanName = e.name.split('/')[0].trim();
+                cleanName = cleanName.replace(/^(Start|Day) of\s+/i, '');
+                
+                nextEventTitleString = `${cleanName} (${diffDays}d)`;
+            } else {
+                nextEventTitleString = "No upcoming events";
+            }
+
+            listEl.innerHTML = eventsWithDates.map((e, index) => {
+                const isNext = index === nextEventIndex;
+                const highlightClass = isNext ? "bg-primary/10 border-l-4 border-primary pl-3 -ml-3 rounded-r-lg" : "";
+                
+                let daysDiffStr = "";
+                if (isNext) {
+                    const diffTime = Math.abs(e.gregorianObj - now);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    daysDiffStr = diffDays === 0 ? "Today / اليوم" : `in ${diffDays} days / خلال ${diffDays} يوم`;
+                }
+
+                return `
+                <div class="flex items-start space-x-3 pb-3 border-b border-gray-100 last:border-0 ${highlightClass} transition-all duration-300">
+                    <div class="bg-accent/10 text-accent rounded-lg p-2 text-center min-w-[50px]">
+                        <div class="text-xl font-bold leading-none font-sans">${e.d}</div>
+                        <div class="text-[0.6rem] uppercase font-bold mt-1 text-gray-500">${HIJRI_MONTHS[e.m - 1].split('/')[0].substring(0,3)}</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-800 text-sm">${e.name}</div>
+                        <div class="text-xs text-gray-500 mt-0.5 font-mono" dir="ltr">${e.gregorian}</div>
+                        <div class="text-[10px] text-primary/80 mt-0.5">${e.hijriStr}</div>
+                        ${isNext ? `<span class="inline-block text-[10px] bg-primary text-white px-2 py-0.5 rounded-full mt-1">${daysDiffStr}</span>` : ''}
+                    </div>
+                </div>
+            `}).join('');
+
+            loadingEl.classList.add('hidden');
+            listEl.classList.remove('hidden');
+
+        } catch (e) {
+            console.error("Events error", e);
+            loadingEl.textContent = t('errorNetwork');
+        }
+    }
+
+    // --- Notification & Title Logic ---
+    function checkNotificationPermission() {
+        const btn = document.getElementById('notification-btn');
+        const dot = document.getElementById('notif-status-dot');
+        
+        if (Notification.permission === 'granted') {
+            dot.className = "absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-white";
+            btn.title = "Notifications Enabled";
+        } else if (Notification.permission === 'denied') {
+            dot.className = "absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-gray-400 border-2 border-white";
+            btn.title = "Notifications Denied";
+        } else {
+            dot.className = "absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-400 border-2 border-white animate-pulse";
+            btn.title = "Enable Notifications";
+        }
+    }
+
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notifications");
+            return;
+        }
+
+        Notification.requestPermission().then(permission => {
+            checkNotificationPermission();
+            if(permission === 'granted') {
+                showNotification("Notifications Enabled", "Now", false);
+            } else {
+                alert("Permission denied. You may need to enable notifications in your browser settings for this site.");
+            }
+        });
+    }
+
+    function flashTitle(text) {
+        if (titleFlashInterval) clearInterval(titleFlashInterval);
+        let isOriginal = false;
+        titleFlashInterval = setInterval(() => {
+            document.title = isOriginal ? originalTitle : text;
+            isOriginal = !isOriginal;
+        }, 1000);
+        // Stop flashing after 30 seconds
+        setTimeout(() => {
+            if (titleFlashInterval) {
+                clearInterval(titleFlashInterval);
+                titleFlashInterval = null;
+            }
+        }, 30000);
+    }
+
+    function playSound() {
+        // Simple beep using AudioContext (no external file needed)
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 440; // A4
+                gain.gain.value = 0.1;
+                osc.start();
+                setTimeout(() => osc.stop(), 500);
+            }
+        } catch(e) { console.log("Audio play failed"); }
+    }
+
+    function openPopupWindow(prayerName, time) {
+        const width = 400;
+        const height = 300;
+        const left = (screen.width/2)-(width/2);
+        const top = (screen.height/2)-(height/2);
+        const popup = window.open('', 'PrayerAlert', `width=${width},height=${height},top=${top},left=${left},scrollbars=no,status=no,resizable=no,menubar=no,toolbar=no`);
+        
+        if (popup) {
+            popup.document.write(`
+                <html>
+                <head>
+                    <title>${prayerName}</title>
+                    <style>
+                        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; text-align: center; }
+                        h1 { color: #059669; font-size: 32px; margin-bottom: 10px; }
+                        p { font-size: 24px; font-weight: bold; color: #333; }
+                        button { margin-top: 20px; padding: 10px 20px; background: #059669; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+                        button:hover { background: #047857; }
+                    </style>
+                </head>
+                <body>
+                    <h1>🕌 ${prayerName}</h1>
+                    <p>Time: ${time}</p>
+                    <button onclick="window.close()">Dismiss</button>
+                </body>
+                </html>
+            `);
+            popup.focus();
+        } else {
+            console.warn("Popup blocked");
+        }
+    }
+
+    function showNotification(title, subtitle, isPrayer = true) {
+        // 1. Flash Title
+        const msg = isPrayer ? `TIME FOR ${title.toUpperCase()}!` : title.toUpperCase();
+        flashTitle(msg);
+        playSound();
+
+        // 2. In-App Modal (Overlay)
+        const modal = document.getElementById('alarm-modal');
+        const modalName = document.getElementById('modal-prayer-name');
+        const modalTime = document.getElementById('modal-prayer-time');
+        const modalLabel = document.querySelector('h3[data-key="timeForPrayer"]');
+        
+        if (modal && modalName && modalTime) {
+            modalName.textContent = title;
+            modalTime.textContent = subtitle;
+            if(!isPrayer && modalLabel) modalLabel.textContent = "Reminder / تذكير";
+            else if(modalLabel) modalLabel.textContent = "It is time for";
+            modal.classList.remove('hidden');
+        }
+
+        // 3. Separate Window Popup (If Enabled)
+        const usePopup = document.getElementById('use-popup-window')?.checked;
+        if (usePopup) {
+            openPopupWindow(title, subtitle);
+        }
+
+        // 4. System Notification
+        if (Notification.permission === "granted") {
+            try {
+                const bodyText = isPrayer 
+                    ? `It is now time for ${title} prayer (${subtitle}).`
+                    : `${subtitle}`;
+                
+                const notif = new Notification(isPrayer ? `Time for ${title}` : title, {
+                    body: bodyText,
+                    icon: "https://cdn-icons-png.flaticon.com/512/5061/5061444.png",
+                    requireInteraction: true 
+                });
+                notif.onclick = function() {
+                    window.focus();
+                    this.close();
+                };
+            } catch(e) { console.error("Notification failed", e); }
+        }
+    }
+
+    function setupModalListeners() {
+        const modal = document.getElementById('alarm-modal');
+        const dismissBtn = document.getElementById('dismiss-alarm-btn');
+        const closeX = document.getElementById('modal-close-x');
+
+        const hideModal = () => modal.classList.add('hidden');
+
+        if(dismissBtn) dismissBtn.addEventListener('click', hideModal);
+        if(closeX) closeX.addEventListener('click', hideModal);
+        if(modal) modal.addEventListener('click', (e) => {
+            if(e.target === modal) hideModal();
+        });
+    }
+
+    // --- Daily & Events Data Fetching ---
+
+    async function fetchDailyWidgetData() {
+        const cityInput = document.getElementById('city-input');
+        const city = cityInput.value;
+        const country = document.getElementById('country-select').value;
+        const state = document.getElementById('state-select').value;
+        const method = document.getElementById('method-select').value;
+
+        if(!city) return;
+
+        const listEl = document.getElementById('daily-list');
+        const loadingEl = document.getElementById('daily-loading');
+        const locEl = document.getElementById('daily-location');
+        const dateGregEl = document.getElementById('daily-date-gregorian');
+        const dateHijriEl = document.getElementById('daily-date-hijri');
+
+        listEl.classList.add('hidden');
+        loadingEl.classList.remove('hidden');
+        loadingEl.textContent = t('loadingDaily');
+        locEl.textContent = `${city}, ${country}`;
+
+        const apiUrl = `https://api.aladhan.com/v1/timingsByCity/${currentDate.getDate()}-${currentDate.getMonth()+1}-${currentDate.getFullYear()}?city=${city}&country=${country}&state=${state}&method=${method}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const json = await response.json();
+            if (json.code === 200) {
+                const data = json.data;
+                const times = data.timings;
+                const timezone = data.meta.timezone; 
+                
+                dateGregEl.textContent = data.date.readable;
+                const hMonthIdx = parseInt(data.date.hijri.month.number) - 1;
+                dateHijriEl.textContent = `${data.date.hijri.day} ${HIJRI_MONTHS[hMonthIdx]} ${data.date.hijri.year}`;
+                
+                const prayers = [
+                    { key: 'Fajr', name: 'Fajr / الفجر', time: times.Fajr }, 
+                    { key: 'Sunrise', name: 'Sunrise / الشروق', time: times.Sunrise, isSecondary: true }, 
+                    { key: 'Dhuhr', name: 'Dhuhr / الظهر', time: times.Dhuhr }, 
+                    { key: 'Asr', name: 'Asr / العصر', time: times.Asr }, 
+                    { key: 'Maghrib', name: 'Maghrib / المغرب', time: times.Maghrib }, 
+                    { key: 'Isha', name: 'Isha / العشاء', time: times.Isha }
+                ];
+
+                listEl.innerHTML = prayers.map(p => `
+                    <li class="flex justify-between items-center ${p.isSecondary ? 'text-gray-400 text-xs border-b border-dashed border-gray-100 pb-2 mb-2' : 'text-gray-700 text-lg border-b border-gray-100 pb-2 transition-all duration-300'}" data-prayer="${p.key}">
+                        <span class="${p.isSecondary ? '' : 'font-bold font-serif'}">${p.name}</span>
+                        <span class="${p.isSecondary ? '' : 'font-mono text-primary-dark'}" dir="ltr">${formatTime12(p.time)}</span>
+                    </li>
+                `).join('');
+
+                loadingEl.classList.add('hidden');
+                listEl.classList.remove('hidden');
+                
+                startCountdown(times, timezone);
+            }
+        } catch (e) {
+            console.error("Daily widget error", e);
+            loadingEl.textContent = t('errorNetwork');
+        }
+    }
+
+    // --- Countdown Function ---
+    function startCountdown(timings, timezone) {
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        const prayers = [
+            { key: 'Fajr', time: timings.Fajr },
+            { key: 'Sunrise', time: timings.Sunrise }, 
+            { key: 'Dhuhr', time: timings.Dhuhr },
+            { key: 'Asr', time: timings.Asr },
+            { key: 'Maghrib', time: timings.Maghrib },
+            { key: 'Isha', time: timings.Isha }
+        ];
+
+        const formatDiffShort = (ms) => {
+             const h = Math.floor(ms / 3600000);
+             const m = Math.floor((ms % 3600000) / 60000);
+             const pad = (n) => n < 10 ? '0'+n : n;
+             return `${pad(h)}:${pad(m)}`;
+        };
+
+        const update = () => {
+            const now = new Date();
+            const options = { timeZone: timezone, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const parts = formatter.formatToParts(now);
+            
+            const getPart = (type) => parseInt(parts.find(p => p.type === type).value);
+            const localNow = new Date(getPart('year'), getPart('month')-1, getPart('day'), getPart('hour'), getPart('minute'), getPart('second'));
+
+            // Clock
+            const localTimeEl = document.getElementById('daily-local-time');
+            if(localTimeEl) localTimeEl.textContent = localNow.toLocaleTimeString('en-US', { hour12: true });
+
+            let nextPrayer = null;
+            let prevPrayer = null;
+            
+            // Build Prayer Objects
+            const prayerObjs = prayers.map(p => {
+                const [h, m] = cleanTime(p.time).split(':').map(Number);
+                const d = new Date(localNow);
+                d.setHours(h, m, 0, 0);
+                return { ...p, date: d };
+            });
+            prayerObjs.sort((a,b) => a.date - b.date);
+
+            // --- Notification Logic ---
+            
+            // 1. Prayer Time Check
+            prayerObjs.forEach(p => {
+                const diff = Math.abs(p.date - localNow);
+                const notifKey = `${p.key}-${localNow.getDate()}`; 
+                
+                // 60 sec window
+                if (diff < 60000 && !notifiedPrayers.has(notifKey)) {
+                    notifiedPrayers.add(notifKey);
+                    showNotification(p.key, formatTime12Plain(p.time), true);
+                }
+            });
+
+            // 2. Friday Last Hour Check (Sa'at al-Istijabah)
+            if (localNow.getDay() === 5) { // 5 is Friday
+                const maghribPrayer = prayers.find(p => p.key === 'Maghrib');
+                if (maghribPrayer) {
+                    const [h, m] = cleanTime(maghribPrayer.time).split(':').map(Number);
+                    const maghribDate = new Date(localNow);
+                    maghribDate.setHours(h, m, 0, 0);
+                    
+                    const lastHourStart = new Date(maghribDate.getTime() - 60 * 60 * 1000); // 1 hour before
+                    
+                    // Check if we are currently in the last hour
+                    if (localNow >= lastHourStart && localNow < maghribDate) {
+                        const notifKey = `FridayDoaa-${localNow.getDate()}`;
+                        if (!notifiedPrayers.has(notifKey)) {
+                            notifiedPrayers.add(notifKey);
+                            showNotification("Last Hour of Friday", "Make Doaa / ساعة استجابة", false);
+                        }
+                    }
+                }
+            }
+
+            // Find Next
+            for(let p of prayerObjs) {
+                if(p.date > localNow) {
+                    nextPrayer = p;
+                    break;
+                }
+            }
+            if(!nextPrayer) {
+                const p = prayerObjs[0]; // Fajr
+                const d = new Date(p.date);
+                d.setDate(d.getDate() + 1);
+                nextPrayer = { ...p, date: d };
+            }
+
+            // Find Previous
+            for(let i = prayerObjs.length - 1; i >= 0; i--) { 
+                 if(prayerObjs[i].date <= localNow) { 
+                     prevPrayer = prayerObjs[i]; 
+                     break; 
+                 }
+            }
+            if(!prevPrayer) {
+                const p = prayerObjs[prayerObjs.length - 1]; // Isha
+                const d = new Date(p.date);
+                d.setDate(d.getDate() - 1);
+                prevPrayer = { ...p, date: d };
+            }
+
+            // Calculations
+            const diffNext = nextPrayer.date - localNow;
+            const diffPrev = localNow - prevPrayer.date;
+
+            // Render
+            document.querySelectorAll('#daily-list li').forEach(li => {
+                li.classList.remove('bg-primary/10', 'border-l-4', 'border-primary', 'pl-3');
+                li.classList.add('border-gray-100');
+                const existingTimers = li.querySelectorAll('.prayer-timer');
+                existingTimers.forEach(el => el.remove());
+            });
+
+            const pad = (n) => n < 10 ? '0'+n : n;
+            const formatDiff = (ms) => {
+                 const h = Math.floor(ms / 3600000);
+                 const m = Math.floor((ms % 3600000) / 60000);
+                 const s = Math.floor((ms % 60000) / 1000);
+                 return `${pad(h)}:${pad(m)}:${pad(s)}`;
+            };
+
+            const timeLeftFull = formatDiff(diffNext);
+            const timeLeftShort = formatDiffShort(diffNext);
+            const timeSinceShort = formatDiffShort(diffPrev);
+            
+            // Title alternating logic
+            if (!titleFlashInterval) {
+                const nowSec = Math.floor(Date.now() / 3000); // Switch every 3 seconds
+                const cycle = nowSec % 5; // 5 states now
+                
+                if (cycle === 0) {
+                     // State 1: Next Prayer e.g. -01:30 Fajr
+                     document.title = `-${timeLeftShort} ${nextPrayer.key}`;
+                } else if (cycle === 1) {
+                     // State 2: Prev Prayer e.g. +02:15 Dhuhr
+                     document.title = `+${timeSinceShort} ${prevPrayer.key}`;
+                } else if (cycle === 2) {
+                     // State 3: Gregorian Date (DD MMM YYYY)
+                     const d = new Date();
+                     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                     document.title = `${pad(d.getDate())} ${months[d.getMonth()]} ${d.getFullYear()}`;
+                } else if (cycle === 3) {
+                     // State 4: Hijri Date (DD Month YYYY)
+                     const hMonth = HIJRI_MONTHS[currentHijriMonth-1]?.split('/')[0].trim() || "";
+                     document.title = `${currentHijriDay} ${hMonth} ${currentHijriYear}`;
+                } else if (cycle === 4) {
+                     // State 5: Next Hijri Event e.g. "Ramadan (15d)"
+                     let shortEvt = nextEventTitleString.replace("Next: ", "").replace(" days", "d").replace(" day", "d");
+                     if(shortEvt.length > 30) shortEvt = shortEvt.substring(0, 30) + "..";
+                     document.title = shortEvt || "Islamic Dashboard";
+                }
+            }
+
+            // Highlight Next
+            const nextLi = document.querySelector(`li[data-prayer="${nextPrayer.key}"]`);
+            if(nextLi) {
+                nextLi.classList.remove('border-gray-100');
+                nextLi.classList.add('bg-primary/10', 'border-l-4', 'border-primary', 'pl-3');
+                let t = document.createElement('span');
+                t.className = 'prayer-timer text-xs font-mono text-primary ml-2 block sm:inline';
+                t.innerHTML = `(-${timeLeftFull})`;
+                nextLi.querySelector('span:first-child').appendChild(t);
+            }
+
+            // Show Time Since Prev
+            if(prevPrayer.key !== nextPrayer.key) {
+                const prevLi = document.querySelector(`li[data-prayer="${prevPrayer.key}"]`);
+                if(prevLi) {
+                    let t = document.createElement('span');
+                    t.className = 'prayer-timer text-xs font-mono text-gray-400 ml-2 block sm:inline';
+                    t.innerHTML = `(+${formatDiff(diffPrev)})`;
+                    prevLi.querySelector('span:first-child').appendChild(t);
+                }
+            }
+        };
+
+        update();
+        countdownInterval = setInterval(update, 1000);
+    }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        initApp();
+        checkNotificationPermission(); // Check initial state
+    });
+
+    async function initApp() {
+        const calendarTypeSelect = document.getElementById('calendar-type-select');
+        const loadButton = document.getElementById('load-schedule-btn');
+        const printButton = document.getElementById('print-btn');
+        const excelButton = document.getElementById('excel-btn');
+        const methodSelect = document.getElementById('method-select');
+        const countrySelect = document.getElementById('country-select');
+        const stateSelect = document.getElementById('state-select');
+        const cityInput = document.getElementById('city-input'); 
+        const favoritesSelect = document.getElementById('favorites-select');
+        const addFavoriteBtn = document.getElementById('add-favorite-btn');
+        const deleteFavoriteBtn = document.getElementById('delete-favorite-btn');
+        const notifBtn = document.getElementById('notification-btn');
+
+        // Initial setup - Bilingual default
+        populateDaySelectors();
+        updateMonthYearOptions(true); 
+        loadFavorites(); 
+        setupModalListeners(); // Setup modal events
+        
+        // Listeners
+        notifBtn.addEventListener('click', requestNotificationPermission);
+
+        countrySelect.addEventListener('change', () => {
+            const countryName = countrySelect.value;
+            if (!isAutoDetecting) {
+                const defaultMethod = COUNTRY_METHOD_DEFAULTS[countryName];
+                if (defaultMethod) {
+                    methodSelect.value = defaultMethod;
+                    updateFooterText();
+                }
+                fetchCapitalAndLoadState(countryName);
+            } else {
+                loadStates(); 
+            }
+        });
+        
+        stateSelect.addEventListener('change', () => {
+            if (!isAutoDetecting) loadCities(null, true); 
+            else loadCities();
+        });
+        
+        cityInput.addEventListener('change', () => {
+            if(cityInput.value) { fetchPrayerTimes(); fetchDailyWidgetData(); }
+        });
+
+        methodSelect.addEventListener('change', () => {
+            updateFooterText();
+            if(cityInput.value) { fetchPrayerTimes(); fetchDailyWidgetData(); }
+        });
+
+        loadButton.addEventListener('click', () => { 
+             if(validateLocation()) { fetchPrayerTimes(); fetchDailyWidgetData(); }
+        });
+        
+        calendarTypeSelect.addEventListener('change', () => {
+            updateMonthYearOptions(true);
+            calculateSpecialDays();
+        });
+
+        if (printButton) {
+            printButton.addEventListener('click', () => {
+                try { window.focus(); window.print(); } catch (e) { alert("Printing error."); }
+            });
+        }
+
+        if (excelButton) {
+            excelButton.addEventListener('click', downloadExcel);
+        }
+
+        // Favorites
+        addFavoriteBtn.addEventListener('click', saveFavorite);
+        deleteFavoriteBtn.addEventListener('click', deleteFavorite);
+        favoritesSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val) {
+                applyFavorite(JSON.parse(val));
+                deleteFavoriteBtn.disabled = false;
+            } else {
+                deleteFavoriteBtn.disabled = true;
+            }
+        });
+
+        // Async Loading
+        await loadCountries();
+        await autoDetectLocation();
+        
+        calculateSpecialDays();
+    }
+
+    // --- Favorites ---
+    function loadFavorites() {
+        const select = document.getElementById('favorites-select');
+        const favorites = JSON.parse(localStorage.getItem('islamic_dashboard_favorites') || '[]');
+        select.innerHTML = `<option value="" selected>${t('selectFavorite')}</option>`;
+        favorites.forEach((fav) => {
+            const opt = document.createElement('option');
+            opt.value = JSON.stringify(fav);
+            opt.textContent = `${fav.city}, ${fav.country}`;
+            select.appendChild(opt);
+        });
+        document.getElementById('delete-favorite-btn').disabled = true;
+    }
+
+    function saveFavorite() {
+        const country = document.getElementById('country-select').value;
+        const state = document.getElementById('state-select').value;
+        const city = document.getElementById('city-input').value;
+        const method = document.getElementById('method-select').value;
+        const calendarType = document.getElementById('calendar-type-select').value;
+
+        if (!country || !city) return;
+
+        const newFav = { country, state, city, method, calendarType };
+        let favorites = JSON.parse(localStorage.getItem('islamic_dashboard_favorites') || '[]');
+        
+        const existingIndex = favorites.findIndex(f => f.city === city && f.country === country);
+        if (existingIndex >= 0) favorites[existingIndex] = newFav;
+        else favorites.push(newFav);
+        
+        localStorage.setItem('islamic_dashboard_favorites', JSON.stringify(favorites));
+        loadFavorites();
+        alert(t('addedFavorite'));
+    }
+
+    function deleteFavorite() {
+        const select = document.getElementById('favorites-select');
+        if (!select.value) return;
+        if(!confirm(t('confirmDelete'))) return;
+
+        const selectedFav = JSON.parse(select.value);
+        let favorites = JSON.parse(localStorage.getItem('islamic_dashboard_favorites') || '[]');
+        favorites = favorites.filter(f => !(f.city === selectedFav.city && f.country === selectedFav.country));
+        localStorage.setItem('islamic_dashboard_favorites', JSON.stringify(favorites));
+        loadFavorites();
+        select.selectedIndex = 0;
+    }
+
+    async function applyFavorite(fav) {
+        isAutoDetecting = true; 
+        const countrySelect = document.getElementById('country-select');
+        const methodSelect = document.getElementById('method-select');
+        const calendarSelect = document.getElementById('calendar-type-select');
+        
+        let countryFound = false;
+        for (let i = 0; i < countrySelect.options.length; i++) {
+            if (countrySelect.options[i].text === fav.country || countrySelect.options[i].value === fav.country) {
+                countrySelect.selectedIndex = i;
+                countryFound = true;
+                break;
+            }
+        }
+
+        if (countryFound) {
+            if (fav.method) methodSelect.value = fav.method;
+            if (fav.calendarType) calendarSelect.value = fav.calendarType;
+            updateFooterText();
+            await loadStates(fav.state, fav.city, false);
+        }
+        isAutoDetecting = false;
+    }
+
+    // --- Auto Detect ---
+    async function autoDetectLocation() {
+        const dailyLocEl = document.getElementById('daily-location');
+        try {
+            const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
+            if (!response.ok) throw new Error("GeoJS unreachable");
+            
+            const data = await response.json();
+            
+            if (data && data.country && data.city) {
+                dailyLocEl.innerHTML = `<span class="text-primary font-bold">Detected: ${data.city}, ${data.country}</span>`;
+                isAutoDetecting = true; 
+                const countrySelect = document.getElementById('country-select');
+                let foundCountry = false;
+                
+                for (let i = 0; i < countrySelect.options.length; i++) {
+                    if (countrySelect.options[i].text === data.country || countrySelect.options[i].value === data.country) {
+                        countrySelect.selectedIndex = i;
+                        const defaultMethod = COUNTRY_METHOD_DEFAULTS[data.country];
+                        if (defaultMethod) {
+                            document.getElementById('method-select').value = defaultMethod;
+                            updateFooterText();
+                        }
+                        foundCountry = true;
+                        break;
+                    }
+                }
+                
+                if (foundCountry) {
+                    await loadStates(data.region, data.city, false); 
+                }
+                isAutoDetecting = false;
+            } else {
+                dailyLocEl.textContent = "Location detection unavailable.";
+            }
+        } catch (e) {
+            console.warn("Auto-detect failed:", e);
+            dailyLocEl.textContent = "Select location manually.";
+        }
+    }
+
+    // --- Location Loaders ---
+    async function loadCountries() {
+        const countrySelect = document.getElementById('country-select');
+        countrySelect.innerHTML = `<option value="" disabled selected>${t('loading')}</option>`;
+        try {
+            const response = await fetch(`${API_BASE}/countries`);
+            const data = await response.json();
+            countrySelect.innerHTML = `<option value="" disabled selected>${t('selectCountryPlaceholder')}</option>`;
+            if (!data.error && data.data) {
+                data.data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.country; opt.textContent = c.country; countrySelect.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            countrySelect.innerHTML = `<option value="" disabled>Error</option>`;
+        }
+    }
+
+    async function fetchCapitalAndLoadState(countryName) {
+        try {
+            const response = await fetch(`${API_BASE}/countries/capital`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ country: countryName })
+            });
+            const data = await response.json();
+            if(!data.error && data.data.capital) {
+                loadStates(data.data.capital, data.data.capital, true); 
+            } else {
+                loadStates(null, null, true);
+            }
+        } catch (e) { loadStates(null, null, true); }
+    }
+
+    async function loadStates(autoSelectState = null, autoSelectCity = null, fallbackToFirst = false) {
+        const countryName = document.getElementById('country-select').value; 
+        const stateSelect = document.getElementById('state-select');
+        stateSelect.innerHTML = `<option value="">${t('loading')}</option>`;
+        stateSelect.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE}/countries/states`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ country: countryName })
+            });
+            const data = await response.json();
+            stateSelect.innerHTML = `<option value="">${t('selectStatePlaceholder')}</option>`;
+            
+            if (!data.error && data.data.states.length > 0) {
+                data.data.states.forEach(state => {
+                    const opt = document.createElement('option');
+                    opt.value = state.name; opt.textContent = state.name; stateSelect.appendChild(opt);
+                });
+                stateSelect.disabled = false;
+
+                let foundStateIndex = -1;
+                if (autoSelectState) {
+                    for (let i = 0; i < stateSelect.options.length; i++) {
+                        if (stateSelect.options[i].value === autoSelectState) {
+                            foundStateIndex = i; break;
+                        }
+                    }
+                    if (foundStateIndex === -1) {
+                        const cleanTarget = autoSelectState.toLowerCase().replace(/[^a-z]/g, '');
+                        for (let i = 0; i < stateSelect.options.length; i++) {
+                            const cleanState = stateSelect.options[i].value.toLowerCase().replace(/[^a-z]/g, '');
+                            if (cleanState && (cleanState.includes(cleanTarget) || cleanTarget.includes(cleanState))) {
+                                foundStateIndex = i; break;
+                            }
+                        }
+                    }
+                }
+
+                if (foundStateIndex !== -1) {
+                    stateSelect.selectedIndex = foundStateIndex;
+                    await loadCities(autoSelectCity, fallbackToFirst);
+                } else if (fallbackToFirst && stateSelect.options.length > 1) {
+                    stateSelect.selectedIndex = 1;
+                    await loadCities(autoSelectCity, fallbackToFirst);
+                }
+
+            } else {
+                stateSelect.innerHTML = `<option value="N/A">N/A</option>`;
+                stateSelect.disabled = false; 
+            }
+        } catch (e) { stateSelect.innerHTML = `<option value="">Error</option>`; }
+    }
+
+    async function loadCities(autoSelectCity = null, fallbackToFirst = false) {
+        const countryName = document.getElementById('country-select').value;
+        const stateName = document.getElementById('state-select').value;
+        const cityInput = document.getElementById('city-input');
+        const datalist = document.getElementById('cities-datalist');
+        
+        cityInput.value = ""; 
+        datalist.innerHTML = "";
+
+        try {
+            const response = await fetch(`${API_BASE}/countries/state/cities`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ country: countryName, state: stateName })
+            });
+            const data = await response.json();
+            
+            if (!data.error && data.data.length > 0) {
+                data.data.forEach(city => {
+                    const opt = document.createElement('option');
+                    opt.value = city; datalist.appendChild(opt);
+                });
+
+                if (autoSelectCity) {
+                    cityInput.value = autoSelectCity;
+                    fetchPrayerTimes();
+                    fetchDailyWidgetData();
+                } else if (fallbackToFirst && data.data.length > 0) {
+                    cityInput.value = data.data[0];
+                    fetchPrayerTimes();
+                    fetchDailyWidgetData();
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function validateLocation() {
+        if (!document.getElementById('city-input').value) {
+            document.getElementById('error-message').textContent = t('validationError');
+            document.getElementById('error-container').classList.remove('hidden');
+            return false;
+        }
+        return true;
+    }
+
+    async function fetchPrayerTimes() {
+        const city = document.getElementById('city-input').value;
+        const country = document.getElementById('country-select').value;
+        const state = document.getElementById('state-select').value;
+        const method = document.getElementById('method-select').value;
+        
+        if(!city) { validateLocation(); return; }
+
+        const month = document.getElementById('month-select').value;
+        const year = document.getElementById('year-select').value;
+        const startDay = parseInt(document.getElementById('start-day-select').value);
+        let endDay = parseInt(document.getElementById('end-day-select').value);
+        if (endDay === 32) endDay = 99; 
+        
+        const calendarType = document.getElementById('calendar-type-select').value;
+        const errorContainer = document.getElementById('error-container');
+        const tableBody = document.getElementById('prayer-table-body');
+
+        errorContainer.classList.add('hidden');
+        tableBody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-primary"></div></td></tr>`;
+        
+        updateTitle();
+        updateFooterText();
+
+        const endpoint = calendarType === 'gregorian' ? 'calendarByCity' : 'hijriCalendarByCity';
+        const apiUrl = `https://api.aladhan.com/v1/${endpoint}/${year}/${month}?city=${city}&country=${country}&state=${state}&method=${method}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.code === 200 && data.data) {
+                const filteredData = data.data.filter(dayObj => {
+                    let dayNumber;
+                    if (calendarType === 'gregorian') dayNumber = parseInt(dayObj.date.gregorian.day);
+                    else dayNumber = parseInt(dayObj.date.hijri.day);
+                    return dayNumber >= startDay && dayNumber <= endDay;
+                });
+                currentPrayerData = filteredData;
+                renderTable(filteredData, calendarType);
+            } else {
+                currentPrayerData = null;
+                document.getElementById('error-message').textContent = t('errorFetch');
+                errorContainer.classList.remove('hidden');
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-gray-400">${t('noData')}</td></tr>`;
+            }
+        } catch (error) {
+            currentPrayerData = null;
+            document.getElementById('error-message').textContent = t('errorNetwork');
+            errorContainer.classList.remove('hidden');
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-gray-400">${t('noData')}</td></tr>`;
+        }
+    }
+
+    function renderTable(daysArray, calendarType) {
+        const tableBody = document.getElementById('prayer-table-body');
+        tableBody.innerHTML = '';
+        if (!daysArray || daysArray.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">${t('noData')}</td></tr>`;
+            return;
+        }
+        daysArray.forEach((dayObj, index) => {
+            let primaryDateStr = ""; let secondaryDateStr = ""; let weekday = "";
+            if (calendarType === 'gregorian') {
+                primaryDateStr = `${parseInt(dayObj.date.gregorian.day)} ${GREGORIAN_MONTHS[parseInt(dayObj.date.gregorian.month.number)-1]}`;
+                secondaryDateStr = `${dayObj.date.hijri.day} ${HIJRI_MONTHS[parseInt(dayObj.date.hijri.month.number)-1]}`;
+                weekday = dayObj.date.gregorian.weekday.en; // API only returns en
+            } else {
+                primaryDateStr = `${parseInt(dayObj.date.hijri.day)} ${HIJRI_MONTHS[parseInt(dayObj.date.hijri.month.number)-1]}`;
+                secondaryDateStr = `${dayObj.date.gregorian.day} ${GREGORIAN_MONTHS[parseInt(dayObj.date.gregorian.month.number)-1]}`;
+                weekday = dayObj.date.gregorian.weekday.en; 
+            }
+            // Simple mapping for weekday if needed
+            const dayMap = { "Saturday": "السبت", "Sunday": "الأحد", "Monday": "الاثنين", "Tuesday": "الثلاثاء", "Wednesday": "الأربعاء", "Thursday": "الخميس", "Friday": "الجمعة" };
+            const weekdayDisp = `${weekday} / ${dayMap[weekday]||''}`;
+
+            const t = dayObj.timings;
+            const isFriday = dayObj.date.gregorian.weekday.en === "Friday";
+            const tr = document.createElement('tr');
+            tr.className = index % 2 === 0 ? "bg-white hover:bg-gray-50 transition-colors" : "bg-gray-50/50 hover:bg-gray-50 transition-colors";
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap rtl:border-l ltr:border-r border-gray-100">
+                    <div class="${isFriday ? 'text-primary font-bold' : 'text-gray-900 font-medium'} text-base">${primaryDateStr}</div>
+                    <div class="text-xs text-gray-500 mt-1 flex items-center"><span class="font-semibold rtl:ml-1 ltr:mr-1">${weekdayDisp}</span> | <span class="rtl:mr-1 ltr:ml-1 opacity-75">${secondaryDateStr}</span></div>
+                </td>
+                <td class="px-6 py-4 font-mono text-gray-700 font-medium" dir="ltr">${formatTime12(t.Fajr)}</td>
+                <td class="px-6 py-4 font-mono text-gray-400 text-sm" dir="ltr">${formatTime12(t.Sunrise)}</td>
+                <td class="px-6 py-4 font-mono text-gray-700 font-medium" dir="ltr">${formatTime12(t.Dhuhr)}</td>
+                <td class="px-6 py-4 font-mono text-gray-700 font-medium" dir="ltr">${formatTime12(t.Asr)}</td>
+                <td class="px-6 py-4 font-mono text-gray-700 font-medium" dir="ltr">${formatTime12(t.Maghrib)}</td>
+                <td class="px-6 py-4 font-mono text-gray-700 font-medium" dir="ltr">${formatTime12(t.Isha)}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function downloadExcel() {
+        if (!currentPrayerData || currentPrayerData.length === 0) {
+            alert(t('noData'));
+            return;
+        }
+
+        const city = document.getElementById('city-input').value;
+        const clean = (time) => cleanTime(time);
+
+        const excelData = currentPrayerData.map(dayObj => {
+            const t = dayObj.timings;
+            let row = {};
+            // Mixed English/Arabic keys for bilingual export
+            row["Date / التاريخ"] = dayObj.date.readable;
+            row["Day / اليوم"] = dayObj.date.gregorian.weekday.en;
+            row["Fajr / الفجر"] = clean(t.Fajr);
+            row["Sunrise / الشروق"] = clean(t.Sunrise);
+            row["Dhuhr / الظهر"] = clean(t.Dhuhr);
+            row["Asr / العصر"] = clean(t.Asr);
+            row["Maghrib / المغرب"] = clean(t.Maghrib);
+            row["Isha / العشاء"] = clean(t.Isha);
+            return row;
+        });
+
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        ws['!cols'] = [{ wch: 15 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Prayer Times");
+        XLSX.writeFile(wb, `Prayer_Times_${city}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+</script>
+</body>
+</html>
