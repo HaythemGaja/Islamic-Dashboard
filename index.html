@@ -570,6 +570,52 @@
     .loc-actions { display:flex; gap:0.6rem; justify-content:flex-end; }
 
     /* =====================================================
+       NOTIFICATION SETTINGS UI
+    ===================================================== */
+    .notif-status-card {
+        display:flex; align-items:center; gap:0.85rem;
+        padding:0.9rem 1rem; border-radius:10px;
+        border:1px solid var(--border); background:var(--surface-2);
+        transition:border-color 0.3s, background 0.3s;
+    }
+    .notif-status-card.granted { border-color:rgba(42,173,126,0.35); background:rgba(30,122,90,0.07); }
+    .notif-status-card.denied  { border-color:rgba(239,68,68,0.3);   background:rgba(239,68,68,0.05); }
+    [data-theme="light"] .notif-status-card.granted { background:rgba(30,122,90,0.06); }
+    .notif-status-icon  { font-size:1.6rem; line-height:1; flex-shrink:0; }
+    .notif-status-label { font-size:0.9rem; font-weight:600; color:var(--text); }
+    .notif-status-sub   { font-size:0.72rem; color:var(--text-3); margin-top:2px; line-height:1.4; }
+
+    .btn-notif-req {
+        background:linear-gradient(135deg,var(--emerald),var(--em-light));
+        border:none; color:white; padding:0.45rem 1rem; border-radius:8px;
+        font-family:'Crimson Pro',serif; font-size:0.85rem; font-weight:600;
+        cursor:pointer; transition:all 0.2s; flex-shrink:0;
+        box-shadow:0 2px 10px rgba(30,122,90,0.25);
+        white-space:nowrap;
+    }
+    .btn-notif-req:hover { opacity:0.88; transform:translateY(-1px); }
+    .btn-notif-req.granted { background:rgba(42,173,126,0.12); color:var(--em-light); border:1px solid rgba(42,173,126,0.3); box-shadow:none; cursor:default; }
+    .btn-notif-req.granted:hover { transform:none; opacity:1; }
+    .btn-notif-req.denied  { background:rgba(239,68,68,0.08); color:#fca5a5; border:1px solid rgba(239,68,68,0.22); box-shadow:none; font-size:0.75rem; cursor:default; }
+    .btn-notif-req.denied:hover  { transform:none; opacity:1; }
+
+    .btn-test-notif {
+        display:flex; align-items:center; gap:5px;
+        background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3);
+        color:var(--gold-light); padding:0.45rem 1rem;
+        border-radius:8px; font-family:'Crimson Pro',serif; font-size:0.85rem;
+        cursor:pointer; transition:all 0.2s;
+    }
+    .btn-test-notif:hover  { background:rgba(201,168,76,0.2); box-shadow:0 0 14px rgba(201,168,76,0.15); }
+    .btn-test-notif:active { transform:scale(0.97); }
+    .btn-test-notif.testing { animation:pulse-gold 0.7s ease-in-out 2; }
+    [data-theme="light"] .btn-test-notif { color:#7a5c10; }
+    @keyframes pulse-gold {
+        0%,100% { box-shadow:0 0 0 0 rgba(201,168,76,0); }
+        50%      { box-shadow:0 0 0 8px rgba(201,168,76,0.25); }
+    }
+
+    /* =====================================================
        NOTIF FAB
     ===================================================== */
     .notif-fab {
@@ -945,7 +991,7 @@
             <div id="print-footer" style="display:none;">
                 <div class="pf-ornament">✦ ✦ ✦</div>
                 <div class="pf-text" id="print-footer-text">Mizan Islamic Dashboard · aladhan.com</div>
-                <div class="pf-arabic"> </div>
+                <div class="pf-arabic"></div>
             </div>
         </div>
 
@@ -1032,14 +1078,40 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>Options</h3>
-                    <div class="toggle-row">
-                        <label class="tlabel" for="use-popup-window">Prayer time alerts <small>Show popup when each prayer time arrives</small></label>
-                        <label class="tog"><input type="checkbox" id="use-popup-window"><span class="tok"></span></label>
+                    <h3>Notifications</h3>
+
+                    <!-- Permission Status Card -->
+                    <div id="notif-status-card" class="notif-status-card">
+                        <div class="notif-status-icon" id="notif-status-icon">🔔</div>
+                        <div style="flex:1;">
+                            <div class="notif-status-label" id="notif-status-label">Checking permission…</div>
+                            <div class="notif-status-sub"  id="notif-status-sub">Browser notifications allow prayer time alerts even when this tab is in the background.</div>
+                        </div>
+                        <button class="btn-notif-req" id="btn-request-notif">Enable</button>
                     </div>
-                    <div class="toggle-row">
-                        <label class="tlabel" for="keep-active-bg">Background accuracy <small>Uses Web Worker to keep countdown accurate when tab is hidden</small></label>
-                        <label class="tog"><input type="checkbox" id="keep-active-bg"><span class="tok"></span></label>
+
+                    <!-- Test Button -->
+                    <div style="margin-top:0.85rem; display:flex; gap:0.65rem; flex-wrap:wrap; align-items:center;">
+                        <button class="btn-test-notif" id="btn-test-notif">
+                            <span>🧪</span> Test Notification
+                        </button>
+                        <span style="font-size:0.72rem; color:var(--text-3);">Sends a sample prayer alert immediately to verify everything works.</span>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div style="margin-top:1rem; border-top:1px solid var(--border-sub); padding-top:0.85rem;">
+                        <div class="toggle-row">
+                            <label class="tlabel" for="use-popup-window">In-app popup alerts <small>Also show the built-in alarm popup when prayer time arrives</small></label>
+                            <label class="tog"><input type="checkbox" id="use-popup-window"><span class="tok"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <label class="tlabel" for="play-adhan-sound">Play adhan sound <small>Plays a short adhan tone with the notification</small></label>
+                            <label class="tog"><input type="checkbox" id="play-adhan-sound"><span class="tok"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <label class="tlabel" for="keep-active-bg">Background accuracy <small>Uses Web Worker to stay accurate when the tab is hidden</small></label>
+                            <label class="tog"><input type="checkbox" id="keep-active-bg"><span class="tok"></span></label>
+                        </div>
                     </div>
                 </div>
 
@@ -1076,7 +1148,7 @@ const API_BASE="https://countriesnow.space/api/v0.1";
 let currentPrayerData=null,countdownInterval=null,backgroundWorker=null;
 let notifiedPrayers=new Set(),nextEventString="",marqueeCountdown="";
 
-let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark'};
+let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark',playAdhan:false};
 
 const NOW=new Date(),CY=NOW.getFullYear(),CM=NOW.getMonth(),CD=NOW.getDate();
 
@@ -1157,6 +1229,7 @@ function saveSettings(){
     if (cSel) cSel.value = S.calendarType;
     S.usePopup=document.getElementById('use-popup-window').checked;
     S.keepActive=document.getElementById('keep-active-bg').checked;
+    S.playAdhan=document.getElementById('play-adhan-sound')?.checked || false;
     localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));
     const btn=document.getElementById('btn-save-settings'),orig=btn.textContent;
     btn.textContent='✓ Saved'; btn.style.background='linear-gradient(135deg,#1a6644,#2aad7e)';
@@ -1170,6 +1243,8 @@ function syncUI(){
     setEl('header-location',loc); setEl('loc-strip-text',loc);
     document.getElementById('use-popup-window').checked=S.usePopup;
     document.getElementById('keep-active-bg').checked=S.keepActive;
+    const padEl = document.getElementById('play-adhan-sound');
+    if (padEl) padEl.checked = S.playAdhan || false;
     applyTheme(S.theme||'dark');
     syncCalPills();
     const ms=document.getElementById('method-select');
@@ -1489,19 +1564,166 @@ function startCountdown(timings,timezone){
         if(prev&&prev.key!==next.key){const pLi=document.querySelector(`li[data-prayer="${prev.key}"]`);if(pLi){const b=document.createElement('span');b.className='p-badge past';b.textContent=`+${fmt(dP)}`;pLi.querySelector('.p-name').appendChild(b);}}
         pObjs.forEach(p=>{if(p.date<=local&&p.key!==next.key){const li=document.querySelector(`li[data-prayer="${p.key}"]`);if(li&&!li.classList.contains('is-sec'))li.classList.add('is-past');}});
         const nk=`${next.key}-${local.getDate()}`;
-        if(dN<=0&&dN>-60000&&!notifiedPrayers.has(nk)){notifiedPrayers.add(nk);triggerAlarm(next.key);}
-        updateTicker();
+        if(dN<=0&&dN>-60000&&!notifiedPrayers.has(nk)){
+            notifiedPrayers.add(nk);
+            // Fire in-app modal if popup option is on
+            if (S.usePopup) triggerAlarm(next.key, false);
+            // Always attempt browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(`🕌 ${next.key} — Prayer Time`, {
+                    body: `It is now time for ${next.key} prayer. الله أكبر`,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
+                    tag:  `mizan-prayer-${next.key}`,
+                    requireInteraction: true
+                });
+            }
+            // If popup not enabled but still want to play sound
+            if (!S.usePopup && document.getElementById('play-adhan-sound')?.checked) {
+                playAdhanTone();
+            }
+        }
     };
     tick();
     if(S.keepActive){const blob=new Blob([WK],{type:'application/javascript'});backgroundWorker=new Worker(URL.createObjectURL(blob));backgroundWorker.onmessage=tick;backgroundWorker.postMessage('start');}
     else countdownInterval=setInterval(tick,1000);
 }
-function triggerAlarm(k){
-    const m=document.getElementById('alarm-modal');
-    document.getElementById('modal-prayer-name').textContent=k;
-    document.getElementById('modal-prayer-time').textContent=`Time for ${k} prayer`;
-    m.classList.add('show');
-    if('Notification'in window&&Notification.permission==='granted')new Notification(`🕌 ${k}`,{body:`Time for ${k} prayer.`});
+// ======================== NOTIFICATIONS ========================
+
+// Adhan tone — short generated beep sequence using Web Audio API (no external file needed)
+function playAdhanTone() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [
+            { f: 440, t: 0,    d: 0.4 },
+            { f: 495, t: 0.45, d: 0.4 },
+            { f: 528, t: 0.9,  d: 0.6 },
+            { f: 495, t: 1.55, d: 0.35 },
+            { f: 440, t: 1.95, d: 0.65 },
+        ];
+        notes.forEach(n => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = n.f;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0, ctx.currentTime + n.t);
+            gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + n.t + 0.05);
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + n.t + n.d);
+            osc.start(ctx.currentTime + n.t);
+            osc.stop(ctx.currentTime + n.t + n.d + 0.05);
+        });
+    } catch(e) { /* audio not supported — silent */ }
+}
+
+// Update the notification status card in Settings
+function updateNotifStatusUI() {
+    const card  = document.getElementById('notif-status-card');
+    const icon  = document.getElementById('notif-status-icon');
+    const label = document.getElementById('notif-status-label');
+    const sub   = document.getElementById('notif-status-sub');
+    const btn   = document.getElementById('btn-request-notif');
+    const dot   = document.getElementById('notif-dot');
+
+    if (!('Notification' in window)) {
+        if (card)  { card.className = 'notif-status-card denied'; }
+        if (icon)  icon.textContent  = '🚫';
+        if (label) label.textContent = 'Not supported';
+        if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
+        if (btn)   { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
+        if (dot)   dot.classList.remove('on');
+        return;
+    }
+
+    const perm = Notification.permission;
+
+    if (perm === 'granted') {
+        if (card)  { card.className = 'notif-status-card granted'; }
+        if (icon)  icon.textContent  = '✅';
+        if (label) label.textContent = 'Notifications enabled';
+        if (sub)   sub.textContent   = 'You will receive prayer time alerts from this device.';
+        if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
+        if (dot)   dot.classList.add('on');
+    } else if (perm === 'denied') {
+        if (card)  { card.className = 'notif-status-card denied'; }
+        if (icon)  icon.textContent  = '🔕';
+        if (label) label.textContent = 'Notifications blocked';
+        if (sub)   sub.textContent   = 'You have blocked notifications. To enable them, click the 🔒 icon in your browser\'s address bar and allow notifications for this site.';
+        if (btn)   { btn.textContent = 'Blocked — see browser'; btn.className = 'btn-notif-req denied'; }
+        if (dot)   dot.classList.remove('on');
+    } else {
+        // 'default' — not asked yet
+        if (card)  { card.className = 'notif-status-card'; }
+        if (icon)  icon.textContent  = '🔔';
+        if (label) label.textContent = 'Notifications not enabled';
+        if (sub)   sub.textContent   = 'Enable browser notifications to receive prayer time alerts even when the tab is in the background.';
+        if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
+        if (dot)   dot.classList.remove('on');
+    }
+}
+
+async function requestNotifPermission() {
+    if (!('Notification' in window)) { updateNotifStatusUI(); return; }
+    if (Notification.permission === 'denied') { updateNotifStatusUI(); return; }
+    if (Notification.permission === 'granted') { updateNotifStatusUI(); return; }
+
+    try {
+        const result = await Notification.requestPermission();
+        updateNotifStatusUI();
+        if (result === 'granted') {
+            // Immediate confirmation notification
+            new Notification('🕌 Mizan — Notifications Enabled', {
+                body: 'You will now receive prayer time alerts.',
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>'
+            });
+        }
+    } catch(e) { updateNotifStatusUI(); }
+}
+
+async function testNotification() {
+    const btn = document.getElementById('btn-test-notif');
+
+    // Visual feedback
+    if (btn) { btn.classList.add('testing'); setTimeout(() => btn.classList.remove('testing'), 1500); }
+
+    const nextPrayerName = document.getElementById('pill-name')?.textContent || 'Fajr';
+
+    // Always show the in-app modal regardless of browser permission
+    triggerAlarm(nextPrayerName, true);
+
+    // Also send browser notification if permitted
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`🕌 ${nextPrayerName} — Prayer Time (Test)`, {
+            body: `This is a test alert. Actual alerts fire automatically at each prayer time.`,
+            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
+            tag:  'mizan-test',
+            requireInteraction: false
+        });
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+        // Permission not yet asked — request it now, then test
+        const p = await Notification.requestPermission();
+        updateNotifStatusUI();
+        if (p === 'granted') {
+            new Notification(`🕌 ${nextPrayerName} — Prayer Time (Test)`, {
+                body: 'Notifications are now enabled! You will receive prayer time alerts.',
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
+                tag:  'mizan-test'
+            });
+        }
+    }
+}
+
+function triggerAlarm(prayerKey, isTest = false) {
+    const modal = document.getElementById('alarm-modal');
+    document.getElementById('modal-prayer-name').textContent = prayerKey;
+    document.getElementById('modal-prayer-time').textContent = isTest
+        ? 'Test Alert — اختبار'
+        : `Time for ${prayerKey} prayer`;
+    modal.classList.add('show');
+
+    // Play tone if enabled
+    if (document.getElementById('play-adhan-sound')?.checked || isTest) {
+        playAdhanTone();
+    }
 }
 
 // ======================== MONTHLY ========================
@@ -1666,10 +1888,23 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.getElementById('favorites-select').addEventListener('change',e=>{document.getElementById('btn-delete-favorite').disabled=!e.target.value;if(e.target.value)applyFav(e.target.value);});
     ['top-favorites-select','monthly-favorites-select'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',e=>{if(e.target.value)applyFav(e.target.value);});});
 
-    document.getElementById('notification-btn').addEventListener('click',()=>{
-        Notification.requestPermission().then(p=>{document.getElementById('notif-dot').className=p==='granted'?'notif-dot on':'notif-dot';});
+    // Notification setup
+    updateNotifStatusUI();
+    document.getElementById('btn-request-notif')?.addEventListener('click', requestNotifPermission);
+    document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
+
+    // FAB notification button — request permission or show status
+    document.getElementById('notification-btn').addEventListener('click', async () => {
+        if (!('Notification' in window)) { alert('Your browser does not support notifications.'); return; }
+        if (Notification.permission === 'granted') {
+            // Already granted — jump to settings
+            switchTab('tab-settings');
+            document.getElementById('notif-status-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            await requestNotifPermission();
+        }
+        updateNotifStatusUI();
     });
-    if('Notification'in window&&Notification.permission==='granted')document.getElementById('notif-dot').classList.add('on');
 
     const cSel=document.getElementById('country-select');
     try{const res=await fetch(`${API_BASE}/countries`);const data=await res.json();data.data.forEach(c=>{const o=document.createElement('option');o.value=c.country;o.textContent=c.country;cSel.appendChild(o);});}catch{}
