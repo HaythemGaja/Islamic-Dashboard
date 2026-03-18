@@ -730,7 +730,9 @@
     }
     .notif-status-card.granted { border-color: rgba(42,173,126,0.35); background: rgba(30,122,90,0.07); }
     .notif-status-card.denied  { border-color: rgba(239,68,68,0.3);   background: rgba(239,68,68,0.05); }
+    .notif-status-card.muted   { border-color: rgba(201,168,76,0.25); background: rgba(201,168,76,0.05); }
     [data-theme="light"] .notif-status-card.granted { background: rgba(30,122,90,0.06); }
+    [data-theme="light"] .notif-status-card.muted   { background: rgba(201,168,76,0.06); }
 
     /* Icon spans two rows on the left */
     .notif-status-icon {
@@ -1305,6 +1307,17 @@
 
                     <!-- Toggles -->
                     <div style="margin-top:1rem; border-top:1px solid var(--border-sub); padding-top:0.85rem;">
+                        <!-- Mute row — only shown when permission is granted -->
+                        <div class="toggle-row" id="notif-mute-row" style="display:none;">
+                            <label class="tlabel" for="notif-mute-toggle">
+                                Disable / mute alerts
+                                <small>Turn off prayer notifications within Mizan without changing browser settings</small>
+                            </label>
+                            <label class="tog">
+                                <input type="checkbox" id="notif-mute-toggle">
+                                <span class="tok"></span>
+                            </label>
+                        </div>
                         <div class="toggle-row">
                             <label class="tlabel" for="use-popup-window">In-app popup alerts <small>Also show the built-in alarm popup when prayer time arrives</small></label>
                             <label class="tog"><input type="checkbox" id="use-popup-window"><span class="tok"></span></label>
@@ -1346,7 +1359,7 @@ const API_BASE="https://countriesnow.space/api/v0.1";
 let currentPrayerData=null,countdownInterval=null,backgroundWorker=null;
 let notifiedPrayers=new Set(),nextEventString="",marqueeCountdown="";
 
-let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark',playAdhan:false};
+let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark',playAdhan:false,notifMuted:false};
 
 const NOW=new Date(),CY=NOW.getFullYear(),CM=NOW.getMonth(),CD=NOW.getDate();
 
@@ -1428,6 +1441,7 @@ function saveSettings(){
     S.usePopup=document.getElementById('use-popup-window').checked;
     S.keepActive=document.getElementById('keep-active-bg').checked;
     S.playAdhan=document.getElementById('play-adhan-sound')?.checked || false;
+    S.notifMuted=document.getElementById('notif-mute-toggle')?.checked || false;
     localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));
     const btn=document.getElementById('btn-save-settings'),orig=btn.textContent;
     btn.textContent='✓ Saved'; btn.style.background='linear-gradient(135deg,#1a6644,#2aad7e)';
@@ -1443,6 +1457,9 @@ function syncUI(){
     document.getElementById('keep-active-bg').checked=S.keepActive;
     const padEl = document.getElementById('play-adhan-sound');
     if (padEl) padEl.checked = S.playAdhan || false;
+    const muteEl = document.getElementById('notif-mute-toggle');
+    if (muteEl) muteEl.checked = S.notifMuted || false;
+    updateNotifStatusUI();
     applyTheme(S.theme||'dark');
     syncCalPills();
     const ms=document.getElementById('method-select');
@@ -2049,34 +2066,54 @@ function updateNotifStatusUI() {
     const label = document.getElementById('notif-status-label');
     const sub   = document.getElementById('notif-status-sub');
     const btn   = document.getElementById('btn-request-notif');
+    const muteRow = document.getElementById('notif-mute-row');
+    const muteEl  = document.getElementById('notif-mute-toggle');
 
     if (!('Notification' in window)) {
-        if (card)  card.className = 'notif-status-card denied';
-        if (icon)  icon.textContent  = '🚫';
-        if (label) label.textContent = 'Not supported';
-        if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
-        if (btn)   { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
+        if (card)    card.className   = 'notif-status-card denied';
+        if (icon)    icon.textContent  = '🚫';
+        if (label)   label.textContent = 'Not supported';
+        if (sub)     sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
+        if (btn)     { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
+        if (muteRow) muteRow.style.display = 'none';
         return;
     }
-    const perm = Notification.permission;
+
+    const perm   = Notification.permission;
+    const muted  = S.notifMuted || false;
+    if (muteEl) muteEl.checked = muted;
+
     if (perm === 'granted') {
-        if (card)  card.className = 'notif-status-card granted';
-        if (icon)  icon.textContent  = '✅';
-        if (label) label.textContent = 'Notifications enabled';
-        if (sub)   sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned for alerts to fire on time.';
-        if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
+        if (muted) {
+            if (card)    card.className   = 'notif-status-card muted';
+            if (icon)    icon.textContent  = '🔕';
+            if (label)   label.textContent = 'Notifications muted';
+            if (sub)     sub.textContent   = 'Prayer alerts are silenced within Mizan. Toggle the switch below to re-enable them.';
+            if (btn)     { btn.textContent = '✓ Permission granted'; btn.className = 'btn-notif-req granted'; }
+        } else {
+            if (card)    card.className   = 'notif-status-card granted';
+            if (icon)    icon.textContent  = '✅';
+            if (label)   label.textContent = 'Notifications enabled';
+            if (sub)     sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned for alerts to fire on time.';
+            if (btn)     { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
+        }
+        if (muteRow) muteRow.style.display = '';
+
     } else if (perm === 'denied') {
-        if (card)  card.className = 'notif-status-card denied';
-        if (icon)  icon.textContent  = '🔕';
-        if (label) label.textContent = 'Notifications blocked';
-        if (sub)   sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
-        if (btn)   { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
+        if (card)    card.className   = 'notif-status-card denied';
+        if (icon)    icon.textContent  = '🔕';
+        if (label)   label.textContent = 'Notifications blocked';
+        if (sub)     sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
+        if (btn)     { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
+        if (muteRow) muteRow.style.display = 'none';
+
     } else {
-        if (card)  card.className = 'notif-status-card';
-        if (icon)  icon.textContent  = '🔔';
-        if (label) label.textContent = 'Notifications not yet enabled';
-        if (sub)   sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when the browser asks. Keep this page open or pinned.';
-        if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
+        if (card)    card.className   = 'notif-status-card';
+        if (icon)    icon.textContent  = '🔔';
+        if (label)   label.textContent = 'Notifications not yet enabled';
+        if (sub)     sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when the browser asks. Keep this page open or pinned.';
+        if (btn)     { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
+        if (muteRow) muteRow.style.display = 'none';
     }
 }
 
@@ -2094,6 +2131,9 @@ async function requestNotifPermission() {
 
 // --- Central dispatcher ---
 async function fireNotification(prayerName, isTest = false) {
+    // Respect app-level mute (unless it's an explicit test)
+    if (!isTest && S.notifMuted) return;
+
     const mobile  = isMobile();
     const timeStr = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     const title   = `🕌 ${prayerName}${isTest?' (Test)':''}`;
@@ -2336,6 +2376,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
     updateNotifStatusUI();
     document.getElementById('btn-request-notif')?.addEventListener('click', requestNotifPermission);
     document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
+
+    // Mute toggle — saves immediately without needing Save Settings
+    document.getElementById('notif-mute-toggle')?.addEventListener('change', e => {
+        S.notifMuted = e.target.checked;
+        localStorage.setItem('islamic_dashboard_settings', JSON.stringify(S));
+        updateNotifStatusUI();
+    });
 
     const cSel=document.getElementById('country-select');
     try{const res=await fetch(`${API_BASE}/countries`);const data=await res.json();data.data.forEach(c=>{const o=document.createElement('option');o.value=c.country;o.textContent=c.country;cSel.appendChild(o);});}catch{}
