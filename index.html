@@ -799,21 +799,6 @@
         50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0.25); }
     }
 
-    /* =====================================================
-       NOTIF FAB
-    ===================================================== */
-    .notif-fab {
-        position:fixed; bottom:calc(76px + env(safe-area-inset-bottom)); right:1.1rem; z-index:40;
-        width:44px; height:44px;
-        background:var(--surface); border:1px solid var(--border); border-radius:50%;
-        display:flex; align-items:center; justify-content:center;
-        cursor:pointer; transition:all 0.25s; box-shadow:var(--shadow);
-    }
-    .notif-fab:hover { border-color:var(--gold); transform:scale(1.08); }
-    .notif-fab svg { width:19px; height:19px; color:var(--text-3); }
-    .notif-fab:hover svg { color:var(--gold); }
-    .notif-dot { position:absolute; top:8px; right:9px; width:9px; height:9px; border-radius:50%; background:#ef4444; border:2px solid var(--bg); }
-    .notif-dot.on { background:var(--em-light); }
 
     /* =====================================================
        UTILS
@@ -862,7 +847,7 @@
         }
 
         /* Hide everything except the print sheet */
-        .ticker-bar, .site-header, .bottom-nav, .notif-fab,
+        .ticker-bar, .site-header, .bottom-nav,
         .no-print, #tab-daily, #tab-events, #tab-settings,
         .monthly-controls, .card-header, .table-footer,
         #monthly-error { display:none !important; }
@@ -1344,13 +1329,6 @@
     </main>
 </div>
 
-<!-- NOTIF FAB -->
-<button class="notif-fab no-print" id="notification-btn" title="Enable prayer notifications" aria-label="Notifications">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-    <span id="notif-dot" class="notif-dot"></span>
-</button>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav no-print" role="navigation" aria-label="Main navigation">
@@ -2071,7 +2049,6 @@ function updateNotifStatusUI() {
     const label = document.getElementById('notif-status-label');
     const sub   = document.getElementById('notif-status-sub');
     const btn   = document.getElementById('btn-request-notif');
-    const dot   = document.getElementById('notif-dot');
 
     if (!('Notification' in window)) {
         if (card)  card.className = 'notif-status-card denied';
@@ -2079,7 +2056,6 @@ function updateNotifStatusUI() {
         if (label) label.textContent = 'Not supported';
         if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
         if (btn)   { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
-        if (dot)   dot.classList.remove('on');
         return;
     }
     const perm = Notification.permission;
@@ -2089,21 +2065,18 @@ function updateNotifStatusUI() {
         if (label) label.textContent = 'Notifications enabled';
         if (sub)   sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned for alerts to fire on time.';
         if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
-        if (dot)   dot.classList.add('on');
     } else if (perm === 'denied') {
         if (card)  card.className = 'notif-status-card denied';
         if (icon)  icon.textContent  = '🔕';
         if (label) label.textContent = 'Notifications blocked';
         if (sub)   sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
         if (btn)   { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
-        if (dot)   dot.classList.remove('on');
     } else {
         if (card)  card.className = 'notif-status-card';
         if (icon)  icon.textContent  = '🔔';
         if (label) label.textContent = 'Notifications not yet enabled';
         if (sub)   sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when the browser asks. Keep this page open or pinned.';
         if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
-        if (dot)   dot.classList.remove('on');
     }
 }
 
@@ -2363,18 +2336,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
     updateNotifStatusUI();
     document.getElementById('btn-request-notif')?.addEventListener('click', requestNotifPermission);
     document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
-
-    // FAB notification button
-    document.getElementById('notification-btn').addEventListener('click', async () => {
-        if (!('Notification' in window)) { alert('Your browser does not support notifications.'); return; }
-        if (Notification.permission === 'granted') {
-            switchTab('tab-settings');
-            setTimeout(() => document.getElementById('notif-status-card')?.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
-        } else {
-            await requestNotifPermission();
-        }
-        updateNotifStatusUI();
-    });
 
     const cSel=document.getElementById('country-select');
     try{const res=await fetch(`${API_BASE}/countries`);const data=await res.json();data.data.forEach(c=>{const o=document.createElement('option');o.value=c.country;o.textContent=c.country;cSel.appendChild(o);});}catch{}
