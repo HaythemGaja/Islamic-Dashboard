@@ -796,6 +796,35 @@
     .notif-test-hint {
         font-size: 0.7rem; color: var(--text-3); text-align: center; line-height: 1.4;
     }
+    /* Disable notification row — always visible, visually distinct */
+    .notif-disable-row {
+        background: rgba(239,68,68,0.04);
+        border: 1px solid rgba(239,68,68,0.14);
+        border-radius: 10px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.6rem;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .notif-disable-row:has(input:checked) {
+        background: rgba(239,68,68,0.09);
+        border-color: rgba(239,68,68,0.32);
+    }
+    .notif-disable-label {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--text);
+        display: block;
+        margin-bottom: 1px;
+    }
+    /* Red-tinted toggle knob for the disable switch */
+    .tok-red { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
+    [data-theme="light"] .tok-red { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.14); }
+    #notif-mute-toggle:checked + .tok-red {
+        background: rgba(239,68,68,0.2);
+        border-color: #f87171;
+    }
+    #notif-mute-toggle:checked + .tok-red::after { background: #f87171; }
+
     @keyframes pulse-gold {
         0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
         50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0.25); }
@@ -1291,7 +1320,6 @@
                             <div class="notif-status-label" id="notif-status-label">Checking permission…</div>
                             <div class="notif-status-sub"  id="notif-status-sub">Enable to receive prayer time alerts on this device.</div>
                         </div>
-                        <!-- Button always on its own full-width row -->
                         <div class="notif-status-btn-row">
                             <button class="btn-notif-req" id="btn-request-notif">Enable Notifications</button>
                         </div>
@@ -1305,21 +1333,23 @@
                         <div class="notif-test-hint">Fires a sample prayer alert immediately to verify sound and browser notification both work.</div>
                     </div>
 
-                    <!-- Toggles -->
+                    <!-- Toggles — always visible -->
                     <div style="margin-top:1rem; border-top:1px solid var(--border-sub); padding-top:0.85rem;">
-                        <!-- Mute row — only shown when permission is granted -->
-                        <div class="toggle-row" id="notif-mute-row" style="display:none;">
+
+                        <!-- DISABLE toggle — prominent, always rendered -->
+                        <div class="toggle-row notif-disable-row" id="notif-disable-row">
                             <label class="tlabel" for="notif-mute-toggle">
-                                Disable / mute alerts
-                                <small>Turn off prayer notifications within Mizan without changing browser settings</small>
+                                <span class="notif-disable-label">🔕 Disable all prayer notifications</span>
+                                <small>Silence Mizan alerts without touching your browser settings. Re-enable anytime.</small>
                             </label>
                             <label class="tog">
                                 <input type="checkbox" id="notif-mute-toggle">
-                                <span class="tok"></span>
+                                <span class="tok tok-red"></span>
                             </label>
                         </div>
+
                         <div class="toggle-row">
-                            <label class="tlabel" for="use-popup-window">In-app popup alerts <small>Also show the built-in alarm popup when prayer time arrives</small></label>
+                            <label class="tlabel" for="use-popup-window">In-app popup alerts <small>Show the built-in alarm popup when prayer time arrives</small></label>
                             <label class="tog"><input type="checkbox" id="use-popup-window"><span class="tok"></span></label>
                         </div>
                         <div class="toggle-row">
@@ -2066,54 +2096,49 @@ function updateNotifStatusUI() {
     const label = document.getElementById('notif-status-label');
     const sub   = document.getElementById('notif-status-sub');
     const btn   = document.getElementById('btn-request-notif');
-    const muteRow = document.getElementById('notif-mute-row');
-    const muteEl  = document.getElementById('notif-mute-toggle');
+    const muteEl = document.getElementById('notif-mute-toggle');
+
+    // Always sync the mute toggle to current S value
+    if (muteEl) muteEl.checked = S.notifMuted || false;
 
     if (!('Notification' in window)) {
-        if (card)    card.className   = 'notif-status-card denied';
-        if (icon)    icon.textContent  = '🚫';
-        if (label)   label.textContent = 'Not supported';
-        if (sub)     sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
-        if (btn)     { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
-        if (muteRow) muteRow.style.display = 'none';
+        if (card)  card.className   = 'notif-status-card denied';
+        if (icon)  icon.textContent  = '🚫';
+        if (label) label.textContent = 'Not supported';
+        if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
+        if (btn)   { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
         return;
     }
 
-    const perm   = Notification.permission;
-    const muted  = S.notifMuted || false;
-    if (muteEl) muteEl.checked = muted;
+    const perm  = Notification.permission;
+    const muted = S.notifMuted || false;
 
     if (perm === 'granted') {
         if (muted) {
-            if (card)    card.className   = 'notif-status-card muted';
-            if (icon)    icon.textContent  = '🔕';
-            if (label)   label.textContent = 'Notifications muted';
-            if (sub)     sub.textContent   = 'Prayer alerts are silenced within Mizan. Toggle the switch below to re-enable them.';
-            if (btn)     { btn.textContent = '✓ Permission granted'; btn.className = 'btn-notif-req granted'; }
+            if (card)  card.className   = 'notif-status-card muted';
+            if (icon)  icon.textContent  = '🔕';
+            if (label) label.textContent = 'Notifications muted';
+            if (sub)   sub.textContent   = 'All prayer alerts are silenced. Use the toggle below to re-enable.';
+            if (btn)   { btn.textContent = '✓ Permission granted'; btn.className = 'btn-notif-req granted'; }
         } else {
-            if (card)    card.className   = 'notif-status-card granted';
-            if (icon)    icon.textContent  = '✅';
-            if (label)   label.textContent = 'Notifications enabled';
-            if (sub)     sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned for alerts to fire on time.';
-            if (btn)     { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
+            if (card)  card.className   = 'notif-status-card granted';
+            if (icon)  icon.textContent  = '✅';
+            if (label) label.textContent = 'Notifications enabled';
+            if (sub)   sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned.';
+            if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
         }
-        if (muteRow) muteRow.style.display = '';
-
     } else if (perm === 'denied') {
-        if (card)    card.className   = 'notif-status-card denied';
-        if (icon)    icon.textContent  = '🔕';
-        if (label)   label.textContent = 'Notifications blocked';
-        if (sub)     sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
-        if (btn)     { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
-        if (muteRow) muteRow.style.display = 'none';
-
+        if (card)  card.className   = 'notif-status-card denied';
+        if (icon)  icon.textContent  = '🔕';
+        if (label) label.textContent = 'Notifications blocked by browser';
+        if (sub)   sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
+        if (btn)   { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
     } else {
-        if (card)    card.className   = 'notif-status-card';
-        if (icon)    icon.textContent  = '🔔';
-        if (label)   label.textContent = 'Notifications not yet enabled';
-        if (sub)     sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when the browser asks. Keep this page open or pinned.';
-        if (btn)     { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
-        if (muteRow) muteRow.style.display = 'none';
+        if (card)  card.className   = 'notif-status-card';
+        if (icon)  icon.textContent  = '🔔';
+        if (label) label.textContent = 'Notifications not yet enabled';
+        if (sub)   sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when prompted.';
+        if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
     }
 }
 
