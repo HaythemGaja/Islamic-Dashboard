@@ -570,8 +570,150 @@
     .loc-actions { display:flex; gap:0.6rem; justify-content:flex-end; }
 
     /* =====================================================
-       NOTIFICATION SETTINGS UI
+       MOBILE FULLSCREEN DAILY + SCROLL-REVEAL HEADER
     ===================================================== */
+
+    /* Sticky scroll header — hidden initially, revealed on scroll */
+    .scroll-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 45;
+        background: var(--nav-bg);
+        border-bottom: 1px solid var(--nav-border);
+        backdrop-filter: blur(18px) saturate(1.5);
+        -webkit-backdrop-filter: blur(18px) saturate(1.5);
+        padding: 0.55rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        transform: translateY(-100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1),
+                    background 0.35s, border-color 0.35s;
+        will-change: transform;
+    }
+    .scroll-header.visible { transform: translateY(0); }
+
+    .sh-left  { display:flex; align-items:center; gap:0.5rem; }
+    .sh-icon  { font-size:1.1rem; line-height:1; }
+    .sh-title { font-family:'Cinzel Decorative',serif; font-size:0.85rem; color:var(--gold); }
+    .sh-loc   { font-size:0.68rem; color:var(--text-3); }
+    .sh-right { display:flex; align-items:center; gap:0.45rem; flex-shrink:0; }
+    .sh-clock {
+        font-family:'JetBrains Mono',monospace;
+        font-size:0.9rem; color:var(--text); white-space:nowrap;
+    }
+    .sh-next-pill {
+        display:inline-flex; align-items:center; gap:4px;
+        background:var(--em-glow); border:1px solid rgba(42,173,126,0.3);
+        border-radius:100px; padding:3px 10px;
+        font-size:0.65rem; color:var(--em-light); white-space:nowrap;
+    }
+    .sh-next-pill .sp-name { font-weight:700; color:#50e09a; }
+    [data-theme="light"] .sh-next-pill .sp-name { color:var(--emerald); }
+
+    /* On mobile: body top-padding shifts down when scroll-header appears */
+    body.header-visible { padding-top: 44px; }
+
+    /* MOBILE FULLSCREEN: only on small screens, only on daily tab */
+    @media (max-width: 639px) {
+        /* When daily tab is active, make it fill the viewport */
+        body.daily-active {
+            overflow: hidden;
+        }
+        body.daily-active #tab-daily {
+            position: fixed;
+            inset: 0;
+            bottom: calc(58px + env(safe-area-inset-bottom));
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 0 0.5rem 0;
+            /* pull it above the bottom nav */
+            z-index: 10;
+        }
+        body.daily-active .ticker-bar,
+        body.daily-active .site-header { display: none !important; }
+
+        body.daily-active .layout-wrapper {
+            padding-left: 0; padding-right: 0;
+        }
+
+        /* Daily tab full-height feel: prayer list fills screen */
+        body.daily-active .daily-grid {
+            min-height: calc(100dvh - 60px - env(safe-area-inset-bottom));
+            padding: 0.75rem 0.75rem 1rem;
+            gap: 0.75rem;
+        }
+
+        body.daily-active .clock-card {
+            padding: 1.1rem 1rem;
+        }
+
+        body.daily-active #big-clock {
+            font-size: 2.8rem;
+        }
+
+        /* When user scrolls: release fixed, go back to normal flow */
+        body.daily-scrolled #tab-daily {
+            position: static;
+        }
+        body.daily-scrolled {
+            overflow: auto;
+        }
+    }
+
+    /* Desktop / tablet: normal header always visible, no fullscreen */
+    @media (min-width: 640px) {
+        .scroll-header { display: none !important; }
+    }
+
+    /* =====================================================
+       NOTIFICATION POPUP WINDOW (PC new-tab style overlay)
+    ===================================================== */
+    .notif-popup-overlay {
+        position: fixed; inset: 0; z-index: 300;
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+        display: none; align-items: flex-start; justify-content: flex-end;
+        padding: 1.5rem;
+        pointer-events: none;
+    }
+    .notif-popup-overlay.show {
+        display: flex;
+        pointer-events: auto;
+        animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+        from { opacity:0; transform: translateY(-20px) scale(0.92); }
+    }
+    .notif-popup-card {
+        background: var(--bg-2);
+        border: 1px solid var(--gold);
+        border-radius: 16px;
+        padding: 1.2rem 1.4rem;
+        max-width: 320px; width: 100%;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 40px rgba(201,168,76,0.15);
+    }
+    .npc-header {
+        display: flex; align-items: center; gap: 0.6rem;
+        margin-bottom: 0.65rem;
+    }
+    .npc-mosque { font-size: 1.8rem; line-height: 1; animation: sway 2s ease-in-out infinite; }
+    .npc-title  { font-family:'Cinzel Decorative',serif; font-size:0.85rem; color:var(--gold); }
+    .npc-app    { font-size: 0.62rem; color:var(--text-3); text-transform:uppercase; letter-spacing:0.1em; }
+    .npc-prayer {
+        font-family:'Cinzel Decorative',serif; font-size:1.5rem;
+        color:var(--gold-light); margin: 0.25rem 0 0.1rem;
+    }
+    .npc-body   { font-size:0.8rem; color:var(--text-2); margin-bottom:0.85rem; }
+    .npc-time   { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text-3); margin-bottom:0.85rem; }
+    .npc-dismiss {
+        width:100%; background:linear-gradient(135deg,var(--emerald),var(--em-light));
+        border:none; color:white; padding:0.6rem; border-radius:10px;
+        font-family:'Crimson Pro',serif; font-size:0.9rem; font-weight:600;
+        cursor:pointer; transition:opacity 0.2s;
+    }
+    .npc-dismiss:hover { opacity:0.85; }
     .notif-status-card {
         display:flex; align-items:center; gap:0.85rem;
         padding:0.9rem 1rem; border-radius:10px;
@@ -818,6 +960,39 @@
 </head>
 <body>
 
+<!-- MOBILE SCROLL-REVEAL HEADER (hidden initially, slides down on scroll) -->
+<div class="scroll-header no-print" id="scroll-header" aria-hidden="true">
+    <div class="sh-left">
+        <div class="sh-icon">☽</div>
+        <div>
+            <div class="sh-title">Mizan</div>
+            <div class="sh-loc" id="sh-loc">—</div>
+        </div>
+    </div>
+    <div class="sh-right">
+        <div class="sh-clock" id="sh-clock">--:--</div>
+        <div class="sh-next-pill" id="sh-pill" style="display:none;">
+            ▶ <span class="sp-name" id="sh-pill-name">—</span>&nbsp;<span id="sh-pill-count">—</span>
+        </div>
+    </div>
+</div>
+
+<!-- PC PRAYER NOTIFICATION POPUP (top-right overlay, like a system notification) -->
+<div class="notif-popup-overlay no-print" id="notif-popup-overlay">
+    <div class="notif-popup-card">
+        <div class="npc-header">
+            <div class="npc-mosque">🕌</div>
+            <div>
+                <div class="npc-title" id="npc-prayer-name">Fajr</div>
+                <div class="npc-app">Mizan · Islamic Dashboard</div>
+            </div>
+        </div>
+        <div class="npc-body">It is now time for prayer</div>
+        <div class="npc-time" id="npc-time">—</div>
+        <button class="npc-dismiss" id="npc-dismiss-btn">Dismiss &nbsp;/&nbsp; إغلاق</button>
+    </div>
+</div>
+
 <!-- TICKER -->
 <div class="ticker-bar no-print">
     <div id="ticker-track" class="ticker-track">✦ Mizan Islamic Dashboard · Loading prayer times…</div>
@@ -991,7 +1166,7 @@
             <div id="print-footer" style="display:none;">
                 <div class="pf-ornament">✦ ✦ ✦</div>
                 <div class="pf-text" id="print-footer-text">Mizan Islamic Dashboard · aladhan.com</div>
-                <div class="pf-arabic"></div>
+                <div class="pf-arabic">بِسْمِ اللَّهِ</div>
             </div>
         </div>
 
@@ -1566,56 +1741,166 @@ function startCountdown(timings,timezone){
         const nk=`${next.key}-${local.getDate()}`;
         if(dN<=0&&dN>-60000&&!notifiedPrayers.has(nk)){
             notifiedPrayers.add(nk);
-            // Fire in-app modal if popup option is on
-            if (S.usePopup) triggerAlarm(next.key, false);
-            // Always attempt browser notification
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(`🕌 ${next.key} — Prayer Time`, {
-                    body: `It is now time for ${next.key} prayer. الله أكبر`,
-                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
-                    tag:  `mizan-prayer-${next.key}`,
-                    requireInteraction: true
-                });
-            }
-            // If popup not enabled but still want to play sound
-            if (!S.usePopup && document.getElementById('play-adhan-sound')?.checked) {
-                playAdhanTone();
-            }
+            fireNotification(next.key, false);
         }
+
+        // Sync mobile scroll header
+        const sh12=h%12||12, smm=pad(m);
+        const sampm=h>=12?'PM':'AM';
+        updateScrollHeader(`${sh12}:${smm} ${sampm}`, next.key, `-${fmt(dN)}`);
     };
     tick();
     if(S.keepActive){const blob=new Blob([WK],{type:'application/javascript'});backgroundWorker=new Worker(URL.createObjectURL(blob));backgroundWorker.onmessage=tick;backgroundWorker.postMessage('start');}
     else countdownInterval=setInterval(tick,1000);
 }
+// ======================== MOBILE FULLSCREEN + SCROLL HEADER ========================
+
+const isMobile = () => window.innerWidth < 640;
+
+function initMobileFullscreen() {
+    if (!isMobile()) return;
+
+    const body    = document.body;
+    const header  = document.getElementById('scroll-header');
+    const daily   = document.getElementById('tab-daily');
+    let ticking   = false;
+
+    function setDailyActive(on) {
+        if (on) {
+            body.classList.add('daily-active');
+            body.classList.remove('daily-scrolled');
+        } else {
+            body.classList.remove('daily-active', 'daily-scrolled');
+        }
+    }
+
+    // Watch which tab is active
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setDailyActive(btn.dataset.target === 'tab-daily');
+        });
+    });
+
+    // Start in daily-active mode since daily is the default tab
+    setDailyActive(true);
+
+    // Listen to scroll on the daily tab container
+    function onDailyScroll() {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const scrollY = daily.scrollTop;
+                const THRESHOLD = 60; // px before header appears
+
+                if (scrollY > THRESHOLD) {
+                    header.classList.add('visible');
+                    body.classList.add('header-visible');
+                } else {
+                    header.classList.remove('visible');
+                    body.classList.remove('header-visible');
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }
+
+    daily.addEventListener('scroll', onDailyScroll, { passive: true });
+}
+
+// Sync scroll header clock & next-pill (called from countdown tick)
+function updateScrollHeader(clockText, nextName, nextCountdown) {
+    const shClock = document.getElementById('sh-clock');
+    const shPill  = document.getElementById('sh-pill');
+    const shName  = document.getElementById('sh-pill-name');
+    const shCount = document.getElementById('sh-pill-count');
+    const shLoc   = document.getElementById('sh-loc');
+
+    if (shClock) shClock.textContent = clockText;
+    if (shLoc)   shLoc.textContent   = S.city ? `${S.city}, ${S.country}` : '—';
+
+    if (shPill && nextName) {
+        shPill.style.display = 'inline-flex';
+        if (shName)  shName.textContent  = nextName;
+        if (shCount) shCount.textContent = nextCountdown;
+    }
+}
+
 // ======================== NOTIFICATIONS ========================
 
-// Adhan tone — short generated beep sequence using Web Audio API (no external file needed)
+// --- Service Worker for background push (mobile home-screen PWA) ---
+async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return null;
+    try {
+        // Inline SW as a blob — no separate file needed
+        const swCode = `
+self.addEventListener('notificationclick', e => {
+    e.notification.close();
+    e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs => {
+        const c = cs.find(w => w.url && w.focused === false);
+        if (c) return c.focus();
+        if (clients.openWindow) return clients.openWindow(self.location.origin);
+    }));
+});
+self.addEventListener('push', e => {
+    const d = e.data ? e.data.json() : {title:'Prayer Time',body:'Time for prayer'};
+    e.waitUntil(self.registration.showNotification(d.title, {
+        body: d.body, icon: d.icon || '', badge: d.badge || '', tag: d.tag || 'prayer',
+        requireInteraction: true, vibrate: [200,100,200,100,200]
+    }));
+});
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        const reg = await navigator.serviceWorker.register(swUrl, { scope: '/' });
+        return reg;
+    } catch(e) {
+        return null;
+    }
+}
+
+let swRegistration = null;
+
+// --- Adhan tone via Web Audio ---
 function playAdhanTone() {
     try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx   = new (window.AudioContext || window.webkitAudioContext)();
         const notes = [
-            { f: 440, t: 0,    d: 0.4 },
-            { f: 495, t: 0.45, d: 0.4 },
-            { f: 528, t: 0.9,  d: 0.6 },
-            { f: 495, t: 1.55, d: 0.35 },
-            { f: 440, t: 1.95, d: 0.65 },
+            { f:440,  t:0,    d:0.45 },
+            { f:495,  t:0.5,  d:0.4  },
+            { f:528,  t:0.95, d:0.6  },
+            { f:495,  t:1.6,  d:0.35 },
+            { f:440,  t:2.0,  d:0.65 },
         ];
         notes.forEach(n => {
-            const osc = ctx.createOscillator();
+            const osc  = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.connect(gain); gain.connect(ctx.destination);
-            osc.frequency.value = n.f;
-            osc.type = 'sine';
+            osc.frequency.value = n.f; osc.type = 'sine';
             gain.gain.setValueAtTime(0, ctx.currentTime + n.t);
             gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + n.t + 0.05);
             gain.gain.linearRampToValueAtTime(0, ctx.currentTime + n.t + n.d);
             osc.start(ctx.currentTime + n.t);
             osc.stop(ctx.currentTime + n.t + n.d + 0.05);
         });
-    } catch(e) { /* audio not supported — silent */ }
+    } catch(e) { /* silent fallback */ }
 }
 
-// Update the notification status card in Settings
+// --- PC popup notification (top-right overlay, like OS notification) ---
+let pcPopupTimer = null;
+function showPcPopup(prayerName, timeStr) {
+    const overlay = document.getElementById('notif-popup-overlay');
+    const nameEl  = document.getElementById('npc-prayer-name');
+    const timeEl  = document.getElementById('npc-time');
+    if (!overlay) return;
+    if (nameEl) nameEl.textContent = prayerName;
+    if (timeEl) timeEl.textContent = timeStr || new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    overlay.classList.add('show');
+    // Auto-dismiss after 30s
+    if (pcPopupTimer) clearTimeout(pcPopupTimer);
+    pcPopupTimer = setTimeout(() => overlay.classList.remove('show'), 30000);
+}
+
+// --- Unified notification status UI ---
 function updateNotifStatusUI() {
     const card  = document.getElementById('notif-status-card');
     const icon  = document.getElementById('notif-status-icon');
@@ -1625,7 +1910,7 @@ function updateNotifStatusUI() {
     const dot   = document.getElementById('notif-dot');
 
     if (!('Notification' in window)) {
-        if (card)  { card.className = 'notif-status-card denied'; }
+        if (card)  card.className = 'notif-status-card denied';
         if (icon)  icon.textContent  = '🚫';
         if (label) label.textContent = 'Not supported';
         if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
@@ -1635,95 +1920,127 @@ function updateNotifStatusUI() {
     }
 
     const perm = Notification.permission;
-
     if (perm === 'granted') {
-        if (card)  { card.className = 'notif-status-card granted'; }
+        if (card)  card.className = 'notif-status-card granted';
         if (icon)  icon.textContent  = '✅';
         if (label) label.textContent = 'Notifications enabled';
-        if (sub)   sub.textContent   = 'You will receive prayer time alerts from this device.';
+        if (sub)   sub.textContent   = 'Prayer time alerts will appear on your device, even with this tab in the background.';
         if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
         if (dot)   dot.classList.add('on');
     } else if (perm === 'denied') {
-        if (card)  { card.className = 'notif-status-card denied'; }
+        if (card)  card.className = 'notif-status-card denied';
         if (icon)  icon.textContent  = '🔕';
         if (label) label.textContent = 'Notifications blocked';
-        if (sub)   sub.textContent   = 'You have blocked notifications. To enable them, click the 🔒 icon in your browser\'s address bar and allow notifications for this site.';
-        if (btn)   { btn.textContent = 'Blocked — see browser'; btn.className = 'btn-notif-req denied'; }
+        if (sub)   sub.textContent   = 'You have blocked notifications. Click the 🔒 icon in your browser\'s address bar → Site settings → Allow Notifications, then reload.';
+        if (btn)   { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
         if (dot)   dot.classList.remove('on');
     } else {
-        // 'default' — not asked yet
-        if (card)  { card.className = 'notif-status-card'; }
+        if (card)  card.className = 'notif-status-card';
         if (icon)  icon.textContent  = '🔔';
-        if (label) label.textContent = 'Notifications not enabled';
-        if (sub)   sub.textContent   = 'Enable browser notifications to receive prayer time alerts even when the tab is in the background.';
+        if (label) label.textContent = 'Notifications not yet enabled';
+        if (sub)   sub.textContent   = 'Tap Enable to receive prayer time alerts on your device. On mobile you may need to add this page to your Home Screen for full notification support.';
         if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
         if (dot)   dot.classList.remove('on');
     }
 }
 
+// --- Request permission robustly (handles both callback and promise APIs) ---
 async function requestNotifPermission() {
-    if (!('Notification' in window)) { updateNotifStatusUI(); return; }
-    if (Notification.permission === 'denied') { updateNotifStatusUI(); return; }
-    if (Notification.permission === 'granted') { updateNotifStatusUI(); return; }
+    if (!('Notification' in window)) { updateNotifStatusUI(); return 'unsupported'; }
+    if (Notification.permission === 'denied')  { updateNotifStatusUI(); return 'denied'; }
+    if (Notification.permission === 'granted') { updateNotifStatusUI(); return 'granted'; }
 
-    try {
-        const result = await Notification.requestPermission();
-        updateNotifStatusUI();
-        if (result === 'granted') {
-            // Immediate confirmation notification
-            new Notification('🕌 Mizan — Notifications Enabled', {
-                body: 'You will now receive prayer time alerts.',
-                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>'
-            });
+    return new Promise(resolve => {
+        // Some old Safari uses callback form
+        const result = Notification.requestPermission(perm => {
+            updateNotifStatusUI();
+            resolve(perm);
+        });
+        // Modern browsers return a promise
+        if (result && typeof result.then === 'function') {
+            result.then(perm => { updateNotifStatusUI(); resolve(perm); });
         }
-    } catch(e) { updateNotifStatusUI(); }
+    });
 }
 
-async function testNotification() {
-    const btn = document.getElementById('btn-test-notif');
+// --- Fire a notification: browser notification + PC popup + modal (based on context) ---
+async function fireNotification(prayerName, isTest = false) {
+    const mobile      = isMobile();
+    const timeStr     = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const title       = `🕌 ${prayerName}${isTest?' (Test)':''}`;
+    const body        = isTest
+        ? `This is a test notification from Mizan.`
+        : `It is now time for ${prayerName} prayer. الله أكبر`;
 
-    // Visual feedback
-    if (btn) { btn.classList.add('testing'); setTimeout(() => btn.classList.remove('testing'), 1500); }
+    const notifOpts = {
+        body,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
+        badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☽</text></svg>',
+        tag:  `mizan-prayer-${prayerName}`,
+        requireInteraction: !isTest,
+        vibrate: mobile ? [300, 100, 300, 100, 600] : undefined,
+        silent: false
+    };
 
-    const nextPrayerName = document.getElementById('pill-name')?.textContent || 'Fajr';
-
-    // Always show the in-app modal regardless of browser permission
-    triggerAlarm(nextPrayerName, true);
-
-    // Also send browser notification if permitted
+    // --- BROWSER NOTIFICATION ---
     if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(`🕌 ${nextPrayerName} — Prayer Time (Test)`, {
-            body: `This is a test alert. Actual alerts fire automatically at each prayer time.`,
-            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
-            tag:  'mizan-test',
-            requireInteraction: false
-        });
-    } else if ('Notification' in window && Notification.permission !== 'denied') {
-        // Permission not yet asked — request it now, then test
-        const p = await Notification.requestPermission();
-        updateNotifStatusUI();
-        if (p === 'granted') {
-            new Notification(`🕌 ${nextPrayerName} — Prayer Time (Test)`, {
-                body: 'Notifications are now enabled! You will receive prayer time alerts.',
-                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>',
-                tag:  'mizan-test'
-            });
+        try {
+            // Prefer SW notification (works on locked screen / mobile background)
+            if (swRegistration && swRegistration.active) {
+                await swRegistration.showNotification(title, notifOpts);
+            } else {
+                new Notification(title, notifOpts);
+            }
+        } catch(e) {
+            // Fallback: plain Notification
+            try { new Notification(title, notifOpts); } catch(e2) { /* silent */ }
         }
+    }
+
+    // --- PC: show top-right overlay popup (supplements or replaces browser notif) ---
+    if (!mobile) {
+        showPcPopup(prayerName, timeStr);
+    }
+
+    // --- In-app modal if usePopup is on, or on mobile (so they always see something) ---
+    if (S.usePopup || mobile) {
+        triggerAlarm(prayerName, isTest);
+    }
+
+    // --- Sound ---
+    if (S.playAdhan || isTest) {
+        playAdhanTone();
     }
 }
 
+// --- In-app alarm modal ---
 function triggerAlarm(prayerKey, isTest = false) {
     const modal = document.getElementById('alarm-modal');
     document.getElementById('modal-prayer-name').textContent = prayerKey;
     document.getElementById('modal-prayer-time').textContent = isTest
-        ? 'Test Alert — اختبار'
+        ? 'Test Alert · اختبار'
         : `Time for ${prayerKey} prayer`;
     modal.classList.add('show');
+}
 
-    // Play tone if enabled
-    if (document.getElementById('play-adhan-sound')?.checked || isTest) {
-        playAdhanTone();
+// --- Test notification ---
+async function testNotification() {
+    const btn = document.getElementById('btn-test-notif');
+    if (btn) { btn.classList.add('testing'); setTimeout(() => btn.classList.remove('testing'), 1500); }
+
+    // If permission not granted yet, request it first
+    if ('Notification' in window && Notification.permission === 'default') {
+        const perm = await requestNotifPermission();
+        if (perm !== 'granted') {
+            // Still show in-app modal so they see something
+            triggerAlarm('Fajr', true);
+            playAdhanTone();
+            return;
+        }
     }
+
+    const prayerName = document.getElementById('pill-name')?.textContent?.trim() || 'Fajr';
+    await fireNotification(prayerName, true);
 }
 
 // ======================== MONTHLY ========================
@@ -1868,6 +2185,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
     // Fetch accurate Hijri date for today immediately — used by updateMonthYear and renderTable
     fetchTodayHijri();
 
+    // Register Service Worker for background notifications
+    registerServiceWorker().then(reg => { swRegistration = reg; });
+
+    // Mobile fullscreen daily view
+    initMobileFullscreen();
+
     initTabs();
     initCalPills();
     initDayListeners();
@@ -1877,6 +2200,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
     document.getElementById('dismiss-alarm-btn').addEventListener('click',()=>document.getElementById('alarm-modal').classList.remove('show'));
     document.getElementById('modal-close-x').addEventListener('click',()=>document.getElementById('alarm-modal').classList.remove('show'));
+    document.getElementById('npc-dismiss-btn')?.addEventListener('click',()=>document.getElementById('notif-popup-overlay').classList.remove('show'));
 
     document.getElementById('btn-save-settings').addEventListener('click',saveSettings);
     document.getElementById('load-schedule-btn').addEventListener('click',fetchMonthly);
@@ -1893,13 +2217,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.getElementById('btn-request-notif')?.addEventListener('click', requestNotifPermission);
     document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
 
-    // FAB notification button — request permission or show status
+    // FAB notification button
     document.getElementById('notification-btn').addEventListener('click', async () => {
         if (!('Notification' in window)) { alert('Your browser does not support notifications.'); return; }
         if (Notification.permission === 'granted') {
-            // Already granted — jump to settings
             switchTab('tab-settings');
-            document.getElementById('notif-status-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => document.getElementById('notif-status-card')?.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
         } else {
             await requestNotifPermission();
         }
