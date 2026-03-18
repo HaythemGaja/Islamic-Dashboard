@@ -714,122 +714,115 @@
     }
     .npc-dismiss:hover { opacity:0.85; }
 
+
     /* =====================================================
-       NOTIFICATION STATUS CARD (Settings)
+       NOTIFICATION MASTER TOGGLE CARD
     ===================================================== */
-    .notif-status-card {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 0.55rem 0.8rem;
-        align-items: start;
-        padding: 1rem 1.1rem;
-        border-radius: 12px;
+    .notif-master-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.2rem;
+        border-radius: 14px;
         border: 1px solid var(--border);
         background: var(--surface-2);
         transition: border-color 0.3s, background 0.3s;
     }
-    .notif-status-card.granted { border-color: rgba(42,173,126,0.35); background: rgba(30,122,90,0.07); }
-    .notif-status-card.denied  { border-color: rgba(239,68,68,0.3);   background: rgba(239,68,68,0.05); }
-    .notif-status-card.muted   { border-color: rgba(201,168,76,0.25); background: rgba(201,168,76,0.05); }
-    [data-theme="light"] .notif-status-card.granted { background: rgba(30,122,90,0.06); }
-    [data-theme="light"] .notif-status-card.muted   { background: rgba(201,168,76,0.06); }
+    .notif-master-card.state-on {
+        border-color: rgba(42,173,126,0.4);
+        background: rgba(30,122,90,0.08);
+    }
+    .notif-master-card.state-off {
+        border-color: rgba(239,68,68,0.25);
+        background: rgba(239,68,68,0.04);
+    }
+    .notif-master-card.state-blocked {
+        border-color: rgba(239,68,68,0.25);
+        background: rgba(239,68,68,0.04);
+    }
+    [data-theme="light"] .notif-master-card.state-on { background: rgba(30,122,90,0.06); }
 
-    /* Icon spans two rows on the left */
-    .notif-status-icon {
-        font-size: 1.6rem; line-height: 1;
-        grid-row: 1 / span 2;
-        padding-top: 0.05rem;
+    .nmc-left { display: flex; align-items: center; gap: 0.85rem; flex: 1; min-width: 0; }
+    .nmc-icon { font-size: 1.75rem; line-height: 1; flex-shrink: 0; }
+    .nmc-label {
+        font-size: 0.95rem; font-weight: 700; color: var(--text);
+        white-space: nowrap;
     }
-    /* Text block: label + sub */
-    .notif-status-text  { grid-column: 2; }
-    .notif-status-label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-    .notif-status-sub   { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; line-height: 1.45; }
-
-    /* Button row — always full-width, sits below icon+text */
-    .notif-status-btn-row {
-        grid-column: 1 / -1;
-        padding-top: 0.2rem;
+    .nmc-sub {
+        font-size: 0.72rem; color: var(--text-3);
+        margin-top: 2px; line-height: 1.4;
     }
 
-    .btn-notif-req {
-        width: 100%;
-        background: linear-gradient(135deg, var(--emerald), var(--em-light));
-        border: none; color: white;
-        padding: 0.6rem 1rem; border-radius: 8px;
-        font-family: 'Crimson Pro', serif; font-size: 0.9rem; font-weight: 600;
-        cursor: pointer; transition: all 0.2s;
-        box-shadow: 0 2px 12px rgba(30,122,90,0.28);
-        text-align: center;
+    /* Big, clear ON/OFF toggle */
+    .nmc-toggle-wrap { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+    .nmc-toggle-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .nmc-track {
+        width: 56px; height: 30px;
+        background: rgba(239,68,68,0.25);
+        border: 1.5px solid rgba(239,68,68,0.4);
+        border-radius: 100px;
+        position: relative;
+        transition: background 0.3s, border-color 0.3s;
+        display: flex; align-items: center;
     }
-    .btn-notif-req:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-notif-req.granted {
-        background: rgba(42,173,126,0.12); color: var(--em-light);
-        border: 1px solid rgba(42,173,126,0.3); box-shadow: none; cursor: default;
+    .nmc-knob {
+        width: 22px; height: 22px;
+        background: #f87171;
+        border-radius: 50%;
+        position: absolute;
+        left: 3px;
+        transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
-    .btn-notif-req.granted:hover { transform: none; opacity: 1; }
-    .btn-notif-req.denied {
-        background: rgba(239,68,68,0.07); color: #fca5a5;
-        border: 1px solid rgba(239,68,68,0.2); box-shadow: none;
-        font-size: 0.82rem; cursor: default;
+    /* ON state */
+    .nmc-toggle-wrap input:checked + .nmc-track {
+        background: rgba(42,173,126,0.3);
+        border-color: rgba(42,173,126,0.6);
     }
-    .btn-notif-req.denied:hover  { transform: none; opacity: 1; }
+    .nmc-toggle-wrap input:checked + .nmc-track .nmc-knob {
+        transform: translateX(26px);
+        background: var(--em-light);
+    }
+    /* Disabled (browser blocked) state */
+    .nmc-toggle-wrap.blocked { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
-    /* Test button — full width on mobile, auto on desktop */
-    .notif-test-row {
-        display: flex;
-        flex-direction: column;
-        gap: 0.55rem;
-        margin-top: 0.85rem;
-    }
+    /* Test button */
     .btn-test-notif {
         display: flex; align-items: center; justify-content: center; gap: 6px;
         width: 100%;
-        background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3);
+        background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25);
         color: var(--gold-light); padding: 0.6rem 1rem;
-        border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.9rem;
+        border-radius: 10px; font-family: 'Crimson Pro', serif; font-size: 0.88rem;
         cursor: pointer; transition: all 0.2s;
     }
-    .btn-test-notif:hover  { background: rgba(201,168,76,0.2); box-shadow: 0 0 14px rgba(201,168,76,0.15); }
+    .btn-test-notif:hover  { background: rgba(201,168,76,0.16); }
     .btn-test-notif:active { transform: scale(0.97); }
     .btn-test-notif.testing { animation: pulse-gold 0.7s ease-in-out 2; }
     [data-theme="light"] .btn-test-notif { color: #7a5c10; }
-    .notif-test-hint {
-        font-size: 0.7rem; color: var(--text-3); text-align: center; line-height: 1.4;
+
+    /* Sub-options — fade in/out */
+    .notif-sub-options {
+        margin-top: 0.6rem;
+        border-top: 1px solid var(--border-sub);
+        padding-top: 0.7rem;
+        overflow: hidden;
+        transition: opacity 0.25s, max-height 0.3s;
+        max-height: 300px;
+        opacity: 1;
     }
-    /* Disable notification row — always visible, visually distinct */
-    .notif-disable-row {
-        background: rgba(239,68,68,0.04);
-        border: 1px solid rgba(239,68,68,0.14);
-        border-radius: 10px;
-        padding: 0.7rem 0.9rem;
-        margin-bottom: 0.6rem;
-        transition: background 0.2s, border-color 0.2s;
+    .notif-sub-options.hidden-opts {
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        border-top-color: transparent;
+        pointer-events: none;
     }
-    .notif-disable-row:has(input:checked) {
-        background: rgba(239,68,68,0.09);
-        border-color: rgba(239,68,68,0.32);
-    }
-    .notif-disable-label {
-        font-size: 0.92rem;
-        font-weight: 700;
-        color: var(--text);
-        display: block;
-        margin-bottom: 1px;
-    }
-    /* Red-tinted toggle knob for the disable switch */
-    .tok-red { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
-    [data-theme="light"] .tok-red { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.14); }
-    #notif-mute-toggle:checked + .tok-red {
-        background: rgba(239,68,68,0.2);
-        border-color: #f87171;
-    }
-    #notif-mute-toggle:checked + .tok-red::after { background: #f87171; }
 
     @keyframes pulse-gold {
         0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
-        50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0.25); }
+        50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0.22); }
     }
-
 
     /* =====================================================
        UTILS
@@ -1313,51 +1306,41 @@
                 <div class="settings-section">
                     <h3>Notifications</h3>
 
-                    <!-- Permission Status Card -->
-                    <div id="notif-status-card" class="notif-status-card">
-                        <div class="notif-status-icon" id="notif-status-icon">🔔</div>
-                        <div class="notif-status-text">
-                            <div class="notif-status-label" id="notif-status-label">Checking permission…</div>
-                            <div class="notif-status-sub"  id="notif-status-sub">Enable to receive prayer time alerts on this device.</div>
+                    <div class="notif-master-card" id="notif-master-card">
+                        <!-- Icon + Text -->
+                        <div class="nmc-left">
+                            <div class="nmc-icon" id="nmc-icon">🔔</div>
+                            <div>
+                                <div class="nmc-label" id="nmc-label">Prayer Notifications</div>
+                                <div class="nmc-sub"   id="nmc-sub">Tap to enable alerts</div>
+                            </div>
                         </div>
-                        <div class="notif-status-btn-row">
-                            <button class="btn-notif-req" id="btn-request-notif">Enable Notifications</button>
-                        </div>
+                        <!-- Single ON/OFF toggle -->
+                        <label class="nmc-toggle-wrap" for="notif-master-toggle" aria-label="Enable or disable prayer notifications">
+                            <input type="checkbox" id="notif-master-toggle">
+                            <span class="nmc-track">
+                                <span class="nmc-knob"></span>
+                            </span>
+                        </label>
                     </div>
 
-                    <!-- Test Button -->
-                    <div class="notif-test-row">
-                        <button class="btn-test-notif" id="btn-test-notif">
-                            <span>🧪</span> Send Test Notification
-                        </button>
-                        <div class="notif-test-hint">Fires a sample prayer alert immediately to verify sound and browser notification both work.</div>
-                    </div>
+                    <!-- Test button — subtle, shown below -->
+                    <button class="btn-test-notif" id="btn-test-notif" style="margin-top:0.75rem;">
+                        <span>🧪</span> Send Test Alert
+                    </button>
 
-                    <!-- Toggles — always visible -->
-                    <div style="margin-top:1rem; border-top:1px solid var(--border-sub); padding-top:0.85rem;">
-
-                        <!-- DISABLE toggle — prominent, always rendered -->
-                        <div class="toggle-row notif-disable-row" id="notif-disable-row">
-                            <label class="tlabel" for="notif-mute-toggle">
-                                <span class="notif-disable-label">🔕 Disable all prayer notifications</span>
-                                <small>Silence Mizan alerts without touching your browser settings. Re-enable anytime.</small>
-                            </label>
-                            <label class="tog">
-                                <input type="checkbox" id="notif-mute-toggle">
-                                <span class="tok tok-red"></span>
-                            </label>
-                        </div>
-
+                    <!-- Sub-options, visible when notifications are on -->
+                    <div id="notif-sub-options" class="notif-sub-options">
                         <div class="toggle-row">
-                            <label class="tlabel" for="use-popup-window">In-app popup alerts <small>Show the built-in alarm popup when prayer time arrives</small></label>
+                            <label class="tlabel" for="use-popup-window">In-app popup <small>Show alarm popup when prayer time arrives</small></label>
                             <label class="tog"><input type="checkbox" id="use-popup-window"><span class="tok"></span></label>
                         </div>
                         <div class="toggle-row">
-                            <label class="tlabel" for="play-adhan-sound">Play adhan sound <small>Plays a short adhan tone with the notification</small></label>
+                            <label class="tlabel" for="play-adhan-sound">Adhan sound <small>Play a short adhan tone</small></label>
                             <label class="tog"><input type="checkbox" id="play-adhan-sound"><span class="tok"></span></label>
                         </div>
                         <div class="toggle-row">
-                            <label class="tlabel" for="keep-active-bg">Background accuracy <small>Uses Web Worker to stay accurate when the tab is hidden</small></label>
+                            <label class="tlabel" for="keep-active-bg">Background accuracy <small>Web Worker keeps countdown accurate when tab is hidden</small></label>
                             <label class="tog"><input type="checkbox" id="keep-active-bg"><span class="tok"></span></label>
                         </div>
                     </div>
@@ -1471,7 +1454,7 @@ function saveSettings(){
     S.usePopup=document.getElementById('use-popup-window').checked;
     S.keepActive=document.getElementById('keep-active-bg').checked;
     S.playAdhan=document.getElementById('play-adhan-sound')?.checked || false;
-    S.notifMuted=document.getElementById('notif-mute-toggle')?.checked || false;
+    // notifMuted is saved immediately on toggle change — no need to re-read here
     localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));
     const btn=document.getElementById('btn-save-settings'),orig=btn.textContent;
     btn.textContent='✓ Saved'; btn.style.background='linear-gradient(135deg,#1a6644,#2aad7e)';
@@ -1487,8 +1470,6 @@ function syncUI(){
     document.getElementById('keep-active-bg').checked=S.keepActive;
     const padEl = document.getElementById('play-adhan-sound');
     if (padEl) padEl.checked = S.playAdhan || false;
-    const muteEl = document.getElementById('notif-mute-toggle');
-    if (muteEl) muteEl.checked = S.notifMuted || false;
     updateNotifStatusUI();
     applyTheme(S.theme||'dark');
     syncCalPills();
@@ -2089,69 +2070,83 @@ function showPcPopup(prayerName, timeStr) {
     pcPopupTimer = setTimeout(() => ov.classList.remove('show'), 45000);
 }
 
-// --- Status UI ---
-function updateNotifStatusUI() {
-    const card  = document.getElementById('notif-status-card');
-    const icon  = document.getElementById('notif-status-icon');
-    const label = document.getElementById('notif-status-label');
-    const sub   = document.getElementById('notif-status-sub');
-    const btn   = document.getElementById('btn-request-notif');
-    const muteEl = document.getElementById('notif-mute-toggle');
+// ======================== NOTIFICATION MASTER TOGGLE ========================
 
-    // Always sync the mute toggle to current S value
-    if (muteEl) muteEl.checked = S.notifMuted || false;
+function notifIsEffectivelyOn() {
+    return 'Notification' in window
+        && Notification.permission === 'granted'
+        && !S.notifMuted;
+}
+
+function updateNotifStatusUI() {
+    const card   = document.getElementById('notif-master-card');
+    const icon   = document.getElementById('nmc-icon');
+    const label  = document.getElementById('nmc-label');
+    const sub    = document.getElementById('nmc-sub');
+    const toggle = document.getElementById('notif-master-toggle');
+    const wrap   = document.querySelector('.nmc-toggle-wrap');
+    const opts   = document.getElementById('notif-sub-options');
 
     if (!('Notification' in window)) {
-        if (card)  card.className   = 'notif-status-card denied';
-        if (icon)  icon.textContent  = '🚫';
-        if (label) label.textContent = 'Not supported';
-        if (sub)   sub.textContent   = 'Your browser does not support notifications. Try Chrome or Firefox.';
-        if (btn)   { btn.textContent = 'Unsupported'; btn.className = 'btn-notif-req denied'; }
+        if (card)   card.className   = 'notif-master-card state-off';
+        if (icon)   icon.textContent  = '🚫';
+        if (label)  label.textContent = 'Notifications';
+        if (sub)    sub.textContent   = 'Not supported in this browser. Try Chrome or Firefox.';
+        if (toggle) { toggle.checked = false; toggle.disabled = true; }
+        if (wrap)   wrap.classList.add('blocked');
+        if (opts)   opts.classList.add('hidden-opts');
         return;
     }
 
-    const perm  = Notification.permission;
-    const muted = S.notifMuted || false;
+    const perm = Notification.permission;
+    const isOn = notifIsEffectivelyOn();
+    if (toggle) { toggle.checked = isOn; toggle.disabled = false; }
+    if (wrap)   wrap.classList.remove('blocked');
 
-    if (perm === 'granted') {
-        if (muted) {
-            if (card)  card.className   = 'notif-status-card muted';
-            if (icon)  icon.textContent  = '🔕';
-            if (label) label.textContent = 'Notifications muted';
-            if (sub)   sub.textContent   = 'All prayer alerts are silenced. Use the toggle below to re-enable.';
-            if (btn)   { btn.textContent = '✓ Permission granted'; btn.className = 'btn-notif-req granted'; }
-        } else {
-            if (card)  card.className   = 'notif-status-card granted';
-            if (icon)  icon.textContent  = '✅';
-            if (label) label.textContent = 'Notifications enabled';
-            if (sub)   sub.textContent   = 'Prayer alerts will appear on this device. Keep this tab open or pinned.';
-            if (btn)   { btn.textContent = '✓ Enabled'; btn.className = 'btn-notif-req granted'; }
-        }
-    } else if (perm === 'denied') {
-        if (card)  card.className   = 'notif-status-card denied';
-        if (icon)  icon.textContent  = '🔕';
-        if (label) label.textContent = 'Notifications blocked by browser';
-        if (sub)   sub.textContent   = 'To fix: tap 🔒 in the address bar → Site settings → Notifications → Allow. Then reload this page.';
-        if (btn)   { btn.textContent = 'Blocked — fix in browser'; btn.className = 'btn-notif-req denied'; }
+    if (perm === 'denied') {
+        if (card)   card.className   = 'notif-master-card state-blocked';
+        if (icon)   icon.textContent  = '🔕';
+        if (label)  label.textContent = 'Notifications';
+        if (sub)    sub.textContent   = 'Blocked by browser. Tap 🔒 in address bar → Site settings → Allow, then reload.';
+        if (toggle) { toggle.checked = false; toggle.disabled = true; }
+        if (wrap)   wrap.classList.add('blocked');
+        if (opts)   opts.classList.add('hidden-opts');
+        return;
+    }
+
+    if (isOn) {
+        if (card)   card.className   = 'notif-master-card state-on';
+        if (icon)   icon.textContent  = '🔔';
+        if (label)  label.textContent = 'Notifications';
+        if (sub)    sub.textContent   = 'Prayer alerts are active — keep this tab open.';
+        if (opts)   opts.classList.remove('hidden-opts');
     } else {
-        if (card)  card.className   = 'notif-status-card';
-        if (icon)  icon.textContent  = '🔔';
-        if (label) label.textContent = 'Notifications not yet enabled';
-        if (sub)   sub.textContent   = 'Tap "Enable" to receive prayer time alerts. On Android/Chrome: tap Allow when prompted.';
-        if (btn)   { btn.textContent = 'Enable Notifications'; btn.className = 'btn-notif-req'; }
+        if (card)   card.className   = 'notif-master-card state-off';
+        if (icon)   icon.textContent  = '🔕';
+        if (label)  label.textContent = 'Notifications';
+        if (sub)    sub.textContent   = perm === 'granted'
+            ? 'Alerts are off. Flip the switch to re-enable.'
+            : 'Flip the switch to enable prayer time alerts.';
+        if (opts)   opts.classList.add('hidden-opts');
     }
 }
 
-// --- Permission request (promise + callback API compat) ---
-async function requestNotifPermission() {
-    if (!('Notification' in window)) { updateNotifStatusUI(); return 'unsupported'; }
-    if (Notification.permission === 'denied')  { updateNotifStatusUI(); return 'denied'; }
-    if (Notification.permission === 'granted') { updateNotifStatusUI(); return 'granted'; }
-    return new Promise(resolve => {
-        const result = Notification.requestPermission(perm => { updateNotifStatusUI(); resolve(perm); });
-        if (result && typeof result.then === 'function')
-            result.then(perm => { updateNotifStatusUI(); resolve(perm); });
-    });
+async function handleMasterToggle(wantsOn) {
+    if (!('Notification' in window)) return;
+    if (wantsOn) {
+        if (Notification.permission !== 'granted') {
+            const perm = await new Promise(resolve => {
+                const r = Notification.requestPermission(p => resolve(p));
+                if (r && typeof r.then === 'function') r.then(p => resolve(p));
+            });
+            if (perm !== 'granted') { S.notifMuted = true; updateNotifStatusUI(); return; }
+        }
+        S.notifMuted = false;
+    } else {
+        S.notifMuted = true;
+    }
+    localStorage.setItem('islamic_dashboard_settings', JSON.stringify(S));
+    updateNotifStatusUI();
 }
 
 // --- Central dispatcher ---
@@ -2223,10 +2218,11 @@ async function testNotification() {
         if (ctx.state === 'suspended') await ctx.resume();
     } catch(e) { /* ok */ }
 
-    if ('Notification' in window && Notification.permission === 'default') {
-        const perm = await requestNotifPermission();
-        if (perm !== 'granted') { triggerAlarm('Fajr', true); playAdhanTone(); return; }
+    // If not yet enabled, try to enable first
+    if (!notifIsEffectivelyOn() && 'Notification' in window && Notification.permission === 'default') {
+        await handleMasterToggle(true);
     }
+
     const prayerName = document.getElementById('pill-name')?.textContent?.trim() || 'Fajr';
     await fireNotification(prayerName, true);
 }
@@ -2397,17 +2393,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.getElementById('favorites-select').addEventListener('change',e=>{document.getElementById('btn-delete-favorite').disabled=!e.target.value;if(e.target.value)applyFav(e.target.value);});
     ['top-favorites-select','monthly-favorites-select'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',e=>{if(e.target.value)applyFav(e.target.value);});});
 
-    // Notification setup
+    // Notification — master toggle
     updateNotifStatusUI();
-    document.getElementById('btn-request-notif')?.addEventListener('click', requestNotifPermission);
-    document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
-
-    // Mute toggle — saves immediately without needing Save Settings
-    document.getElementById('notif-mute-toggle')?.addEventListener('change', e => {
-        S.notifMuted = e.target.checked;
-        localStorage.setItem('islamic_dashboard_settings', JSON.stringify(S));
-        updateNotifStatusUI();
+    document.getElementById('notif-master-toggle')?.addEventListener('change', e => {
+        handleMasterToggle(e.target.checked);
     });
+    document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
 
     const cSel=document.getElementById('country-select');
     try{const res=await fetch(`${API_BASE}/countries`);const data=await res.json();data.data.forEach(c=>{const o=document.createElement('option');o.value=c.country;o.textContent=c.country;cSel.appendChild(o);});}catch{}
