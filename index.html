@@ -1135,19 +1135,48 @@
     }
 
     /* COMPASS */
-    .qibla-compass-container {
-        display: flex; justify-content: center; padding: 1.5rem 1rem 0.5rem;
+    .qibla-compass-outer {
+        position: relative;
+        width: 340px; height: 340px;
+        margin: 1.2rem auto 0;
+        display: flex; align-items: center; justify-content: center;
+    }
+    /* The outer ring that holds the 🕋 icon — fixed position, never rotates */
+    .qibla-icon-ring {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+    /* The 🕋 icon positioned on the ring via JS */
+    .qibla-kaaba-icon {
+        position: absolute;
+        font-size: 1.6rem;
+        line-height: 1;
+        transform: translate(-50%, -50%);
+        transition: filter 0.25s, text-shadow 0.25s;
+        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+        top: 50%; left: 50%; /* will be overridden by JS */
+        z-index: 10;
+    }
+    .qibla-kaaba-icon.aligned {
+        filter: drop-shadow(0 0 12px rgba(52,196,145,0.9)) drop-shadow(0 0 6px rgba(52,196,145,0.6));
+        animation: kaaba-pulse 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes kaaba-pulse {
+        from { transform: translate(-50%,-50%) scale(1); }
+        to   { transform: translate(-50%,-50%) scale(1.2); }
     }
     #qibla-compass-canvas {
-        max-width: 300px; width: 100%;
-        border-radius: 50%; display: block;
+        position: relative; z-index: 5;
+        max-width: 320px; width: 100%;
+        display: block; border-radius: 50%;
     }
     .qibla-compass-status {
-        text-align: center; padding: 0.8rem 1.5rem 1.2rem;
-        font-size: 0.8rem; color: var(--text-3);
+        text-align: center; padding: 0.7rem 1.5rem 1rem;
+        font-size: 0.82rem; color: var(--text-3);
     }
     .qibla-orient-hint {
-        text-align: center; padding: 0.4rem 1rem 1rem;
+        text-align: center; padding: 0 1rem 0.8rem;
         font-size: 0.75rem; color: #f0a040;
     }
 
@@ -1794,14 +1823,21 @@
 
                 <!-- COMPASS view -->
                 <div id="qibla-compass-wrap" class="hidden">
-                    <div class="qibla-compass-container">
-                        <canvas id="qibla-compass-canvas" width="300" height="300"></canvas>
+                    <!-- Outer container holds both the icon ring and the canvas -->
+                    <div class="qibla-compass-outer" id="qibla-compass-outer">
+                        <!-- 12-direction icon ring (fixed in DOM, rotated by JS to world position) -->
+                        <div class="qibla-icon-ring" id="qibla-icon-ring">
+                            <!-- Qibla icon placed at the bearing via JS transform -->
+                            <div class="qibla-kaaba-icon" id="qibla-kaaba-icon">🕋</div>
+                        </div>
+                        <!-- The rotating compass dial canvas -->
+                        <canvas id="qibla-compass-canvas" width="320" height="320"></canvas>
                     </div>
                     <div id="qibla-compass-status" class="qibla-compass-status">
                         Point your device north to calibrate the compass.
                     </div>
                     <div class="qibla-orient-hint" id="qibla-orient-hint" style="display:none;">
-                        ⚠️ Compass not available on this device. Showing fixed bearing from North.
+                        ⚠️ Compass unavailable — showing fixed bearing from North.
                     </div>
                 </div>
 
@@ -3201,45 +3237,46 @@ function intermediatePoint(p1, p2, f) {
 
 function startQiblaCompass() {
     showQiblaState('compass');
+    // Position the Kaaba icon after the DOM renders
+    setTimeout(() => positionKaabaIcon(qiblaData.bearing || 0), 80);
     drawCompass(0);
 
     // Prefer absolute orientation (gives true-North referenced heading)
     const startAbsolute = () => {
         let fired = false;
         const handler = e => {
-            // webkitCompassHeading: iOS, degrees clockwise from magnetic north
-            // absolute event alpha: 0=north on some devices, but check e.absolute
             let heading = null;
             if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
-                heading = e.webkitCompassHeading;
+                heading = e.webkitCompassHeading;          // iOS
             } else if (e.absolute && typeof e.alpha === 'number') {
-                // Absolute alpha: 0=north for Android with absolute event
-                heading = (360 - e.alpha) % 360;
-            } else if (!e.absolute && typeof e.alpha === 'number') {
-                // Non-absolute: alpha is arbitrary offset, use it as heading delta
-                heading = (360 - e.alpha) % 360;
+                heading = (360 - e.alpha) % 360;           // Android absolute
+            } else if (typeof e.alpha === 'number') {
+                heading = (360 - e.alpha) % 360;           // fallback
             }
             if (heading === null) return;
             fired = true;
             qiblaData.deviceHeading = heading;
             drawCompass(heading);
             const diff = Math.round(Math.abs(((qiblaData.bearing - heading + 180) % 360) - 180));
-            const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '→' : '←';
-            document.getElementById('qibla-compass-status').textContent =
-                diff < 5
-                    ? '✅ Facing Qibla! الله أكبر'
-                    : 'Turn ' + diff + '° ' + side + ' toward Qibla · Heading: ' + Math.round(heading) + '°';
+            const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '\u2192' : '\u2190';
+            const statusEl = document.getElementById('qibla-compass-status');
+            if (statusEl) {
+                if (diff < 5) {
+                    statusEl.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
+                    statusEl.style.color = 'var(--em-light)';
+                } else {
+                    statusEl.textContent = 'Turn ' + diff + '\u00b0 ' + side + ' toward Qibla \u00b7 ' + Math.round(heading) + '\u00b0';
+                    statusEl.style.color = '';
+                }
+            }
         };
-        // Try absolute first (better accuracy on Android)
         window.addEventListener('deviceorientationabsolute', handler, true);
         window.addEventListener('deviceorientation', handler, true);
         qiblaData.orientHandler = handler;
-        qiblaData.orientAbsHandler = handler;
         setTimeout(() => { if (!fired) showNoCompass(); }, 2500);
     };
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        // iOS 13+ requires permission request on user gesture
         DeviceOrientationEvent.requestPermission()
             .then(s => { if (s === 'granted') startAbsolute(); else showNoCompass(); })
             .catch(() => showNoCompass());
@@ -3266,155 +3303,222 @@ function stopQiblaCompass() {
     qiblaData.deviceHeading = null;
 }
 
-// drawCompass(deviceHeading)
-//   deviceHeading = direction phone is pointing, clockwise from North (0–360).
-//   Dial rotates by -deviceHeading: when phone points East (90°), N label moves 90° left → stays visually North.
-//   Needle is FIXED in screen space: red tip at screen-top = North, white tip at screen-bottom = South.
-//   Qibla line is FIXED in screen space: angle = (bearing - 90)° in canvas coords (0° = right, -90° = up = North).
+// ── COMPASS DESIGN ─────────────────────────────────────────────────────────
+// • The ENTIRE DIAL (ticks, N/E/S/W labels, Qibla arrow) rotates together.
+//   Dial rotation = -deviceHeading so world labels always face the right direction.
+// • The Qibla arrow is part of the dial — it points at the Qibla bearing
+//   relative to North. Since both rotate together, the arrow always points
+//   at Mecca in the real world.
+// • The 🕋 icon is placed OUTSIDE the canvas on an HTML element ring,
+//   positioned at the Qibla bearing in screen space (fixed, never rotates).
+//   When the dial's Qibla arrow aligns with it (within ±8°), both are highlighted.
+
+function positionKaabaIcon(bearing) {
+    const outer = document.getElementById('qibla-compass-outer');
+    const icon  = document.getElementById('qibla-kaaba-icon');
+    if (!outer || !icon) return;
+
+    const outerSize = outer.offsetWidth || 340;
+    const radius    = outerSize / 2 - 4; // just inside outer edge
+    // bearing = clockwise from North; 0° = top, 90° = right
+    const angleRad = (bearing - 90) * Math.PI / 180;
+    const x = outerSize / 2 + radius * Math.cos(angleRad);
+    const y = outerSize / 2 + radius * Math.sin(angleRad);
+    icon.style.left = x + 'px';
+    icon.style.top  = y + 'px';
+}
+
+function updateKaabaAlignment(deviceHeading) {
+    const icon = document.getElementById('qibla-kaaba-icon');
+    if (!icon || qiblaData.bearing === null) return;
+    // The dial's Qibla arrow points at bearing. The dial has rotated by -heading.
+    // So in screen space the arrow sits at (bearing - heading).
+    // The Kaaba icon is fixed at bearing in screen space.
+    // They align when (bearing - heading) mod 360 ≈ bearing, i.e. when heading ≈ 0.
+    // More precisely: diff between device heading and Qibla bearing.
+    const diff = Math.abs(((qiblaData.bearing - deviceHeading + 180) % 360) - 180);
+    if (diff < 8) {
+        icon.classList.add('aligned');
+    } else {
+        icon.classList.remove('aligned');
+    }
+    return diff;
+}
+
 function drawCompass(deviceHeading) {
     const canvas = document.getElementById('qibla-compass-canvas');
     if (!canvas) return;
-    const ctx   = canvas.getContext('2d');
-    const size  = canvas.width;
+
+    // Position the HTML Kaaba icon
+    positionKaabaIcon(qiblaData.bearing || 0);
+
+    const diff = updateKaabaAlignment(deviceHeading);
+
+    const ctx     = canvas.getContext('2d');
+    const size    = canvas.width;
     const cx = size / 2, cy = size / 2;
-    const r  = size / 2 - 6;
+    const rOuter  = size / 2 - 4;   // dial outer edge
+    const rInner  = rOuter - 34;    // inner usable area
     const isDark  = document.documentElement.getAttribute('data-theme') === 'dark';
-    const gold    = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#c9a84c';
-    const red     = '#ef4444';
-    const white   = isDark ? '#cccccc' : '#eeeeee';
-    const bg      = isDark ? '#111827' : '#fdf6e8';
-    const textCol = isDark ? '#e0d0a0' : '#2a1500';
-    const dimCol  = isDark ? 'rgba(201,168,76,0.2)' : 'rgba(140,90,20,0.2)';
+    const cs      = getComputedStyle(document.documentElement);
+    const gold    = cs.getPropertyValue('--gold').trim() || '#c9a84c';
+    const emLight = cs.getPropertyValue('--em-light').trim() || '#34c491';
+    const textCol = isDark ? '#e0d0a0' : '#2a1400';
+    const dimCol  = isDark ? 'rgba(201,168,76,0.18)' : 'rgba(140,90,20,0.18)';
+    const bg      = isDark ? '#0f1520' : '#fdf6e8';
+    const aligned = diff !== undefined && diff < 8;
 
     ctx.clearRect(0, 0, size, size);
 
-    // ── Background ──────────────────────────────────────────────────────────
+    // ── 1. BACKGROUND ────────────────────────────────────────────────────────
     ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
     ctx.fillStyle = bg;
     ctx.fill();
-    const grad = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, isDark ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.08)');
+
+    // Subtle radial gradient
+    const grd = ctx.createRadialGradient(cx, cy, rInner * 0.4, cx, cy, rOuter);
+    grd.addColorStop(0, 'rgba(0,0,0,0)');
+    grd.addColorStop(1, isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.06)');
+    ctx.beginPath(); ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+    ctx.fillStyle = grd; ctx.fill();
+
+    // Outer ring border
     ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.strokeStyle = gold;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+    ctx.strokeStyle = aligned ? emLight : gold;
+    ctx.lineWidth = aligned ? 3 : 2;
     ctx.stroke();
 
-    // ── ROTATING DIAL (clipped to circle) ──────────────────────────────────
+    // ── 2. CLIPPED ROTATING DIAL ─────────────────────────────────────────────
     ctx.save();
     ctx.beginPath();
-    ctx.arc(cx, cy, r - 1, 0, Math.PI * 2);
+    ctx.arc(cx, cy, rOuter - 1, 0, Math.PI * 2);
     ctx.clip();
 
     ctx.save();
     ctx.translate(cx, cy);
-    // Rotate dial OPPOSITE to heading so world labels stay correct
-    ctx.rotate(-(deviceHeading) * Math.PI / 180);
+    ctx.rotate(-deviceHeading * Math.PI / 180);   // dial tracks device rotation
     ctx.translate(-cx, -cy);
 
-    // Tick marks
+    // ── 2a. Degree tick marks ─────────────────────────────────────────────
     for (let deg = 0; deg < 360; deg += 5) {
-        const a = (deg - 90) * Math.PI / 180;
-        const isMajor = deg % 90 === 0;
-        const isMed   = deg % 45 === 0;
-        const len     = isMajor ? 16 : isMed ? 10 : 5;
+        const a       = (deg - 90) * Math.PI / 180;
+        const isMaj   = deg % 90 === 0;
+        const isMed   = deg % 30 === 0;
+        const tickLen = isMaj ? 18 : isMed ? 11 : 5;
         ctx.beginPath();
-        ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-        ctx.lineTo(cx + (r - len) * Math.cos(a), cy + (r - len) * Math.sin(a));
-        ctx.strokeStyle = isMajor ? gold : isMed ? dimCol + '' : dimCol;
-        ctx.lineWidth   = isMajor ? 2 : 1;
+        ctx.moveTo(cx + rOuter * Math.cos(a), cy + rOuter * Math.sin(a));
+        ctx.lineTo(cx + (rOuter - tickLen) * Math.cos(a), cy + (rOuter - tickLen) * Math.sin(a));
+        ctx.strokeStyle = isMaj ? gold : isMed ? (isDark ? 'rgba(201,168,76,0.4)' : 'rgba(140,90,20,0.35)') : dimCol;
+        ctx.lineWidth   = isMaj ? 2.5 : 1;
         ctx.stroke();
     }
 
-    // Cardinal + intercardinal labels
-    const cards = [
-        ['N', 0, red, 15], ['NE', 45, dimCol, 9], ['E', 90, textCol, 13],
-        ['SE', 135, dimCol, 9], ['S', 180, textCol, 13],
-        ['SW', 225, dimCol, 9], ['W', 270, textCol, 13], ['NW', 315, dimCol, 9]
+    // ── 2b. 12 direction labels (on the dial, rotate with it) ─────────────
+    const dirs12 = [
+        ['N',   0,   '#ef4444', 15, true],
+        ['NNE', 30,  dimCol,     8, false],
+        ['NE',  45,  isDark ? 'rgba(201,168,76,0.55)' : 'rgba(120,80,10,0.6)', 9, false],
+        ['ENE', 60,  dimCol,     8, false],
+        ['E',   90,  textCol,   13, true],
+        ['ESE', 120, dimCol,     8, false],
+        ['SE',  135, isDark ? 'rgba(201,168,76,0.55)' : 'rgba(120,80,10,0.6)', 9, false],
+        ['SSE', 150, dimCol,     8, false],
+        ['S',   180, textCol,   13, true],
+        ['SSW', 210, dimCol,     8, false],
+        ['SW',  225, isDark ? 'rgba(201,168,76,0.55)' : 'rgba(120,80,10,0.6)', 9, false],
+        ['WSW', 240, dimCol,     8, false],
+        ['W',   270, textCol,   13, true],
+        ['WNW', 300, dimCol,     8, false],
+        ['NW',  315, isDark ? 'rgba(201,168,76,0.55)' : 'rgba(120,80,10,0.6)', 9, false],
+        ['NNW', 330, dimCol,     8, false],
     ];
-    cards.forEach(([lbl, deg, col, sz]) => {
+    dirs12.forEach(([lbl, deg, col, sz, bold]) => {
         const a  = (deg - 90) * Math.PI / 180;
-        const lR = r - (lbl.length > 1 ? 28 : 22);
-        ctx.font = `bold ${sz}px 'Cinzel Decorative', 'Crimson Pro', serif`;
+        const lR = rOuter - (lbl.length > 2 ? 26 : lbl.length > 1 ? 22 : 18);
+        ctx.font = (bold ? 'bold ' : '') + sz + 'px \'Crimson Pro\', serif';
         ctx.fillStyle = col;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(lbl, cx + lR * Math.cos(a), cy + lR * Math.sin(a));
     });
 
+    // ── 2c. Inner compass circle ──────────────────────────────────────────
+    ctx.beginPath();
+    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+    ctx.strokeStyle = isDark ? 'rgba(201,168,76,0.15)' : 'rgba(140,90,20,0.12)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    // ── 2d. Qibla ARROW on the dial ───────────────────────────────────────
+    // Arrow at qiblaData.bearing relative to North on the dial.
+    // Since the dial rotates by -heading, this arrow always points at Mecca.
+    const qBearing = qiblaData.bearing || 0;
+    const qA       = (qBearing - 90) * Math.PI / 180;
+    const arrowLen = rInner - 6;
+    const arrowW   = 10;
+    const arrowCol = aligned ? emLight : gold;
+
+    // Glow when aligned
+    if (aligned) {
+        ctx.save();
+        ctx.shadowColor = emLight;
+        ctx.shadowBlur  = 18;
+    }
+
+    // Arrow shaft
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + (arrowLen - 16) * Math.cos(qA), cy + (arrowLen - 16) * Math.sin(qA));
+    ctx.strokeStyle = arrowCol;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Arrowhead (filled triangle)
+    const tipX = cx + arrowLen * Math.cos(qA);
+    const tipY = cy + arrowLen * Math.sin(qA);
+    const baseX = cx + (arrowLen - 20) * Math.cos(qA);
+    const baseY = cy + (arrowLen - 20) * Math.sin(qA);
+    const perpA = qA + Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(baseX + arrowW * Math.cos(perpA), baseY + arrowW * Math.sin(perpA));
+    ctx.lineTo(baseX - arrowW * Math.cos(perpA), baseY - arrowW * Math.sin(perpA));
+    ctx.closePath();
+    ctx.fillStyle = arrowCol;
+    ctx.fill();
+
+    // Tail dot
+    ctx.beginPath();
+    ctx.arc(cx + (arrowLen * 0.45) * Math.cos(qA + Math.PI), cy + (arrowLen * 0.45) * Math.sin(qA + Math.PI), 4, 0, Math.PI * 2);
+    ctx.fillStyle = aligned ? emLight : (isDark ? 'rgba(201,168,76,0.4)' : 'rgba(140,90,20,0.3)');
+    ctx.fill();
+
+    if (aligned) ctx.restore();
+
     ctx.restore(); // end dial rotation
     ctx.restore(); // end clip
 
-    // ── QIBLA LINE — fixed in screen space (world-locked) ──────────────────
-    // bearing° clockwise from North; screen-up = North = canvas angle -90°
-    // So canvas angle = (bearing - 90) * PI/180
-    const qRad = (qiblaData.bearing - 90) * Math.PI / 180;
-    const qLen = r - 30;
-
-    ctx.save();
-    ctx.shadowColor = gold; ctx.shadowBlur = 10;
+    // ── 3. CENTER HUB ────────────────────────────────────────────────────────
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + qLen * Math.cos(qRad), cy + qLen * Math.sin(qRad));
-    ctx.strokeStyle = gold;
-    ctx.lineWidth = 3;
-    ctx.setLineDash([8, 5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-
-    // Kaaba at tip
-    ctx.font = '22px serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('\uD83D\uDED1', cx + (r - 17) * Math.cos(qRad), cy + (r - 17) * Math.sin(qRad));
-
-    // ── NEEDLE — always fixed: red=North=up, white=South=down ──────────────
-    // nUp = -PI/2 = screen-up. This never rotates.
-    const nUp  = -Math.PI / 2;
-    const nLen = r * 0.40;
-    const nW   = 9;
-
-    const drawArrow = (angle, len, col) => {
-        ctx.beginPath();
-        ctx.moveTo(cx + nW * Math.cos(angle + Math.PI/2), cy + nW * Math.sin(angle + Math.PI/2));
-        ctx.lineTo(cx + len * Math.cos(angle),              cy + len * Math.sin(angle));
-        ctx.lineTo(cx - nW * Math.cos(angle + Math.PI/2), cy - nW * Math.sin(angle + Math.PI/2));
-        ctx.closePath();
-        ctx.fillStyle = col; ctx.fill();
-    };
-
-    drawArrow(nUp,            nLen, red);    // Red → up → North
-    drawArrow(nUp + Math.PI,  nLen, white);  // White → down → South
-
-    // Needle border
-    ctx.beginPath();
-    ctx.moveTo(cx + nW * Math.cos(nUp + Math.PI/2),  cy + nW * Math.sin(nUp + Math.PI/2));
-    ctx.lineTo(cx + nLen * Math.cos(nUp),              cy + nLen * Math.sin(nUp));
-    ctx.lineTo(cx - nW * Math.cos(nUp + Math.PI/2),  cy - nW * Math.sin(nUp + Math.PI/2));
-    ctx.lineTo(cx + nLen * Math.cos(nUp + Math.PI),   cy + nLen * Math.sin(nUp + Math.PI));
-    ctx.closePath();
-    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
-    ctx.lineWidth = 1; ctx.stroke();
-
-    // Center cap
-    ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
     ctx.fillStyle = gold; ctx.fill();
     ctx.beginPath();
-    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-    ctx.fillStyle = isDark ? '#111' : '#fff'; ctx.fill();
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = isDark ? '#0f1520' : '#fdf6e8'; ctx.fill();
 
-    // Bearing readout
-    ctx.font = 'bold 11px \'JetBrains Mono\', monospace';
-    ctx.fillStyle = gold;
+    // ── 4. Bearing text in center ─────────────────────────────────────────
+    ctx.font = 'bold 12px \'JetBrains Mono\', monospace';
+    ctx.fillStyle = aligned ? emLight : gold;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('Qibla ' + Math.round(qiblaData.bearing) + '\u00b0', cx, cy + r * 0.5);
+    ctx.fillText(Math.round(qiblaData.bearing || 0) + '\u00b0', cx, cy + rInner * 0.48);
+
+    // Heading readout top-center
+    ctx.font = '10px \'JetBrains Mono\', monospace';
+    ctx.fillStyle = isDark ? 'rgba(201,168,76,0.5)' : 'rgba(100,70,10,0.5)';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(Math.round(deviceHeading) + '\u00b0', cx, cy - rInner * 0.48);
 }
+
 
 // ══ CAMERA AR MODE ════════════════════════════════════════════════════════
 // The Qibla icon ring is "world-locked":
