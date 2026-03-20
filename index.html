@@ -1171,34 +1171,61 @@
     }
     .qibla-ar-overlay {
         position: absolute; inset: 0;
-        display: flex; align-items: center; justify-content: center;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 2rem;
         pointer-events: none;
     }
-    /* Clean arrow wrapper — rotates to face Qibla */
-    .qibla-ar-arrow-wrap {
+
+    /* Directional turn arrows */
+    .qibla-ar-dir-arrow {
+        font-size: 3.5rem; line-height: 1;
+        color: var(--gold);
+        text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 20px rgba(201,168,76,0.6);
+        opacity: 0; transition: opacity 0.3s;
+        font-weight: 900;
+        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.8));
+        flex-shrink: 0;
+    }
+    .qibla-ar-dir-arrow.visible { opacity: 1; }
+    /* Pulse animation on arrows */
+    .qibla-ar-dir-arrow.visible {
+        animation: arrow-pulse 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes arrow-pulse {
+        from { opacity: 0.65; transform: scale(1); }
+        to   { opacity: 1;    transform: scale(1.15); }
+    }
+    .qibla-ar-dir-arrow.left  { animation-direction: alternate; }
+    .qibla-ar-dir-arrow.right { animation-direction: alternate-reverse; }
+
+    /* Fixed Kaaba icon (never rotates) */
+    .qibla-ar-kaaba-fixed {
         display: flex; flex-direction: column; align-items: center; gap: 6px;
-        transition: transform 0.12s linear;
-        filter: drop-shadow(0 2px 12px rgba(0,0,0,0.7));
+        flex: 0 0 auto;
+        filter: drop-shadow(0 2px 12px rgba(0,0,0,0.8));
+        transition: filter 0.3s, transform 0.3s;
     }
-    #qibla-ar-svg {
-        width: 52px; height: 78px;
-        transition: filter 0.25s;
+    .qibla-kaaba-emoji {
+        font-size: 3.2rem; line-height: 1; display: block;
+        transition: filter 0.3s;
     }
-    .qibla-ar-label {
+    .qibla-kaaba-label {
         font-family: 'Cinzel Decorative', serif;
-        font-size: 0.8rem; color: var(--gold);
-        text-shadow: 0 1px 6px rgba(0,0,0,0.9);
-        letter-spacing: 0.1em;
-        transition: color 0.25s;
+        font-size: 0.75rem; color: var(--gold);
+        text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+        letter-spacing: 0.12em;
+        transition: color 0.3s;
     }
-    .qibla-ar-arrow-wrap.aligned #qibla-ar-svg {
-        filter: drop-shadow(0 0 14px rgba(52,196,145,0.9));
+    /* Highlight state when facing Qibla */
+    .qibla-ar-kaaba-fixed.aligned {
+        filter: drop-shadow(0 0 20px rgba(52,196,145,0.95)) drop-shadow(0 0 8px rgba(52,196,145,0.7));
+        transform: scale(1.15);
+        animation: kaaba-glow 0.7s ease-in-out infinite alternate;
     }
-    .qibla-ar-arrow-wrap.aligned .qibla-ar-label {
-        color: var(--em-light);
-    }
-    .qibla-ar-arrow-wrap.aligned #qibla-ar-svg path {
-        fill: var(--em-light);
+    .qibla-ar-kaaba-fixed.aligned .qibla-kaaba-label { color: var(--em-light); }
+    @keyframes kaaba-glow {
+        from { filter: drop-shadow(0 0 14px rgba(52,196,145,0.7)); transform: scale(1.12); }
+        to   { filter: drop-shadow(0 0 28px rgba(52,196,145,1.0)); transform: scale(1.2); }
     }
 
     /* =====================================================
@@ -1817,14 +1844,16 @@
                 <div id="qibla-camera-wrap" class="hidden">
                     <div class="qibla-ar-container">
                         <video id="qibla-video" autoplay playsinline muted></video>
-                        <!-- Clean direction arrow overlay — no compass dial -->
                         <div class="qibla-ar-overlay">
-                            <div class="qibla-ar-arrow-wrap" id="qibla-ar-arrow-wrap">
-                                <svg id="qibla-ar-svg" viewBox="0 0 60 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M30 4 L54 78 L30 62 L6 78 Z" fill="var(--gold)" opacity="0.95"/>
-                                </svg>
-                                <div class="qibla-ar-label" id="qibla-ar-label">Qibla</div>
+                            <!-- Left turn arrow -->
+                            <div class="qibla-ar-dir-arrow left" id="qibla-dir-left">&#8592;</div>
+                            <!-- Fixed Kaaba icon — highlights when facing Qibla -->
+                            <div class="qibla-ar-kaaba-fixed" id="qibla-ar-kaaba-fixed">
+                                <span class="qibla-kaaba-emoji">🕋</span>
+                                <span class="qibla-kaaba-label" id="qibla-kaaba-label">Qibla</span>
                             </div>
+                            <!-- Right turn arrow -->
+                            <div class="qibla-ar-dir-arrow right" id="qibla-dir-right">&#8594;</div>
                         </div>
                     </div>
                     <div id="qibla-ar-status" class="qibla-compass-status">
@@ -3208,34 +3237,58 @@ function startQiblaCompass() {
     showQiblaState('compass');
     drawCompass(0);
 
-    // Prefer absolute orientation (gives true-North referenced heading)
+    // Smoothing state — low-pass filter on heading
+    let smoothHeading  = null;   // current smoothed value
+    let rafPending     = false;  // rAF throttle flag
+    const ALPHA        = 0.12;   // smoothing factor: 0=frozen, 1=raw (lower = smoother)
+
+    // Shortest-path interpolation to avoid 359→1 jumps
+    function lerpAngle(current, target, alpha) {
+        let diff = ((target - current + 540) % 360) - 180; // -180..+180
+        return (current + diff * alpha + 360) % 360;
+    }
+
     const startAbsolute = () => {
         let fired = false;
         const handler = e => {
-            let heading = null;
+            let raw = null;
             if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
-                heading = e.webkitCompassHeading;          // iOS
+                raw = e.webkitCompassHeading;
             } else if (e.absolute && typeof e.alpha === 'number') {
-                heading = (360 - e.alpha) % 360;           // Android absolute
+                raw = (360 - e.alpha) % 360;
             } else if (typeof e.alpha === 'number') {
-                heading = (360 - e.alpha) % 360;           // fallback
+                raw = (360 - e.alpha) % 360;
             }
-            if (heading === null) return;
+            if (raw === null) return;
             fired = true;
-            qiblaData.deviceHeading = heading;
-            drawCompass(heading);
-            const diff = Math.round(Math.abs(((qiblaData.bearing - heading + 180) % 360) - 180));
-            const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '\u2192' : '\u2190';
-            const statusEl = document.getElementById('qibla-compass-status');
-            if (statusEl) {
-                if (diff < 5) {
-                    statusEl.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
-                    statusEl.style.color = 'var(--em-light)';
-                } else {
-                    statusEl.textContent = 'Turn ' + diff + '\u00b0 ' + side + ' toward Qibla \u00b7 ' + Math.round(heading) + '\u00b0';
-                    statusEl.style.color = '';
+
+            // Initialise on first reading
+            if (smoothHeading === null) smoothHeading = raw;
+
+            // Apply low-pass filter
+            smoothHeading = lerpAngle(smoothHeading, raw, ALPHA);
+
+            // Throttle redraws to rAF — skip if one is already queued
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() => {
+                rafPending = false;
+                qiblaData.deviceHeading = smoothHeading;
+                drawCompass(smoothHeading);
+
+                const diff = Math.round(Math.abs(((qiblaData.bearing - smoothHeading + 180) % 360) - 180));
+                const side = ((qiblaData.bearing - smoothHeading + 360) % 360) < 180 ? '\u2192' : '\u2190';
+                const statusEl = document.getElementById('qibla-compass-status');
+                if (statusEl) {
+                    if (diff < 5) {
+                        statusEl.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
+                        statusEl.style.color = 'var(--em-light)';
+                    } else {
+                        statusEl.textContent = 'Turn ' + diff + '\u00b0 ' + side + ' \u00b7 ' + Math.round(smoothHeading) + '\u00b0';
+                        statusEl.style.color = '';
+                    }
                 }
-            }
+            });
         };
         window.addEventListener('deviceorientationabsolute', handler, true);
         window.addEventListener('deviceorientation', handler, true);
@@ -3479,38 +3532,72 @@ function startQiblaCamera() {
 }
 
 function startCameraOrientation() {
-    const arrow  = document.getElementById('qibla-ar-arrow-wrap');
-    const label  = document.getElementById('qibla-ar-label');
+    const kaaba  = document.getElementById('qibla-ar-kaaba-fixed');
+    const label  = document.getElementById('qibla-kaaba-label');
+    const dirL   = document.getElementById('qibla-dir-left');
+    const dirR   = document.getElementById('qibla-dir-right');
     const status = document.getElementById('qibla-ar-status');
 
-    // Rotate the arrow so it stays world-locked on Qibla bearing.
-    // offset = bearing - heading: when phone faces North (heading=0), arrow points at bearing.
-    // As phone rotates CW, heading increases, offset decreases, keeping arrow on Mecca.
+    // Smoothing for camera mode too
+    let smoothHeading = null;
+    let rafPending    = false;
+    const ALPHA       = 0.15;
+    function lerpAngle(cur, tgt, a) {
+        const d = ((tgt - cur + 540) % 360) - 180;
+        return (cur + d * a + 360) % 360;
+    }
+
     const handleOrientation = e => {
-        let heading = null;
-        if (typeof e.webkitCompassHeading === 'number') {
-            heading = e.webkitCompassHeading;
-        } else if (e.alpha !== null && e.alpha !== undefined) {
-            heading = (360 - e.alpha) % 360;
-        }
-        if (heading === null) return;
+        let raw = null;
+        if (typeof e.webkitCompassHeading === 'number') raw = e.webkitCompassHeading;
+        else if (e.alpha !== null && e.alpha !== undefined) raw = (360 - e.alpha) % 360;
+        if (raw === null) return;
 
-        qiblaData.deviceHeading = heading;
-        const offset = (qiblaData.bearing - heading + 360) % 360;
-        if (arrow) arrow.style.transform = 'rotate(' + offset + 'deg)';
+        if (smoothHeading === null) smoothHeading = raw;
+        smoothHeading = lerpAngle(smoothHeading, raw, ALPHA);
 
-        const diff = Math.round(Math.abs(((qiblaData.bearing - heading + 180) % 360) - 180));
-        const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '\u2192' : '\u2190';
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(() => {
+            rafPending = false;
+            qiblaData.deviceHeading = smoothHeading;
 
-        if (diff < 8) {
-            if (arrow) arrow.classList.add('aligned');
-            if (label) label.textContent = '\u0627\u0644\u0642\u0628\u0644\u0629';  // القبلة
-            if (status) { status.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631'; status.style.color = 'var(--em-light)'; }
-        } else {
-            if (arrow) arrow.classList.remove('aligned');
-            if (label) label.textContent = 'Qibla';
-            if (status) { status.textContent = 'Turn ' + diff + '\u00b0 ' + side + ' toward Qibla'; status.style.color = ''; }
-        }
+            const diff = Math.round(Math.abs(((qiblaData.bearing - smoothHeading + 180) % 360) - 180));
+            // signed offset: positive = Qibla is to the right, negative = to the left
+            const signed = ((qiblaData.bearing - smoothHeading + 360) % 360);
+            const turnRight = signed <= 180; // CW to reach Qibla
+            const aligned   = diff < 8;
+
+            // Kaaba highlight
+            if (kaaba)  kaaba.classList.toggle('aligned', aligned);
+            if (label)  label.textContent = aligned ? '\u0627\u0644\u0642\u0628\u0644\u0629' : 'Qibla';
+
+            // Directional arrows
+            if (dirL && dirR) {
+                if (aligned) {
+                    dirL.classList.remove('visible');
+                    dirR.classList.remove('visible');
+                } else if (turnRight) {
+                    dirL.classList.remove('visible');
+                    dirR.classList.add('visible');
+                } else {
+                    dirL.classList.add('visible');
+                    dirR.classList.remove('visible');
+                }
+            }
+
+            // Status text
+            if (status) {
+                if (aligned) {
+                    status.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
+                    status.style.color = 'var(--em-light)';
+                } else {
+                    const arrow = turnRight ? '\u2192' : '\u2190';
+                    status.textContent = 'Turn ' + diff + '\u00b0 ' + arrow + ' toward Qibla';
+                    status.style.color = '';
+                }
+            }
+        });
     };
 
     qiblaData.orientHandler = handleOrientation;
@@ -3520,7 +3607,7 @@ function startCameraOrientation() {
             .then(s => {
                 if (s === 'granted') {
                     window.addEventListener('deviceorientation', handleOrientation, true);
-                    if (status) status.textContent = 'Raise your phone — the arrow will lock onto Qibla.';
+                    if (status) status.textContent = 'Rotate your phone to find the Qibla direction.';
                 } else {
                     if (status) status.textContent = 'Compass permission denied. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
                 }
@@ -3529,10 +3616,8 @@ function startCameraOrientation() {
             });
     } else if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', handleOrientation, true);
-        if (status) status.textContent = 'Raise your phone — the arrow will lock onto Qibla.';
+        if (status) status.textContent = 'Rotate your phone to find the Qibla direction.';
     } else {
-        const offset = qiblaData.bearing;
-        if (arrow) arrow.style.transform = 'rotate(' + offset + 'deg)';
         if (status) status.textContent = 'Compass unavailable. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
     }
 }
