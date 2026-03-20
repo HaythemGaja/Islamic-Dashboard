@@ -1141,31 +1141,6 @@
         margin: 1.2rem auto 0;
         display: flex; align-items: center; justify-content: center;
     }
-    /* The outer ring that holds the 🕋 icon — fixed position, never rotates */
-    .qibla-icon-ring {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-    }
-    /* The 🕋 icon positioned on the ring via JS */
-    .qibla-kaaba-icon {
-        position: absolute;
-        font-size: 1.6rem;
-        line-height: 1;
-        transform: translate(-50%, -50%);
-        transition: filter 0.25s, text-shadow 0.25s;
-        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
-        top: 50%; left: 50%; /* will be overridden by JS */
-        z-index: 10;
-    }
-    .qibla-kaaba-icon.aligned {
-        filter: drop-shadow(0 0 12px rgba(52,196,145,0.9)) drop-shadow(0 0 6px rgba(52,196,145,0.6));
-        animation: kaaba-pulse 0.6s ease-in-out infinite alternate;
-    }
-    @keyframes kaaba-pulse {
-        from { transform: translate(-50%,-50%) scale(1); }
-        to   { transform: translate(-50%,-50%) scale(1.2); }
-    }
     #qibla-compass-canvas {
         position: relative; z-index: 5;
         max-width: 320px; width: 100%;
@@ -1174,6 +1149,7 @@
     .qibla-compass-status {
         text-align: center; padding: 0.7rem 1.5rem 1rem;
         font-size: 0.82rem; color: var(--text-3);
+        transition: color 0.3s;
     }
     .qibla-orient-hint {
         text-align: center; padding: 0 1rem 0.8rem;
@@ -1185,7 +1161,6 @@
         position: relative; width: 100%;
         aspect-ratio: 9/16; max-height: 70vh;
         overflow: hidden; background: #000;
-        border-radius: 0;
     }
     @media (orientation: landscape) {
         .qibla-ar-container { aspect-ratio: 16/9; max-height: 60vh; }
@@ -1194,32 +1169,36 @@
         position: absolute; inset: 0;
         width: 100%; height: 100%; object-fit: cover;
     }
-    #qibla-ar-canvas {
-        position: absolute; inset: 0;
-        width: 100%; height: 100%; pointer-events: none;
-    }
     .qibla-ar-overlay {
         position: absolute; inset: 0;
         display: flex; align-items: center; justify-content: center;
         pointer-events: none;
     }
-    .qibla-ar-ring {
-        position: relative;
-        width: 220px; height: 220px;
-        border: 2px solid rgba(201,168,76,0.5);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        transition: transform 0.15s linear;
-        filter: drop-shadow(0 0 12px rgba(201,168,76,0.4));
+    /* Clean arrow wrapper — rotates to face Qibla */
+    .qibla-ar-arrow-wrap {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        transition: transform 0.12s linear;
+        filter: drop-shadow(0 2px 12px rgba(0,0,0,0.7));
     }
-    .qibla-ar-arrow {
-        position: absolute; top: -8px; left: 50%;
-        transform: translateX(-50%);
-        width: 40px; height: 60px;
+    #qibla-ar-svg {
+        width: 52px; height: 78px;
+        transition: filter 0.25s;
     }
-    .qibla-ar-kaaba {
-        font-size: 2.2rem;
-        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+    .qibla-ar-label {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: 0.8rem; color: var(--gold);
+        text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+        letter-spacing: 0.1em;
+        transition: color 0.25s;
+    }
+    .qibla-ar-arrow-wrap.aligned #qibla-ar-svg {
+        filter: drop-shadow(0 0 14px rgba(52,196,145,0.9));
+    }
+    .qibla-ar-arrow-wrap.aligned .qibla-ar-label {
+        color: var(--em-light);
+    }
+    .qibla-ar-arrow-wrap.aligned #qibla-ar-svg path {
+        fill: var(--em-light);
     }
 
     /* =====================================================
@@ -1823,14 +1802,7 @@
 
                 <!-- COMPASS view -->
                 <div id="qibla-compass-wrap" class="hidden">
-                    <!-- Outer container holds both the icon ring and the canvas -->
                     <div class="qibla-compass-outer" id="qibla-compass-outer">
-                        <!-- 12-direction icon ring (fixed in DOM, rotated by JS to world position) -->
-                        <div class="qibla-icon-ring" id="qibla-icon-ring">
-                            <!-- Qibla icon placed at the bearing via JS transform -->
-                            <div class="qibla-kaaba-icon" id="qibla-kaaba-icon">🕋</div>
-                        </div>
-                        <!-- The rotating compass dial canvas -->
                         <canvas id="qibla-compass-canvas" width="320" height="320"></canvas>
                     </div>
                     <div id="qibla-compass-status" class="qibla-compass-status">
@@ -1845,16 +1817,13 @@
                 <div id="qibla-camera-wrap" class="hidden">
                     <div class="qibla-ar-container">
                         <video id="qibla-video" autoplay playsinline muted></video>
-                        <canvas id="qibla-ar-canvas"></canvas>
+                        <!-- Clean direction arrow overlay — no compass dial -->
                         <div class="qibla-ar-overlay">
-                            <div class="qibla-ar-ring" id="qibla-ar-ring">
-                                <div class="qibla-ar-arrow" id="qibla-ar-arrow">
-                                    <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 4 L36 52 L20 42 L4 52 Z" fill="var(--gold)" opacity="0.92"/>
-                                        <circle cx="20" cy="42" r="4" fill="white" opacity="0.7"/>
-                                    </svg>
-                                </div>
-                                <div class="qibla-ar-kaaba">🕋</div>
+                            <div class="qibla-ar-arrow-wrap" id="qibla-ar-arrow-wrap">
+                                <svg id="qibla-ar-svg" viewBox="0 0 60 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M30 4 L54 78 L30 62 L6 78 Z" fill="var(--gold)" opacity="0.95"/>
+                                </svg>
+                                <div class="qibla-ar-label" id="qibla-ar-label">Qibla</div>
                             </div>
                         </div>
                     </div>
@@ -3237,8 +3206,6 @@ function intermediatePoint(p1, p2, f) {
 
 function startQiblaCompass() {
     showQiblaState('compass');
-    // Position the Kaaba icon after the DOM renders
-    setTimeout(() => positionKaabaIcon(qiblaData.bearing || 0), 80);
     drawCompass(0);
 
     // Prefer absolute orientation (gives true-North referenced heading)
@@ -3313,46 +3280,12 @@ function stopQiblaCompass() {
 //   positioned at the Qibla bearing in screen space (fixed, never rotates).
 //   When the dial's Qibla arrow aligns with it (within ±8°), both are highlighted.
 
-function positionKaabaIcon(bearing) {
-    const outer = document.getElementById('qibla-compass-outer');
-    const icon  = document.getElementById('qibla-kaaba-icon');
-    if (!outer || !icon) return;
-
-    const outerSize = outer.offsetWidth || 340;
-    const radius    = outerSize / 2 - 4; // just inside outer edge
-    // bearing = clockwise from North; 0° = top, 90° = right
-    const angleRad = (bearing - 90) * Math.PI / 180;
-    const x = outerSize / 2 + radius * Math.cos(angleRad);
-    const y = outerSize / 2 + radius * Math.sin(angleRad);
-    icon.style.left = x + 'px';
-    icon.style.top  = y + 'px';
-}
-
-function updateKaabaAlignment(deviceHeading) {
-    const icon = document.getElementById('qibla-kaaba-icon');
-    if (!icon || qiblaData.bearing === null) return;
-    // The dial's Qibla arrow points at bearing. The dial has rotated by -heading.
-    // So in screen space the arrow sits at (bearing - heading).
-    // The Kaaba icon is fixed at bearing in screen space.
-    // They align when (bearing - heading) mod 360 ≈ bearing, i.e. when heading ≈ 0.
-    // More precisely: diff between device heading and Qibla bearing.
-    const diff = Math.abs(((qiblaData.bearing - deviceHeading + 180) % 360) - 180);
-    if (diff < 8) {
-        icon.classList.add('aligned');
-    } else {
-        icon.classList.remove('aligned');
-    }
-    return diff;
-}
-
 function drawCompass(deviceHeading) {
     const canvas = document.getElementById('qibla-compass-canvas');
     if (!canvas) return;
 
-    // Position the HTML Kaaba icon
-    positionKaabaIcon(qiblaData.bearing || 0);
-
-    const diff = updateKaabaAlignment(deviceHeading);
+    const diff = Math.abs(((qiblaData.bearing - deviceHeading + 180) % 360) - 180);
+    const aligned = diff < 8;
 
     const ctx     = canvas.getContext('2d');
     const size    = canvas.width;
@@ -3366,7 +3299,6 @@ function drawCompass(deviceHeading) {
     const textCol = isDark ? '#e0d0a0' : '#2a1400';
     const dimCol  = isDark ? 'rgba(201,168,76,0.18)' : 'rgba(140,90,20,0.18)';
     const bg      = isDark ? '#0f1520' : '#fdf6e8';
-    const aligned = diff !== undefined && diff < 8;
 
     ctx.clearRect(0, 0, size, size);
 
@@ -3547,10 +3479,13 @@ function startQiblaCamera() {
 }
 
 function startCameraOrientation() {
-    const ring   = document.getElementById('qibla-ar-ring');
+    const arrow  = document.getElementById('qibla-ar-arrow-wrap');
+    const label  = document.getElementById('qibla-ar-label');
     const status = document.getElementById('qibla-ar-status');
 
-    // handleOrientation: rotate ring so Qibla icon stays world-locked
+    // Rotate the arrow so it stays world-locked on Qibla bearing.
+    // offset = bearing - heading: when phone faces North (heading=0), arrow points at bearing.
+    // As phone rotates CW, heading increases, offset decreases, keeping arrow on Mecca.
     const handleOrientation = e => {
         let heading = null;
         if (typeof e.webkitCompassHeading === 'number') {
@@ -3558,25 +3493,23 @@ function startCameraOrientation() {
         } else if (e.alpha !== null && e.alpha !== undefined) {
             heading = (360 - e.alpha) % 360;
         }
-        if (heading === null || !ring) return;
+        if (heading === null) return;
 
         qiblaData.deviceHeading = heading;
-
-        // offset = how much to rotate the ring so the Kaaba arrow stays pointing at Mecca
-        // When phone faces North (heading=0): offset = bearing (arrow points toward Qibla)
-        // When phone rotates CW by X°: bearing stays fixed in world, so offset = bearing - heading
         const offset = (qiblaData.bearing - heading + 360) % 360;
-        ring.style.transform = 'rotate(' + offset + 'deg)';
+        if (arrow) arrow.style.transform = 'rotate(' + offset + 'deg)';
 
         const diff = Math.round(Math.abs(((qiblaData.bearing - heading + 180) % 360) - 180));
-        const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '→' : '←';
+        const side = ((qiblaData.bearing - heading + 360) % 360) < 180 ? '\u2192' : '\u2190';
 
         if (diff < 8) {
-            status.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
-            ring.style.boxShadow = '0 0 30px rgba(42,200,120,0.6)';
+            if (arrow) arrow.classList.add('aligned');
+            if (label) label.textContent = '\u0627\u0644\u0642\u0628\u0644\u0629';  // القبلة
+            if (status) { status.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631'; status.style.color = 'var(--em-light)'; }
         } else {
-            status.textContent = 'Rotate ' + diff + '\u00b0 ' + side + ' toward Qibla';
-            ring.style.boxShadow = '';
+            if (arrow) arrow.classList.remove('aligned');
+            if (label) label.textContent = 'Qibla';
+            if (status) { status.textContent = 'Turn ' + diff + '\u00b0 ' + side + ' toward Qibla'; status.style.color = ''; }
         }
     };
 
@@ -3587,21 +3520,20 @@ function startCameraOrientation() {
             .then(s => {
                 if (s === 'granted') {
                     window.addEventListener('deviceorientation', handleOrientation, true);
-                    status.textContent = 'Raise your phone — the \uD83D\uDED1 will lock onto Mecca.';
+                    if (status) status.textContent = 'Raise your phone — the arrow will lock onto Qibla.';
                 } else {
-                    status.textContent = 'Compass permission denied. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
+                    if (status) status.textContent = 'Compass permission denied. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
                 }
             }).catch(() => {
-                status.textContent = 'Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
+                if (status) status.textContent = 'Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
             });
     } else if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', handleOrientation, true);
-        status.textContent = 'Raise your phone — the \uD83D\uDED1 will lock onto Mecca.';
+        if (status) status.textContent = 'Raise your phone — the arrow will lock onto Qibla.';
     } else {
-        // No compass: show fixed bearing, ring static
         const offset = qiblaData.bearing;
-        if (ring) ring.style.transform = 'rotate(' + offset + 'deg)';
-        status.textContent = 'Compass unavailable. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
+        if (arrow) arrow.style.transform = 'rotate(' + offset + 'deg)';
+        if (status) status.textContent = 'Compass unavailable. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
     }
 }
 
