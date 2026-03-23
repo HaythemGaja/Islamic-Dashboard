@@ -3002,12 +3002,13 @@ const MECCA = { lat: 21.4225, lng: 39.8262 };
 
 let qiblaData = {
     userLat: null, userLng: null,
-    bearing: null,       // degrees from N to Mecca
-    deviceHeading: null, // degrees from N (compass)
+    bearing: null,
+    deviceHeading: null,
     mode: 'map',
     map: null, qiblaLine: null,
     videoStream: null,
     orientHandler: null,
+    orientAbsHandler: null,
     animFrame: null,
 };
 
@@ -3249,33 +3250,21 @@ function startQiblaCompass() {
     }
 
     const startAbsolute = () => {
-        let fired = false;
-        const handler = e => {
-            let raw = null;
-            if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
-                raw = e.webkitCompassHeading;
-            } else if (e.absolute && typeof e.alpha === 'number') {
-                raw = (360 - e.alpha) % 360;
-            } else if (typeof e.alpha === 'number') {
-                raw = (360 - e.alpha) % 360;
-            }
+        let firedAbsolute = false;
+        let firedAny      = false;
+
+        // Handler that processes a heading value
+        const process = raw => {
             if (raw === null) return;
-            fired = true;
-
-            // Initialise on first reading
+            firedAny = true;
             if (smoothHeading === null) smoothHeading = raw;
-
-            // Apply low-pass filter
             smoothHeading = lerpAngle(smoothHeading, raw, ALPHA);
-
-            // Throttle redraws to rAF — skip if one is already queued
             if (rafPending) return;
             rafPending = true;
             requestAnimationFrame(() => {
                 rafPending = false;
                 qiblaData.deviceHeading = smoothHeading;
                 drawCompass(smoothHeading);
-
                 const diff = Math.round(Math.abs(((qiblaData.bearing - smoothHeading + 180) % 360) - 180));
                 const side = ((qiblaData.bearing - smoothHeading + 360) % 360) < 180 ? '\u2192' : '\u2190';
                 const statusEl = document.getElementById('qibla-compass-status');
@@ -3290,10 +3279,39 @@ function startQiblaCompass() {
                 }
             });
         };
-        window.addEventListener('deviceorientationabsolute', handler, true);
-        window.addEventListener('deviceorientation', handler, true);
-        qiblaData.orientHandler = handler;
-        setTimeout(() => { if (!fired) showNoCompass(); }, 2500);
+
+        // Absolute handler — always correct (true North referenced)
+        const absHandler = e => {
+            let raw = null;
+            if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+                raw = e.webkitCompassHeading;           // iOS
+            } else if (typeof e.alpha === 'number') {
+                raw = (360 - e.alpha) % 360;            // Android absolute alpha
+            }
+            if (raw !== null) firedAbsolute = true;
+            process(raw);
+        };
+
+        // Fallback handler — only used if absolute never fires
+        const fallbackHandler = e => {
+            if (firedAbsolute) return;  // absolute is working, ignore fallback
+            let raw = null;
+            if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+                raw = e.webkitCompassHeading;
+            } else if (typeof e.alpha === 'number') {
+                raw = (360 - e.alpha) % 360;
+            }
+            process(raw);
+        };
+
+        window.addEventListener('deviceorientationabsolute', absHandler, true);
+        window.addEventListener('deviceorientation', fallbackHandler, true);
+
+        // Store both so stopQiblaCompass can remove them
+        qiblaData.orientHandler     = fallbackHandler;
+        qiblaData.orientAbsHandler  = absHandler;
+
+        setTimeout(() => { if (!firedAny) showNoCompass(); }, 2500);
     };
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -3315,8 +3333,11 @@ function showNoCompass() {
 }
 
 function stopQiblaCompass() {
+    if (qiblaData.orientAbsHandler) {
+        window.removeEventListener('deviceorientationabsolute', qiblaData.orientAbsHandler, true);
+        qiblaData.orientAbsHandler = null;
+    }
     if (qiblaData.orientHandler) {
-        window.removeEventListener('deviceorientationabsolute', qiblaData.orientHandler, true);
         window.removeEventListener('deviceorientation', qiblaData.orientHandler, true);
         qiblaData.orientHandler = null;
     }
