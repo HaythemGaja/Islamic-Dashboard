@@ -3559,41 +3559,34 @@ function startCameraOrientation() {
     const dirR   = document.getElementById('qibla-dir-right');
     const status = document.getElementById('qibla-ar-status');
 
-    // Smoothing for camera mode too
-    let smoothHeading = null;
-    let rafPending    = false;
-    const ALPHA       = 0.15;
+    let smoothHeading  = null;
+    let rafPending     = false;
+    let firedAbsolute  = false;
+    const ALPHA = 0.15;
+
     function lerpAngle(cur, tgt, a) {
         const d = ((tgt - cur + 540) % 360) - 180;
         return (cur + d * a + 360) % 360;
     }
 
-    const handleOrientation = e => {
-        let raw = null;
-        if (typeof e.webkitCompassHeading === 'number') raw = e.webkitCompassHeading;
-        else if (e.alpha !== null && e.alpha !== undefined) raw = (360 - e.alpha) % 360;
+    const process = raw => {
         if (raw === null) return;
-
         if (smoothHeading === null) smoothHeading = raw;
         smoothHeading = lerpAngle(smoothHeading, raw, ALPHA);
-
         if (rafPending) return;
         rafPending = true;
         requestAnimationFrame(() => {
             rafPending = false;
             qiblaData.deviceHeading = smoothHeading;
 
-            const diff = Math.round(Math.abs(((qiblaData.bearing - smoothHeading + 180) % 360) - 180));
-            // signed offset: positive = Qibla is to the right, negative = to the left
-            const signed = ((qiblaData.bearing - smoothHeading + 360) % 360);
-            const turnRight = signed <= 180; // CW to reach Qibla
+            const diff      = Math.round(Math.abs(((qiblaData.bearing - smoothHeading + 180) % 360) - 180));
+            const signed    = ((qiblaData.bearing - smoothHeading + 360) % 360);
+            const turnRight = signed <= 180;
             const aligned   = diff < 8;
 
-            // Kaaba highlight
-            if (kaaba)  kaaba.classList.toggle('aligned', aligned);
-            if (label)  label.textContent = aligned ? '\u0627\u0644\u0642\u0628\u0644\u0629' : 'Qibla';
+            if (kaaba) kaaba.classList.toggle('aligned', aligned);
+            if (label) label.textContent = aligned ? '\u0627\u0644\u0642\u0628\u0644\u0629' : 'Qibla';
 
-            // Directional arrows
             if (dirL && dirR) {
                 if (aligned) {
                     dirL.classList.remove('visible');
@@ -3607,7 +3600,6 @@ function startCameraOrientation() {
                 }
             }
 
-            // Status text
             if (status) {
                 if (aligned) {
                     status.textContent = '\u2705 Facing Qibla! \u0627\u0644\u0644\u0647 \u0623\u0643\u0628\u0631';
@@ -3621,23 +3613,48 @@ function startCameraOrientation() {
         });
     };
 
-    qiblaData.orientHandler = handleOrientation;
+    // Absolute handler — North-referenced (correct on both iOS and Android)
+    const absHandler = e => {
+        let raw = null;
+        if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+            raw = e.webkitCompassHeading;
+        } else if (typeof e.alpha === 'number') {
+            raw = (360 - e.alpha) % 360;
+        }
+        if (raw !== null) firedAbsolute = true;
+        process(raw);
+    };
+
+    // Fallback — only runs if absolute never fires
+    const fallbackHandler = e => {
+        if (firedAbsolute) return;
+        let raw = null;
+        if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+            raw = e.webkitCompassHeading;
+        } else if (typeof e.alpha === 'number') {
+            raw = (360 - e.alpha) % 360;
+        }
+        process(raw);
+    };
+
+    const attach = () => {
+        window.addEventListener('deviceorientationabsolute', absHandler, true);
+        window.addEventListener('deviceorientation', fallbackHandler, true);
+        qiblaData.orientAbsHandler = absHandler;
+        qiblaData.orientHandler    = fallbackHandler;
+        if (status) status.textContent = 'Rotate your phone to find the Qibla direction.';
+    };
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
             .then(s => {
-                if (s === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation, true);
-                    if (status) status.textContent = 'Rotate your phone to find the Qibla direction.';
-                } else {
-                    if (status) status.textContent = 'Compass permission denied. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
-                }
+                if (s === 'granted') attach();
+                else if (status) status.textContent = 'Compass permission denied. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
             }).catch(() => {
                 if (status) status.textContent = 'Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
             });
-    } else if (window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', handleOrientation, true);
-        if (status) status.textContent = 'Rotate your phone to find the Qibla direction.';
+    } else if (window.DeviceOrientationEvent || window.ondeviceorientationabsolute !== undefined) {
+        attach();
     } else {
         if (status) status.textContent = 'Compass unavailable. Qibla is ' + Math.round(qiblaData.bearing) + '\u00b0 from North.';
     }
@@ -3649,6 +3666,10 @@ function stopQiblaCamera() {
         qiblaData.videoStream = null;
         const v = document.getElementById('qibla-video');
         if (v) v.srcObject = null;
+    }
+    if (qiblaData.orientAbsHandler) {
+        window.removeEventListener('deviceorientationabsolute', qiblaData.orientAbsHandler, true);
+        qiblaData.orientAbsHandler = null;
     }
     if (qiblaData.orientHandler) {
         window.removeEventListener('deviceorientation', qiblaData.orientHandler, true);
