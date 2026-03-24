@@ -1112,6 +1112,29 @@
         border-color: rgba(201,168,76,0.5); color: var(--gold-light); font-weight: 700;
     }
     .qibla-mode-btn:hover:not(.active) { border-color: rgba(201,168,76,0.3); color: var(--gold); }
+    .qibla-auto-btn.active {
+        background: linear-gradient(135deg, rgba(52,196,145,0.2), rgba(52,196,145,0.08));
+        border-color: rgba(52,196,145,0.55); color: var(--em-light); font-weight: 700;
+    }
+    .qibla-auto-pill {
+        display: flex; align-items: center; gap: 6px;
+        padding: 0.28rem 0.85rem;
+        background: rgba(52,196,145,0.1);
+        border-bottom: 1px solid rgba(52,196,145,0.2);
+        font-size: 0.72rem; color: var(--em-light);
+        font-family: 'Crimson Pro', serif; letter-spacing: 0.03em;
+    }
+    [data-theme="light"] .qibla-auto-pill { color: #16704a; background: rgba(22,112,74,0.08); }
+    .qibla-auto-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--em-light);
+        animation: auto-blink 1.4s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+    @keyframes auto-blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
+    }
 
     /* Loading / error */
     .qibla-status-block {
@@ -1805,6 +1828,12 @@
                     <button class="qibla-mode-btn active" data-mode="map"     id="qbtn-map">🗺 Map</button>
                     <button class="qibla-mode-btn"        data-mode="compass" id="qbtn-compass">🧭 Compass</button>
                     <button class="qibla-mode-btn"        data-mode="camera"  id="qbtn-camera">📷 Camera AR</button>
+                    <button class="qibla-mode-btn qibla-auto-btn" id="qbtn-auto" title="Switch modes automatically based on phone orientation">⚡ Auto</button>
+                </div>
+                <!-- Auto mode indicator (shown when Auto is active) -->
+                <div class="qibla-auto-pill" id="qibla-auto-pill" style="display:none;">
+                    <span class="qibla-auto-dot"></span>
+                    Auto · <span id="qibla-auto-current">Compass</span>
                 </div>
 
                 <!-- Loading / error state -->
@@ -1993,6 +2022,10 @@ function toggleTheme(){
 function initTabs(){
     document.querySelectorAll('.nav-btn').forEach(btn=>{
         btn.addEventListener('click',()=>{
+            // Stop Qibla auto mode when leaving the Qibla tab
+            if (btn.dataset.target !== 'tab-qibla' && window._qiblaInited) {
+                stopAutoMode();
+            }
             document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
@@ -3010,6 +3043,9 @@ let qiblaData = {
     orientHandler: null,
     orientAbsHandler: null,
     animFrame: null,
+    autoMode: false,
+    autoCurrentMode: null,
+    autoOrientHandler: null,
 };
 
 // ── Haversine bearing ──────────────────────────────────────────────────────
@@ -3036,18 +3072,121 @@ function calcDistance(lat1, lng1, lat2, lng2) {
 
 // ── Entry point ────────────────────────────────────────────────────────────
 function initQibla() {
-    // Mode buttons
-    document.querySelectorAll('.qibla-mode-btn').forEach(btn => {
+    // Manual mode buttons
+    document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(btn => {
         btn.addEventListener('click', () => {
+            stopAutoMode();
             document.querySelectorAll('.qibla-mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             switchQiblaMode(btn.dataset.mode);
         });
     });
 
+    // Auto mode button
+    document.getElementById('qbtn-auto')?.addEventListener('click', () => {
+        const isOn = qiblaData.autoMode;
+        if (isOn) {
+            stopAutoMode();
+        } else {
+            startAutoMode();
+        }
+    });
+
     document.getElementById('qibla-retry-btn')?.addEventListener('click', startQiblaLocation);
 
     startQiblaLocation();
+}
+
+// ── Auto mode: switch between compass and camera based on device tilt ───────
+// Beta = front-back tilt: 0° = flat on table, 90° = upright (portrait).
+// Thresholds: beta < 30° → flat → compass; beta > 50° → raised → camera AR.
+// Hysteresis band (30–50°) prevents rapid switching at the boundary.
+
+function startAutoMode() {
+    if (!window.DeviceOrientationEvent && !window.ondeviceorientationabsolute) {
+        alert('Device orientation sensors not available on this device.');
+        return;
+    }
+
+    qiblaData.autoMode = true;
+    qiblaData.autoCurrentMode = null; // force initial switch
+
+    // Update button UI
+    document.getElementById('qbtn-auto')?.classList.add('active');
+    // Dim manual buttons (still clickable to exit auto)
+    document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b => {
+        b.style.opacity = '0.4';
+        b.style.pointerEvents = 'none';
+    });
+    document.getElementById('qibla-auto-pill').style.display = 'flex';
+
+    const FLAT_THRESH   = 30;  // below this → flat → compass
+    const RAISED_THRESH = 50;  // above this → raised → camera AR
+
+    const handler = e => {
+        if (!qiblaData.autoMode) return;
+        // beta: device tilt from horizontal. 0=flat, 90=upright portrait.
+        const beta = Math.abs(e.beta || 0);
+
+        let newMode = qiblaData.autoCurrentMode;
+        if (beta < FLAT_THRESH) {
+            newMode = 'compass';
+        } else if (beta > RAISED_THRESH) {
+            newMode = 'camera';
+        }
+        // In the hysteresis band, keep current mode
+
+        if (newMode && newMode !== qiblaData.autoCurrentMode) {
+            qiblaData.autoCurrentMode = newMode;
+
+            // Update indicator label
+            const label = document.getElementById('qibla-auto-current');
+            if (label) label.textContent = newMode === 'compass' ? '🧭 Compass' : '📷 Camera AR';
+
+            // Highlight the corresponding mode button (visual only, no click handler)
+            document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === newMode);
+            });
+
+            switchQiblaMode(newMode);
+        }
+    };
+
+    window.addEventListener('deviceorientation', handler, true);
+    qiblaData.autoOrientHandler = handler;
+
+    // Trigger once immediately in case phone is already tilted
+    // by dispatching a synthetic check after a short delay
+    setTimeout(() => {
+        if (qiblaData.autoMode && qiblaData.autoCurrentMode === null) {
+            // Default to compass if no event fired
+            qiblaData.autoCurrentMode = 'compass';
+            document.getElementById('qibla-auto-current').textContent = '🧭 Compass';
+            document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === 'compass');
+            });
+            switchQiblaMode('compass');
+        }
+    }, 800);
+}
+
+function stopAutoMode() {
+    if (!qiblaData.autoMode) return;
+    qiblaData.autoMode = false;
+    qiblaData.autoCurrentMode = null;
+
+    if (qiblaData.autoOrientHandler) {
+        window.removeEventListener('deviceorientation', qiblaData.autoOrientHandler, true);
+        qiblaData.autoOrientHandler = null;
+    }
+
+    // Restore manual buttons
+    document.getElementById('qbtn-auto')?.classList.remove('active');
+    document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b => {
+        b.style.opacity = '';
+        b.style.pointerEvents = '';
+    });
+    document.getElementById('qibla-auto-pill').style.display = 'none';
 }
 
 function startQiblaLocation() {
