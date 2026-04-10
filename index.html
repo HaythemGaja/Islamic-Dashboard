@@ -431,6 +431,50 @@
     [data-theme="light"] .table-footer { background:rgba(0,0,0,0.03); }
 
     /* =====================================================
+       NEW FEATURES: DAILY INSPIRATION & TRACKER
+    ===================================================== */
+    .inspiration-card {
+        background: linear-gradient(135deg, var(--surface), var(--surface-2));
+        border: 1px solid var(--border); border-radius: 16px;
+        padding: 1.2rem 1.5rem; margin-bottom: 1rem;
+        display: flex; gap: 1rem; align-items: center; position: relative;
+        overflow: hidden;
+    }
+    .inspiration-card::before {
+        content: '✨'; position: absolute; top: -10px; right: -5px; font-size: 6rem;
+        opacity: 0.04; color: var(--gold); pointer-events: none;
+    }
+    .insp-icon { font-size: 2rem; color: var(--gold); flex-shrink: 0; display: flex;}
+    .insp-content { flex: 1; }
+    .insp-ar { font-family: 'Noto Naskh Arabic', serif; font-size: 1.15rem; color: var(--gold-light); margin-bottom: 0.2rem; }
+    [data-theme="light"] .insp-ar { color: var(--gold); }
+    .insp-en { font-size: 0.85rem; color: var(--text-2); font-style: italic; line-height: 1.4; margin-bottom: 0.4rem; }
+    .insp-ref { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .prayer-tracker-btn {
+        width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid var(--border-sub);
+        background: transparent; color: transparent; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s; font-size: 0.8rem;
+    }
+    .prayer-tracker-btn:hover { border-color: var(--gold); }
+    
+    /* Tracker States */
+    .trk-1 { background: rgba(34,197,94,0.15); border-color: var(--em-light); color: var(--em-light); } /* On Time */
+    .trk-2 { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #f59e0b; } /* Late */
+    .trk-3 { background: rgba(239,68,68,0.15); border-color: #ef4444; color: #ef4444; } /* Missed */
+    
+    .btn-gps {
+        background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.28);
+        color: var(--gold-light); border-radius: 8px; width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
+        transition: all 0.2s; flex-shrink: 0;
+    }
+    .btn-gps:hover { background: rgba(201,168,76,0.2); }
+    .btn-gps.locating { animation: pulse-gold 1s infinite; pointer-events: none; }
+    [data-theme="light"] .btn-gps { color: #7a5c10; }
+
+    /* =====================================================
        EVENTS TAB
     ===================================================== */
     .events-grid {
@@ -1055,6 +1099,17 @@
         <div id="tab-daily" class="tab-content">
             <div id="daily-loading" class="loading-blk"><svg class="svg-icon spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg> Loading prayer times…</div>
             <div id="daily-loaded" class="hidden">
+                
+                <!-- Daily Inspiration Card -->
+                <div class="inspiration-card">
+                    <div class="insp-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                    <div class="insp-content">
+                        <div class="insp-ar" id="insp-ar"></div>
+                        <div class="insp-en" id="insp-en"></div>
+                        <div class="insp-ref" id="insp-ref"></div>
+                    </div>
+                </div>
+
                 <div class="daily-grid">
                     <div class="clock-card">
                         <div id="big-clock">--:--<span class="ampm">--</span></div>
@@ -1216,10 +1271,15 @@
                     <div class="s2">
                         <div><label class="field-label">Country</label><select class="ctrl-select" id="country-select" style="width:100%"><option value="" disabled selected>Loading…</option></select></div>
                         <div><label class="field-label">State / Region</label><select class="ctrl-select" id="state-select" style="width:100%"><option value="">Select</option></select></div>
-                        <div style="grid-column:1/-1">
-                            <label class="field-label">City</label>
-                            <input type="text" class="ctrl-input" id="city-input" list="cities-datalist" placeholder="Type or select city…" autocomplete="off">
-                            <datalist id="cities-datalist"></datalist>
+                        <div style="grid-column:1/-1; display: flex; gap: 0.5rem; align-items: flex-end;">
+                            <div style="flex:1;">
+                                <label class="field-label">City</label>
+                                <input type="text" class="ctrl-input" id="city-input" list="cities-datalist" placeholder="Type or select city…" autocomplete="off">
+                                <datalist id="cities-datalist"></datalist>
+                            </div>
+                            <button class="btn-gps" id="btn-gps" title="Auto-Locate Me (GPS)">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-14 0c0 4.5 7 11 7 11s7-6.5 7-11Z"/></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1543,8 +1603,34 @@ const SVG_ICONS = {
     calendar: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
     mosque: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg>`,
     sparkle: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>`,
-    playFill: `<svg class="svg-icon fill" viewBox="0 0 24 24" style="width:0.7em;height:0.7em;"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+    playFill: `<svg class="svg-icon fill" viewBox="0 0 24 24" style="width:0.7em;height:0.7em;"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+    check: `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+    minus: `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+    x: `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
 };
+
+const INSPIRATIONS = [
+    { ar: "فَاذْكُرُونِي أَذْكُرْكُمْ", en: "So remember Me; I will remember you.", ref: "Quran 2:152" },
+    { ar: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", en: "Indeed, with hardship [will be] ease.", ref: "Quran 94:6" },
+    { ar: "لا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا", en: "Do not grieve; indeed Allah is with us.", ref: "Quran 9:40" },
+    { ar: "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", en: "And He is with you wherever you are.", ref: "Quran 57:4" },
+    { ar: "رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ", en: "My Lord, indeed I am, for whatever good You would send down to me, in need.", ref: "Quran 28:24" },
+    { ar: "وَٱصۡبِرۡ لِحُكۡمِ رَبِّكَ فَإِنَّكَ بِأَعۡيُنِنَا", en: "And be patient for the decision of your Lord, for indeed, you are in Our eyes.", ref: "Quran 52:48" },
+    { ar: "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا", en: "Our Lord, let not our hearts deviate after You have guided us.", ref: "Quran 3:8" },
+    { ar: "احْفَظِ اللَّهَ يَحْفَظْكَ", en: "Be mindful of Allah, and Allah will protect you.", ref: "Hadith - Tirmidhi" },
+    { ar: "الدِّينُ النَّصِيحَةُ", en: "Religion is sincerity.", ref: "Hadith - Muslim" },
+    { ar: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ", en: "The best among you is the one who learns the Quran and teaches it.", ref: "Hadith - Bukhari" }
+];
+
+function initInspiration() {
+    // Generate a daily pseudo-random index
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    const ins = INSPIRATIONS[dayOfYear % INSPIRATIONS.length];
+    
+    document.getElementById('insp-ar').textContent = ins.ar;
+    document.getElementById('insp-en').textContent = ins.en;
+    document.getElementById('insp-ref').textContent = ins.ref;
+}
 
 const THEME_PRESETS = {
     dark: {
@@ -2088,7 +2174,11 @@ function jumpToToday() {
 }
 
 // ======================== REFRESH ========================
-async function refreshAll(){updateMonthYear();populateDays();await fetchDaily();await fetchMonthly();calcEvents();updateTicker();}
+async function refreshAll(){
+    updateMonthYear();populateDays();
+    initInspiration(); // Update daily quote
+    await fetchDaily();await fetchMonthly();calcEvents();updateTicker();
+}
 
 // ======================== DAILY ========================
 async function fetchDaily(){
@@ -2110,24 +2200,76 @@ async function fetchDaily(){
     ldd.classList.add('hidden');
     
     const d=NOW;
+    const cacheKey = `mizan_daily_${d.getDate()}_${d.getMonth()}_${city}`;
     const url=`https://api.aladhan.com/v1/timingsByCity/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state||'')}&method=${method}`;
+    
+    let json = null;
+    
     try{
-        const res=await fetch(url),json=await res.json();
+        const res=await fetch(url);
+        json=await res.json();
         if(json.code!==200)throw 0;
-        const{timings,date,meta}=json.data;
-        document.getElementById('clock-date').textContent=date.readable;
-        document.getElementById('clock-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`;
-        document.getElementById('header-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;
-        const plist=[{key:'Fajr',time:timings.Fajr},{key:'Sunrise',time:timings.Sunrise,sec:true},{key:'Dhuhr',time:timings.Dhuhr},{key:'Asr',time:timings.Asr},{key:'Maghrib',time:timings.Maghrib},{key:'Isha',time:timings.Isha}];
-        document.getElementById('daily-list').innerHTML=plist.map(p=>`
-            <li class="prayer-item${p.sec?' is-sec':''}" data-prayer="${p.key}">
+        // Save to cache for offline support
+        localStorage.setItem(cacheKey, JSON.stringify(json));
+    }catch(e){
+        // Fallback to cache if offline
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            json = JSON.parse(cached);
+        } else {
+            ld.innerHTML=`<svg class="svg-icon" viewBox="0 0 24 24" style="color:#ef4444;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Could not load prayer times. Check location settings or internet connection.`;
+            return;
+        }
+    }
+
+    const{timings,date,meta}=json.data;
+    document.getElementById('clock-date').textContent=date.readable;
+    document.getElementById('clock-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`;
+    document.getElementById('header-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;
+    
+    // Load Tracker Data
+    const trkKey = `mizan_trk_${d.getDate()}_${d.getMonth()}`;
+    const trackerData = JSON.parse(localStorage.getItem(trkKey) || '{}');
+
+    const plist=[{key:'Fajr',time:timings.Fajr},{key:'Sunrise',time:timings.Sunrise,sec:true},{key:'Dhuhr',time:timings.Dhuhr},{key:'Asr',time:timings.Asr},{key:'Maghrib',time:timings.Maghrib},{key:'Isha',time:timings.Isha}];
+    document.getElementById('daily-list').innerHTML=plist.map(p=>{
+        const stat = trackerData[p.key] || 0; // 0: unset, 1: on-time, 2: late, 3: missed
+        let statCls = '', statIco = '';
+        if(stat===1) { statCls=' trk-1'; statIco=SVG_ICONS.check; }
+        if(stat===2) { statCls=' trk-2'; statIco=SVG_ICONS.minus; }
+        if(stat===3) { statCls=' trk-3'; statIco=SVG_ICONS.x; }
+        
+        return `<li class="prayer-item${p.sec?' is-sec':''}" data-prayer="${p.key}">
+            <div style="display:flex; align-items:center; gap:10px;">
+                ${p.sec ? '' : `<button class="prayer-tracker-btn${statCls}" data-prayer="${p.key}" data-status="${stat}" title="Track Prayer">${statIco}</button>`}
                 <div><div class="p-name">${p.key}</div><span class="p-name-ar">${PAR[p.key]||''}</span></div>
-                <div class="p-time" dir="ltr">${fmtT(p.time)}</div>
-            </li>`).join('');
-        ld.classList.add('hidden');
-        ldd.classList.remove('hidden');
-        startCountdown(timings,meta.timezone);
-    }catch(e){ld.innerHTML=`<svg class="svg-icon" viewBox="0 0 24 24" style="color:#ef4444;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Could not load prayer times. Check location settings.`;}
+            </div>
+            <div class="p-time" dir="ltr">${fmtT(p.time)}</div>
+        </li>`;
+    }).join('');
+    
+    // Attach tracker events
+    document.querySelectorAll('.prayer-tracker-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const pKey = btn.dataset.prayer;
+            let st = parseInt(btn.dataset.status);
+            st = (st + 1) % 4; // Cycle: 0 -> 1(On Time) -> 2(Late) -> 3(Missed) -> 0
+            
+            // Save state
+            const curData = JSON.parse(localStorage.getItem(trkKey) || '{}');
+            curData[pKey] = st;
+            localStorage.setItem(trkKey, JSON.stringify(curData));
+            
+            // Update UI
+            btn.dataset.status = st;
+            btn.className = 'prayer-tracker-btn' + (st===1?' trk-1':st===2?' trk-2':st===3?' trk-3':'');
+            btn.innerHTML = st===1 ? SVG_ICONS.check : st===2 ? SVG_ICONS.minus : st===3 ? SVG_ICONS.x : '';
+        });
+    });
+
+    ld.classList.add('hidden');
+    ldd.classList.remove('hidden');
+    startCountdown(timings,meta.timezone);
 }
 
 // ======================== COUNTDOWN + PRAYER SCHEDULER ========================
@@ -2541,13 +2683,25 @@ async function fetchMonthly(){
     const names = calendarType==='gregorian' ? GMONTHS : HMONTHS;
     const mName = names[parseInt(month)-1]||'';
     document.getElementById('monthly-title').textContent=`${mName} ${year}`;
+    
+    const cacheKey = `mizan_month_${year}_${month}_${ep}_${city}`;
+    let data = null;
+    
     try{
-        const res=await fetch(url),data=await res.json();
-        if(data.code===200&&data.data){
-            const filtered=data.data.filter(d=>{const n=parseInt(calendarType==='gregorian'?d.date.gregorian.day:d.date.hijri.day);return ed===32?n>=sd:n>=sd&&n<=ed;});
-            currentPrayerData=filtered;renderTable(filtered,calendarType);
-        }else body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)">No data found. Verify location settings.</td></tr>`;
-    }catch{body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:#ef4444">Network error.</td></tr>`;}
+        const res=await fetch(url);
+        data=await res.json();
+        if(data.code === 200) localStorage.setItem(cacheKey, JSON.stringify(data));
+    }catch{
+        const cached = localStorage.getItem(cacheKey);
+        if(cached) data = JSON.parse(cached);
+    }
+    
+    if(data && data.code===200&&data.data){
+        const filtered=data.data.filter(d=>{const n=parseInt(calendarType==='gregorian'?d.date.gregorian.day:d.date.hijri.day);return ed===32?n>=sd:n>=sd&&n<=ed;});
+        currentPrayerData=filtered;renderTable(filtered,calendarType);
+    }else{
+        body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:#ef4444">Network error or no data found.</td></tr>`;
+    }
 }
 
 function renderTable(arr,calType){
@@ -2953,14 +3107,70 @@ function reorderAzkarItem(id, newPos) {
 
 // ======================== INIT ========================
 document.addEventListener('DOMContentLoaded',async()=>{
+    
+    // Inject PWA Manifest (Inline dynamically to avoid external files)
+    const manifest = {
+        name: "Mizan Islamic Dashboard",
+        short_name: "Mizan",
+        description: "Prayer times, Hijri calendar, and Azkar.",
+        display: "standalone",
+        start_url: ".",
+        background_color: "#232736",
+        theme_color: "#232736",
+        icons: [{ src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>", sizes: "192x192", type: "image/svg+xml" }]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestUrl}">`);
+
     fetchTodayHijri();
     initMobileFullscreen();
     initTabs();
     initCalPills();
     initDayListeners();
+    initInspiration(); // Initialize Daily Ayah/Hadith
 
     initAzkar();
     renderAzkar('morning');
+
+    // Setup GPS Button
+    document.getElementById('btn-gps')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        if (!navigator.geolocation) return alert("Geolocation is not supported by your browser.");
+        
+        btn.classList.add('locating');
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                // Free BigDataCloud Reverse Geocoding API
+                const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=en`);
+                const d = await r.json();
+                if (d.city || d.locality) {
+                    const locName = d.city || d.locality;
+                    document.getElementById('city-input').value = locName;
+                    
+                    // Attempt to match country
+                    const cSel = document.getElementById('country-select');
+                    let matched = false;
+                    for(let i=0; i<cSel.options.length; i++) {
+                        if(cSel.options[i].value === d.countryName || d.countryName.includes(cSel.options[i].value)) {
+                            cSel.selectedIndex = i;
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if(matched) await loadStates(null, locName, false);
+                    saveSettings();
+                }
+            } catch(e) {
+                alert("Could not fetch city name from GPS coordinates.");
+            } finally {
+                btn.classList.remove('locating');
+            }
+        }, () => {
+            alert("Failed to get your location. Please allow GPS permissions.");
+            btn.classList.remove('locating');
+        }, { enableHighAccuracy: true });
+    });
 
     const cSel = document.getElementById('country-select');
     try {
