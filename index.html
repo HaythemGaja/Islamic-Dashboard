@@ -271,10 +271,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
     document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
 
-    const swCode = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>self.clients.claim());self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(res=>{return res||fetch(e.request).then(fRes=>{return caches.open('mizan-v1').then(cache=>{if(e.request.url.startsWith('http'))cache.put(e.request,fRes.clone());return fRes;});});}).catch(()=>new Response('Offline')));});`;
-    const swBlob = new Blob([swCode], {type: 'application/javascript'});
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob));
-
     fetchTodayHijri(); initMobileFullscreen(); initTabs(); initCalPills(); initDayListeners(); initInspiration();
     initAzkar(); renderAzkar('morning');
 
