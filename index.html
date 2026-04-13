@@ -1227,6 +1227,19 @@ function calcDistance(lat1,lng1,lat2,lng2){
 function destPoint(lat,lng,brng,d){
     const R=6371; const brngRad=brng*Math.PI/180; const lat1=lat*Math.PI/180; const lng1=lng*Math.PI/180; const lat2=Math.asin(Math.sin(lat1)*Math.cos(d/R)+Math.cos(lat1)*Math.sin(d/R)*Math.cos(brngRad)); const lng2=lng1+Math.atan2(Math.sin(brngRad)*Math.sin(d/R)*Math.cos(lat1),Math.cos(d/R)-Math.sin(lat1)*Math.sin(lat2)); return [lat2*180/Math.PI,lng2*180/Math.PI];
 }
+function getGreatCircle(lat1,lng1,lat2,lng2){
+    const toRad=d=>d*Math.PI/180; const toDeg=r=>r*180/Math.PI; const p1=toRad(lat1), l1=toRad(lng1); const p2=toRad(lat2), l2=toRad(lng2);
+    const d=2*Math.asin(Math.sqrt(Math.pow(Math.sin((p1-p2)/2),2)+Math.cos(p1)*Math.cos(p2)*Math.pow(Math.sin((l1-l2)/2),2)));
+    if(d===0)return[[lat1,lng1]]; const coords=[];
+    for(let i=0;i<=100;i++){
+        const f=i/100; const A=Math.sin((1-f)*d)/Math.sin(d); const B=Math.sin(f*d)/Math.sin(d);
+        const x=A*Math.cos(p1)*Math.cos(l1)+B*Math.cos(p2)*Math.cos(l2); const y=A*Math.cos(p1)*Math.sin(l1)+B*Math.cos(p2)*Math.sin(l2); const z=A*Math.sin(p1)+B*Math.sin(p2);
+        let lon=toDeg(Math.atan2(y,x));
+        if(i>0){ let prevLon=coords[i-1][1]; if(lon-prevLon>180)lon-=360; else if(lon-prevLon<-180)lon+=360; }
+        coords.push([toDeg(Math.atan2(z,Math.sqrt(x*x+y*y))),lon]);
+    }
+    return coords;
+}
 
 function initQibla(){
     $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(btn=>{ btn.addEventListener('click',()=>{ stopAutoMode(); $$('.qibla-mode-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); switchQiblaMode(btn.dataset.mode); }); });
@@ -1286,8 +1299,8 @@ function startQiblaMap(){
         const userMarker = L.marker([qiblaData.userLat,qiblaData.userLng],{icon:userIcon}).addTo(map).bindPopup('📍 Your location');
         L.marker([MECCA.lat,MECCA.lng],{icon:meccaIcon}).addTo(map).bindPopup('Mecca');
         
-        const rayEnd=destPoint(qiblaData.userLat,qiblaData.userLng,qiblaData.bearing,1500);
-        qiblaData.qiblaLine=L.polyline([[qiblaData.userLat,qiblaData.userLng],rayEnd],{color:'var(--gold)',weight:4,opacity:0.9}).addTo(map);
+        const gcCoords=getGreatCircle(qiblaData.userLat,qiblaData.userLng,MECCA.lat,MECCA.lng);
+        qiblaData.qiblaLine=L.polyline(gcCoords,{color:'var(--gold)',weight:4,opacity:0.9}).addTo(map);
         map.fitBounds(qiblaData.qiblaLine.getBounds(),{padding:[40,40]});
 
         const pointer = $('qibla-map-pointer');
