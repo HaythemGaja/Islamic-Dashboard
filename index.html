@@ -14,142 +14,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <style>
-    /* =====================================================
-       DESIGN TOKENS — LIGHTER DARK MODE
-    ===================================================== */
     :root {
-        --gold:        #c9a84c;
-        --gold-light:  #e8c86a;
-        --emerald:     #22c55e;
-        --em-light:    #4ade80;
-        --em-glow:     rgba(34,197,94,0.15);
-
-        --bg:          #232736;
-        --bg-2:        #2e3446;
-        --bg-3:        #3b4256;
-        --surface:     #282d3e;
-        --surface-2:   #31374a;
-
-        --border:      rgba(201,168,76,0.25);
-        --border-sub:  rgba(255,255,255,0.08);
-
-        --text:        #ffffff;
-        --text-2:      #cbd5e1;
-        --text-3:      #94a3b8;
-
-        --shadow:      0 4px 32px rgba(0,0,0,0.4);
-        --shadow-g:    0 0 40px rgba(201,168,76,0.08);
-
-        --ticker-bg:   #1a1d29;
-        --ticker-fade: #1a1d29;
-
-        --nav-bg:      rgba(35,39,54,0.97);
-        --nav-border:  rgba(201,168,76,0.25);
-        --nav-active:  var(--gold);
-        --nav-dim:     #64748b;
-
-        --pat-op:      0.06;
+        --gold: #c9a84c; --gold-light: #e8c86a; --emerald: #22c55e; --em-light: #4ade80; --em-glow: rgba(34,197,94,0.15);
+        --bg: #232736; --bg-2: #2e3446; --bg-3: #3b4256; --surface: #282d3e; --surface-2: #31374a;
+        --border: rgba(201,168,76,0.25); --border-sub: rgba(255,255,255,0.08);
+        --text: #ffffff; --text-2: #cbd5e1; --text-3: #94a3b8;
+        --shadow: 0 4px 32px rgba(0,0,0,0.4); --shadow-g: 0 0 40px rgba(201,168,76,0.08);
+        --ticker-bg: #1a1d29; --ticker-fade: #1a1d29; --nav-bg: rgba(35,39,54,0.97); --nav-border: rgba(201,168,76,0.25); --nav-active: var(--gold); --nav-dim: #64748b; --pat-op: 0.06;
     }
-
-    /* =====================================================
-       LIGHT MODE
-    ===================================================== */
     [data-theme="light"] {
-        --bg:          #f8fafc;
-        --bg-2:        #f1f5f9;
-        --bg-3:        #e2e8f0;
-        --surface:     #ffffff;
-        --surface-2:   #f8fafc;
-
-        --border:      rgba(140,100,30,0.25);
-        --border-sub:  rgba(0,0,0,0.08);
-
-        --text:        #0f172a;
-        --text-2:      #334155;
-        --text-3:      #64748b;
-
-        --shadow:      0 4px 24px rgba(0,0,0,0.08);
-        --shadow-g:    0 0 30px rgba(180,140,50,0.05);
-
-        --ticker-bg:   #f1f5f9;
-        --ticker-fade: #f1f5f9;
-
-        --nav-bg:      rgba(255,255,255,0.98);
-        --nav-border:  rgba(140,100,30,0.22);
-        --nav-active:  #8a6010;
-        --nav-dim:     #64748b;
-
-        --pat-op:      0.04;
-
-        --gold:        #8a6010;
-        --gold-light:  #a07820;
-        --em-light:    #16a34a;
-        --em-glow:     rgba(22,163,74,0.1);
+        --bg: #f8fafc; --bg-2: #f1f5f9; --bg-3: #e2e8f0; --surface: #ffffff; --surface-2: #f8fafc;
+        --border: rgba(140,100,30,0.25); --border-sub: rgba(0,0,0,0.08);
+        --text: #0f172a; --text-2: #334155; --text-3: #64748b;
+        --shadow: 0 4px 24px rgba(0,0,0,0.08); --shadow-g: 0 0 30px rgba(180,140,50,0.05);
+        --ticker-bg: #f1f5f9; --ticker-fade: #f1f5f9; --nav-bg: rgba(255,255,255,0.98); --nav-border: rgba(140,100,30,0.22); --nav-active: #8a6010; --nav-dim: #64748b; --pat-op: 0.04; --gold: #8a6010; --gold-light: #a07820; --em-light: #16a34a; --em-glow: rgba(22,163,74,0.1);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
     html { scroll-behavior: smooth; }
-
-    body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'Crimson Pro', Georgia, serif;
-        min-height: 100vh;
-        min-height: 100dvh;
-        overflow-x: hidden;
-        padding-bottom: calc(68px + env(safe-area-inset-bottom));
-        transition: background 0.35s, color 0.35s;
-    }
-
-    .svg-icon {
-        width: 1.15em; height: 1.15em; stroke: currentColor; fill: none;
-        stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-        display: inline-block; vertical-align: middle; position: relative;
-        top: -0.05em; flex-shrink: 0;
-    }
+    body { background: var(--bg); color: var(--text); font-family: 'Crimson Pro', Georgia, serif; min-height: 100vh; overflow-x: hidden; padding-bottom: calc(68px + env(safe-area-inset-bottom)); transition: background 0.35s, color 0.35s; }
+    .svg-icon { width: 1.15em; height: 1.15em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; vertical-align: middle; position: relative; top: -0.05em; flex-shrink: 0; }
     .svg-icon.fill { fill: currentColor; stroke: none; }
-
-    body::before {
-        content:''; position:fixed; inset:0; z-index:0;
-        background-image:url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-opacity='1'%3E%3Cpolygon points='60,8 112,34 112,86 60,112 8,86 8,34'/%3E%3Cpolygon points='60,24 96,43 96,77 60,96 24,77 24,43'/%3E%3Cline x1='60' y1='8' x2='60' y2='24'/%3E%3Cline x1='112' y1='34' x2='96' y2='43'/%3E%3Cline x1='112' y1='86' x2='96' y2='77'/%3E%3Cline x1='60' y1='112' x2='60' y2='96'/%3E%3Cline x1='8' y1='86' x2='24' y2='77'/%3E%3Cline x1='8' y1='34' x2='24' y2='43'/%3E%3C/g%3E%3C/svg%3E");
-        background-size:120px 120px; opacity:var(--pat-op); pointer-events:none;
-        transition: opacity 0.35s;
-    }
-    body::after {
-        content:''; position:fixed; z-index:0; top:-200px; left:50%; transform:translateX(-50%);
-        width:900px; height:600px; background:radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%); pointer-events:none;
-    }
-
+    body::before { content:''; position:fixed; inset:0; z-index:0; background-image:url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-opacity='1'%3E%3Cpolygon points='60,8 112,34 112,86 60,112 8,86 8,34'/%3E%3Cpolygon points='60,24 96,43 96,77 60,96 24,77 24,43'/%3E%3Cline x1='60' y1='8' x2='60' y2='24'/%3E%3Cline x1='112' y1='34' x2='96' y2='43'/%3E%3Cline x1='112' y1='86' x2='96' y2='77'/%3E%3Cline x1='60' y1='112' x2='60' y2='96'/%3E%3Cline x1='8' y1='86' x2='24' y2='77'/%3E%3Cline x1='8' y1='34' x2='24' y2='43'/%3E%3C/g%3E%3C/svg%3E"); background-size:120px 120px; opacity:var(--pat-op); pointer-events:none; transition: opacity 0.35s; }
     .layout-wrapper { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 1rem 1.5rem; }
-
-    .ticker-bar { background:var(--ticker-bg); border-bottom:1px solid var(--border); padding:8px 0; overflow:hidden; position:relative; z-index:10; transition:background 0.35s, border-color 0.35s; }
-    .ticker-bar::before,.ticker-bar::after { content:''; position:absolute; top:0; bottom:0; width:60px; z-index:2; }
+    .ticker-bar { background:var(--ticker-bg); border-bottom:1px solid var(--border); padding:8px 0; overflow:hidden; position:relative; z-index:10; }
+    .ticker-bar::before, .ticker-bar::after { content:''; position:absolute; top:0; bottom:0; width:60px; z-index:2; }
     .ticker-bar::before { left:0; background:linear-gradient(90deg, var(--ticker-fade),transparent); }
     .ticker-bar::after { right:0; background:linear-gradient(270deg, var(--ticker-fade),transparent); }
     .ticker-track { display:inline-flex; align-items: center; white-space:nowrap; animation:tickscroll 55s linear infinite; font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--gold); letter-spacing:0.04em; padding-left:100%; gap: 1.5rem; }
     .ticker-item { display: inline-flex; align-items: center; gap: 0.4rem; }
-    .ticker-track:hover { animation-play-state:paused; }
     @keyframes tickscroll { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
-
     .site-header { padding:0.9rem 0 0.75rem; display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap; border-bottom:1px solid var(--border); }
     .logo-block { display:flex; align-items:center; gap:0.7rem; }
-    .logo-icon { width:40px; height:40px; flex-shrink:0; color: var(--gold); background:linear-gradient(135deg,var(--bg-3),var(--bg-2)); border:1.5px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 0 16px rgba(201,168,76,0.18); transition:background 0.35s; }
+    .logo-icon { width:40px; height:40px; flex-shrink:0; color: var(--gold); background:linear-gradient(135deg,var(--bg-3),var(--bg-2)); border:1.5px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 0 16px rgba(201,168,76,0.18); }
     .logo-text { font-family:'Cinzel Decorative',serif; }
     .logo-text .title { font-size:1.1rem; color:var(--gold); letter-spacing:0.06em; font-weight: 700; }
     .logo-text .subtitle { font-size:0.6rem; color:var(--text-3); letter-spacing:0.12em; text-transform:uppercase; display:none; }
     @media(min-width:480px){ .logo-text .subtitle { display:block; } }
-
     .header-right { display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap; justify-content:flex-end; }
     #header-location { font-size:0.82rem; color:var(--text); font-weight:600; }
     #header-hijri { font-size:0.7rem; color:var(--gold); font-family:'Noto Naskh Arabic',serif; }
-
     .theme-btn { width:36px; height:36px; border-radius:50%; background:var(--surface); border:1px solid var(--border); color: var(--gold); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.25s; flex-shrink:0; font-size: 1.1rem; }
     .theme-btn:hover { border-color:var(--gold); box-shadow:0 0 10px rgba(201,168,76,0.2); }
-
-    .fav-mini { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.3rem 0.6rem; color:var(--text); font-family:'Crimson Pro',serif; font-size:0.78rem; outline:none; cursor:pointer; max-width:155px; -webkit-appearance:none; appearance:none; transition:background 0.35s, border-color 0.35s; }
+    .fav-mini { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.3rem 0.6rem; color:var(--text); font-family:'Crimson Pro',serif; font-size:0.78rem; outline:none; cursor:pointer; max-width:155px; -webkit-appearance:none; appearance:none; }
     .fav-mini option { background:var(--bg-2); color:var(--text); }
-
-    .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:50; background:var(--nav-bg); border-top:1px solid var(--nav-border); backdrop-filter:blur(18px) saturate(1.5); -webkit-backdrop-filter:blur(18px) saturate(1.5); padding-bottom:env(safe-area-inset-bottom); transition:background 0.35s, border-color 0.35s; }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:50; background:var(--nav-bg); border-top:1px solid var(--nav-border); backdrop-filter:blur(18px); padding-bottom:env(safe-area-inset-bottom); }
     .bottom-nav-inner { display:flex; max-width:600px; margin:0 auto; padding:0 0.5rem; justify-content: space-around;}
     .nav-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:9px 12px; background:none; border:none; color:var(--nav-dim); cursor:pointer; transition:color 0.2s; font-family:'Crimson Pro',serif; position:relative; }
     .nav-btn .nav-icon { font-size:1.3rem; transition:transform 0.2s; }
@@ -158,33 +66,27 @@
     .nav-btn.active .nav-icon { transform:translateY(-2px); }
     .nav-btn:hover { color:var(--gold); }
     .nav-btn.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:22px; height:3px; background:var(--gold); border-radius:3px 3px 0 0; }
-
     .tab-content { animation:fadeUp 0.25s ease both; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} }
     .hidden { display:none !important; }
-
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow),var(--shadow-g); position:relative; transition:background 0.35s, border-color 0.35s; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow),var(--shadow-g); position:relative; }
     .card::before { content:''; position:absolute; inset:0; background:linear-gradient(160deg,rgba(201,168,76,0.025) 0%,transparent 50%); pointer-events:none; }
     .card-header { padding:1.3rem 1.5rem 1rem; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(201,168,76,0.04) 0%,transparent 100%); }
     .card-header h2 { font-family:'Cinzel Decorative',serif; font-size:0.95rem; color:var(--gold); letter-spacing:0.06em; font-weight: 700; }
     .card-sub { font-size:0.7rem; color:var(--text-3); text-transform:uppercase; letter-spacing:0.1em; margin-top:3px; }
-
     .daily-grid { display:grid; grid-template-columns:1fr; gap:1rem; }
     @media(min-width:640px){ .daily-grid { grid-template-columns:1fr 1fr; } }
-
-    .clock-card { background:linear-gradient(160deg,var(--bg-3) 0%,var(--bg-2) 100%); border:1px solid var(--border); border-radius:16px; padding:1.4rem; text-align:center; position:relative; overflow:hidden; transition:background 0.35s; }
+    .clock-card { background:linear-gradient(160deg,var(--bg-3) 0%,var(--bg-2) 100%); border:1px solid var(--border); border-radius:16px; padding:1.4rem; text-align:center; position:relative; overflow:hidden; }
     [data-theme="light"] .clock-card { background:linear-gradient(160deg,#e2e8f0 0%,#f8fafc 100%); }
     .clock-card .bg-moon { position:absolute; bottom:-25px; right:-15px; color:var(--gold); opacity:0.06; pointer-events:none; font-size: 8rem; }
     #big-clock { font-family:'JetBrains Mono',monospace; font-size:2.6rem; color:var(--text); letter-spacing:-0.02em; line-height:1; text-shadow:0 0 28px rgba(201,168,76,0.22); }
     #big-clock .ampm { font-size:0.85rem; color:var(--gold); margin-left:4px; }
     .clock-date { font-size:0.85rem; color:var(--text-2); margin-top:0.35rem; }
     .clock-hijri { font-size:0.78rem; color:var(--gold); font-family:'Noto Naskh Arabic',serif; margin-top:3px; }
-
     .next-pill { display:inline-flex; align-items:center; gap:5px; background:var(--em-glow); border:1px solid rgba(34,197,94,0.3); border-radius:100px; padding:4px 13px; font-size:0.75rem; color:var(--em-light); margin-top:0.6rem; }
     .next-pill .pname { font-weight:700; color:var(--em-light); }
     .next-pill .pcount { font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
-    #next-event-disp { font-size:0.7rem; color:var(--em-light); margin-top:0.3rem; transition:color 0.35s; display: flex; align-items: center; justify-content: center; gap: 4px; }
-
+    #next-event-disp { font-size:0.7rem; color:var(--em-light); margin-top:0.3rem; display: flex; align-items: center; justify-content: center; gap: 4px; }
     .inspiration-card { background: linear-gradient(135deg, var(--surface), var(--surface-2)); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; position: relative; overflow: hidden; }
     .inspiration-card::before { content: '✨'; position: absolute; top: -10px; right: -5px; font-size: 6rem; opacity: 0.04; color: var(--gold); pointer-events: none; }
     .insp-icon { font-size: 2rem; color: var(--gold); flex-shrink: 0; display: flex;}
@@ -193,8 +95,7 @@
     [data-theme="light"] .insp-ar { color: var(--gold); }
     .insp-en { font-size: 0.85rem; color: var(--text-2); font-style: italic; line-height: 1.4; margin-bottom: 0.4rem; }
     .insp-ref { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; }
-
-    .prayer-list-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:background 0.35s, border-color 0.35s; }
+    .prayer-list-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
     .loc-strip { display:flex; align-items:center; gap:5px; padding:0.6rem 1.1rem; border-bottom:1px solid var(--border-sub); font-size:0.68rem; color:var(--text-3); text-transform:uppercase; letter-spacing:0.09em; }
     .loc-strip b { color:var(--gold); }
     .prayer-item { display:flex; justify-content:space-between; align-items:center; padding:0.78rem 1.1rem; border-bottom:1px solid var(--border-sub); transition:background 0.15s; }
@@ -211,30 +112,19 @@
     .p-badge { font-family:'JetBrains Mono',monospace; font-size:0.6rem; background:var(--em-glow); color:var(--em-light); border-radius:4px; padding:1px 5px; margin-left:4px; }
     .p-badge.past { background:rgba(255,255,255,0.06); color:var(--text-3); }
     [data-theme="light"] .p-badge.past { background:rgba(0,0,0,0.05); }
-
-    .prayer-tracker-btn { width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid var(--border-sub); background: transparent; color: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.8rem; }
-    .prayer-tracker-btn:hover { border-color: var(--gold); }
-    .trk-1 { background: rgba(34,197,94,0.15); border-color: var(--em-light); color: var(--em-light); } 
-    .trk-2 { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #f59e0b; } 
-    .trk-3 { background: rgba(239,68,68,0.15); border-color: #ef4444; color: #ef4444; }
-
-    .monthly-controls { display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; padding:1.1rem 1.2rem; border-bottom:1px solid var(--border); background:var(--surface-2); transition:background 0.35s; }
+    .monthly-controls { display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; padding:1.1rem 1.2rem; border-bottom:1px solid var(--border); background:var(--surface-2); }
     @media(min-width:600px){ .monthly-controls { grid-template-columns:repeat(3,1fr); } }
     @media(min-width:900px){ .monthly-controls { grid-template-columns:repeat(6,1fr); } }
     .ctrl-group { display:flex; flex-direction:column; gap:3px; }
     .ctrl-label { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); }
-    .ctrl-select,.ctrl-input { width:100%; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:0.42rem 0.6rem; color:var(--text); font-family:'Crimson Pro',serif; font-size:0.82rem; outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; transition:border-color 0.2s, background 0.35s, color 0.35s; }
+    .ctrl-select,.ctrl-input { width:100%; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:0.42rem 0.6rem; color:var(--text); font-family:'Crimson Pro',serif; font-size:0.82rem; outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; transition:border-color 0.2s; }
     .ctrl-select:focus,.ctrl-input:focus { border-color:var(--gold); }
-    .ctrl-select option { background:var(--bg-2); color:var(--text); }
-
     .btn-update { grid-column:1/-1; background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08)); border:1px solid rgba(201,168,76,0.35); color:var(--gold-light); padding:0.48rem 1rem; border-radius:8px; display: flex; justify-content: center; align-items: center; gap: 6px; font-family:'Crimson Pro',serif; font-size:0.88rem; cursor:pointer; transition:all 0.2s; }
     .btn-update:hover { background:rgba(201,168,76,0.26); }
     [data-theme="light"] .btn-update { color:#7a5c10; }
     @media(min-width:900px){ .btn-update { grid-column:auto; } }
-
     .btn-today { background: var(--em-glow); border: 1px solid rgba(34,197,94,0.35); color: var(--em-light); padding: 0.48rem 0.85rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
     .btn-today:hover { background: rgba(34,197,94,0.25); }
-
     .overflow-table { overflow-x:auto; }
     .prayer-table { width:100%; border-collapse:collapse; }
     .prayer-table thead th { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); padding:0.7rem 1rem; text-align:left; background:rgba(0,0,0,0.2); border-bottom:1px solid var(--border); white-space:nowrap; }
@@ -253,7 +143,6 @@
     .sunrise-col { color:var(--text-3) !important; }
     .table-footer { padding:0.6rem 1.2rem; font-size:0.65rem; color:var(--text-3); border-top:1px solid var(--border); background:rgba(0,0,0,0.15); letter-spacing:0.04em; }
     [data-theme="light"] .table-footer { background:rgba(0,0,0,0.03); }
-
     .events-grid { display:grid; grid-template-columns:1fr; gap:0.7rem; padding:1.2rem; }
     @media(min-width:540px){ .events-grid { grid-template-columns:1fr 1fr; } }
     .event-card { background:var(--surface-2); border:1px solid var(--border-sub); border-radius:12px; padding:0.9rem 1.1rem; display:flex; gap:0.8rem; align-items:flex-start; transition:all 0.2s; }
@@ -270,7 +159,6 @@
     .badge-next { background:rgba(34,197,94,0.16); color:var(--em-light); border:1px solid rgba(34,197,94,0.26); }
     .badge-soon { background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid rgba(201,168,76,0.18); }
     .badge-past { background:var(--surface-2); color:var(--text-3); border:1px solid var(--border-sub); }
-
     .settings-section { padding:1.3rem 1.4rem; border-bottom:1px solid var(--border); }
     .settings-section:last-child { border-bottom:none; }
     .settings-section h3 { font-family:'Cinzel Decorative',serif; font-size:0.7rem; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.9rem; font-weight: 700; }
@@ -279,16 +167,13 @@
     .field-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); margin-bottom:3px; display:block; }
     .fav-bar { background:var(--surface-2); border:1px solid var(--border-sub); border-radius:12px; padding:0.95rem 1.1rem; }
     .fav-bar-row { display:flex; gap:0.45rem; margin-top:0.5rem; align-items:center; }
-
     .btn-gps { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.28); color: var(--gold-light); border-radius: 8px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
     .btn-gps:hover { background: rgba(201,168,76,0.2); }
     .btn-gps.locating { animation: pulse-gold 1s infinite; pointer-events: none; opacity: 0.7; }
     [data-theme="light"] .btn-gps { color: #7a5c10; }
-
     .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:0.5rem 0; gap: 1rem; }
     .toggle-row .tlabel { font-size:0.86rem; color:var(--text); flex:1; }
     .toggle-row .tlabel small { display:block; font-size:0.7rem; color:var(--text-3); margin-top:1px; }
-
     .tog { position:relative; width:42px; height:22px; flex-shrink:0; }
     .tog input { opacity:0; width:0; height:0; position:absolute; }
     .tok { position:absolute; inset:0; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:100px; cursor:pointer; transition:all 0.3s; }
@@ -296,22 +181,17 @@
     .tok::after { content:''; position:absolute; width:16px; height:16px; left:2px; top:2px; background:var(--text-3); border-radius:50%; transition:all 0.3s; }
     .tog input:checked + .tok { background:var(--em-glow); border-color:var(--em-light); }
     .tog input:checked + .tok::after { transform:translateX(20px); background:var(--em-light); }
-
     .btn-save { width:100%; background:linear-gradient(135deg,var(--emerald) 0%,var(--em-light) 100%); color:white; border:none; padding:0.82rem; border-radius:10px; font-family:'Crimson Pro',serif; font-size:1rem; font-weight:600; cursor:pointer; letter-spacing:0.04em; transition:all 0.2s; box-shadow:0 4px 18px rgba(34,197,94,0.2); display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-save:hover { opacity:0.9; transform:translateY(-1px); }
-
     .btn-sm { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.28); color:var(--gold-light); padding:0.42rem 0.8rem; display: flex; align-items: center; gap: 4px; border-radius:8px; font-family:'Crimson Pro',serif; font-size:0.82rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
     .btn-sm:hover { background:rgba(201,168,76,0.2); }
     [data-theme="light"] .btn-sm { color:#7a5c10; }
-
     .btn-del { background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.22); color:#ef4444; padding:0.42rem 0.72rem; display: flex; align-items: center; justify-content: center; border-radius:8px; font-size:0.82rem; cursor:pointer; transition:all 0.2s; }
     .btn-del:disabled { opacity:0.28; cursor:not-allowed; }
     .btn-del:not(:disabled):hover { background:rgba(239,68,68,0.14); }
-
     .btn-icon { background:var(--surface-2); border:1px solid var(--border-sub); display: flex; align-items: center; gap: 4px; color:var(--text-2); padding:0.38rem 0.65rem; border-radius:8px; font-size:0.76rem; cursor:pointer; transition:all 0.2s; }
     .btn-icon:hover { background:rgba(255,255,255,0.1); color:var(--text); }
     [data-theme="light"] .btn-icon:hover { background:rgba(0,0,0,0.08); }
-
     .color-customizer { background: var(--surface-2); border: 1px solid var(--border-sub); border-radius: 12px; padding: 1rem; margin-top: 0.5rem; }
     .color-cust-title { font-size: 0.82rem; font-weight: 700; color: var(--text-2); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
     .color-cust-badge { font-size: 0.65rem; color: var(--text-3); font-weight: 400; background: var(--border-sub); border-radius: 4px; padding: 1px 6px; }
@@ -326,13 +206,11 @@
     .color-cust-actions { margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; }
     .btn-cust-reset { background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-3); font-size: 0.78rem; padding: 0.4rem 0.8rem; cursor: pointer; transition: all 0.2s; font-family: 'Crimson Pro', serif; display: flex; align-items: center; gap: 4px; }
     .btn-cust-reset:hover { border-color: rgba(239,68,68,0.4); color: #ef4444; }
-
     .settings-version { text-align: center; padding: 1.5rem 1rem 0.5rem; border-top: 1px solid var(--border-sub); margin-top: 0.5rem; }
     .sv-logo { color: var(--gold); display: flex; justify-content: center; margin-bottom: 0.3rem; font-size: 1.5rem; }
     .sv-name { font-family: 'Cinzel Decorative', serif; font-size: 0.75rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 0.25rem; font-weight: 700; }
     .sv-ver { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-3); margin-bottom: 0.2rem; }
     .sv-copy { font-size: 0.7rem; color: var(--text-3); opacity: 0.6; }
-
     .modal-ov { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:200; display:none; align-items:center; justify-content:center; }
     .modal-ov.show { display:flex; }
     .alarm-box { background:var(--surface); border:1px solid var(--gold); border-radius:20px; padding:2.5rem 2rem; text-align:center; max-width:350px; width:90%; box-shadow:0 0 70px rgba(201,168,76,0.15); animation:minIn 0.35s cubic-bezier(0.34,1.56,0.64,1); position:relative; }
@@ -352,8 +230,7 @@
     #confirm-city-text { font-family:'Cinzel Decorative',serif; font-size:1.25rem; color:var(--gold-light); font-weight: 700; }
     #confirm-country-text { font-size:0.75rem; color:var(--text-3); margin-top:3px; }
     .loc-actions { display:flex; gap:0.6rem; justify-content:flex-end; }
-
-    .scroll-header { position: fixed; top: 0; left: 0; right: 0; z-index: 45; background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); padding: 0.55rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; transform: translateY(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.35s, border-color 0.35s; }
+    .scroll-header { position: fixed; top: 0; left: 0; right: 0; z-index: 45; background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); backdrop-filter: blur(18px); padding: 0.55rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; transform: translateY(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.35s, border-color 0.35s; }
     .scroll-header.visible { transform: translateY(0); }
     .sh-left { display:flex; align-items:center; gap:0.5rem; }
     .sh-icon { color: var(--gold); display: flex; }
@@ -363,7 +240,6 @@
     .sh-clock { font-family:'JetBrains Mono',monospace; font-size:0.9rem; color:var(--text); white-space:nowrap; }
     .sh-next-pill { display:inline-flex; align-items:center; gap:4px; background:var(--em-glow); border:1px solid rgba(34,197,94,0.3); border-radius:100px; padding:3px 10px; font-size:0.65rem; color:var(--em-light); white-space:nowrap; }
     .sh-next-pill .sp-name { font-weight:700; }
-
     body.header-visible { padding-top: 44px; }
     @media (max-width: 639px) {
         body.daily-active { overflow: hidden; }
@@ -377,7 +253,6 @@
         body.daily-scrolled { overflow: auto; }
     }
     @media (min-width: 640px) { .scroll-header { display: none !important; } }
-
     .notif-popup-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: flex-start; justify-content: flex-end; padding: 1.5rem; pointer-events: none; }
     .notif-popup-overlay.show { display: flex; pointer-events: auto; animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
     @keyframes popIn { from { opacity:0; transform: translateY(-20px) scale(0.92); } }
@@ -391,7 +266,6 @@
     .npc-time { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text-3); margin-bottom:0.85rem; display: flex; align-items: center; gap: 4px;}
     .npc-dismiss { width:100%; background:linear-gradient(135deg,var(--emerald),var(--em-light)); border:none; color:white; padding:0.6rem; border-radius:10px; font-family:'Crimson Pro',serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .npc-dismiss:hover { opacity:0.9; }
-
     .notif-master-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); transition: border-color 0.3s, background 0.3s; }
     .notif-master-card.state-on { border-color: rgba(34,197,94,0.4); background: var(--em-glow); }
     .notif-master-card.state-off { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.06); }
@@ -417,9 +291,7 @@
     [data-theme="light"] .btn-test-notif { color: #7a5c10; }
     .notif-sub-options { margin-top: 0.6rem; border-top: 1px solid var(--border-sub); padding-top: 0.7rem; overflow: hidden; transition: opacity 0.25s, max-height 0.3s; max-height: 300px; opacity: 1; }
     .notif-sub-options.hidden-opts { max-height: 0; opacity: 0; padding-top: 0; border-top-color: transparent; pointer-events: none; }
-
     @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); } 50% { box-shadow: 0 0 0 8px rgba(201,168,76,0.22); } }
-
     .qibla-card { overflow: hidden; }
     .qibla-bearing-badge { display: flex; align-items: baseline; gap: 3px; font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700; color: var(--gold); line-height: 1; }
     .qibla-bearing-label { font-size: 0.65rem; color: var(--text-3); font-family: 'Crimson Pro', serif; }
@@ -431,15 +303,14 @@
     .qibla-auto-pill { display: flex; align-items: center; gap: 6px; padding: 0.28rem 0.85rem; background: var(--em-glow); border-bottom: 1px solid rgba(34,197,94,0.2); font-size: 0.72rem; color: var(--em-light); font-family: 'Crimson Pro', serif; letter-spacing: 0.03em; }
     .qibla-auto-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--em-light); animation: auto-blink 1.4s ease-in-out infinite; flex-shrink: 0; }
     .qibla-status-block { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; padding: 3rem 1.5rem; text-align: center; color: var(--text-3); font-size: 0.88rem; }
-    #qibla-map-wrap { padding: 0; }
-    #qibla-map { width: 100%; height: 420px; border-radius: 0; background: var(--bg); }
+    #qibla-map-wrap { padding: 0; position: relative; }
+    #qibla-map { width: 100%; height: 420px; border-radius: 0; background: var(--bg); z-index: 1;}
     @media (max-width: 600px) { #qibla-map { height: 320px; } }
     .qibla-map-info { display: flex; justify-content: space-between; padding: 0.6rem 1rem; font-size: 0.72rem; color: var(--text-3); font-family: 'JetBrains Mono', monospace; border-top: 1px solid var(--border-sub); align-items: center;}
     .qibla-compass-outer { position: relative; width: 340px; height: 340px; margin: 1.2rem auto 0; display: flex; align-items: center; justify-content: center; }
     #qibla-compass-canvas { position: relative; z-index: 5; max-width: 320px; width: 100%; display: block; border-radius: 50%; }
     .qibla-compass-status { text-align: center; padding: 0.7rem 1.5rem 1rem; font-size: 0.82rem; color: var(--text-3); transition: color 0.3s; }
     .qibla-orient-hint { text-align: center; padding: 0 1rem 0.8rem; font-size: 0.75rem; color: #f59e0b; display: flex; justify-content: center; align-items: center; gap: 6px; }
-
     .qibla-ar-container { position: relative; width: 100%; aspect-ratio: 9/16; max-height: 70vh; overflow: hidden; background: #000; }
     @media (orientation: landscape) { .qibla-ar-container { aspect-ratio: 16/9; max-height: 60vh; } }
     #qibla-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -454,7 +325,6 @@
     .qibla-ar-kaaba-fixed.aligned { filter: drop-shadow(0 0 20px rgba(34,197,94,0.95)) drop-shadow(0 0 8px rgba(34,197,94,0.7)); transform: scale(1.15); animation: kaaba-glow 0.7s ease-in-out infinite alternate; }
     .qibla-ar-kaaba-fixed.aligned .qibla-kaaba-label { color: var(--em-light); }
     .qibla-ar-kaaba-fixed.aligned .qibla-kaaba-emoji { color: var(--em-light); }
-
     .cal-system-toggle { display:flex; align-items:center; gap:0.5rem; background:var(--surface); border:1px solid var(--border-sub); border-radius:10px; padding:0.5rem 0.9rem; margin-bottom:0; }
     .cal-system-toggle label { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); white-space:nowrap; }
     .cal-pill-group { display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
@@ -462,7 +332,6 @@
     .cal-pill.active { background:var(--gold); color:#1a1000; font-weight:700; }
     [data-theme="light"] .cal-pill.active { background:#8a6010; color:white; }
     .cal-pill:not(.active):hover { background:rgba(201,168,76,0.1); color:var(--gold); }
-
     @media print {
         @page { size: A4 portrait; margin: 10mm 12mm 10mm 12mm; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -474,7 +343,7 @@
         #print-header { display: flex !important; justify-content: space-between; align-items: flex-end; border-bottom: 2.5px solid #8a6820; padding-bottom: 6mm; margin-bottom: 5mm; }
         #print-header .ph-left { display:flex; align-items:center; gap:5mm; }
         #print-header .ph-mosque { color: #8a6820; font-size: 28pt; line-height:1; display:flex;}
-        #print-header .ph-title { font-family: 'Cinzel Decorative', 'Times New Roman', serif; font-size: 18pt; font-weight: 700; color: #8a6820; letter-spacing: 0.04em; line-height:1.1; }
+        #print-header .ph-title { font-family: 'Cinzel Decorative', serif; font-size: 18pt; font-weight: 700; color: #8a6820; letter-spacing: 0.04em; line-height:1.1; }
         #print-header .ph-subtitle { font-size: 8.5pt; color: #6a5020; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
         #print-header .ph-right { text-align: right; }
         #print-header .ph-month { font-family: 'Cinzel Decorative', serif; font-size: 13pt; color: #1a1200; font-weight: 700; }
@@ -494,7 +363,7 @@
         .prayer-table tbody tr.is-friday .date-main { color: #8a6820 !important; font-weight: 700 !important; }
         .prayer-table tbody tr.is-today { background: #e8f5ee !important; }
         .prayer-table tbody tr.is-today td:first-child { border-left: 3pt solid #16a34a !important; }
-        .prayer-table td { padding: 2.2mm 2.5mm !important; font-size: 8pt !important; color: #1a1200 !important; font-family: 'JetBrains Mono', 'Courier New', monospace !important; border: none !important; }
+        .prayer-table td { padding: 2.2mm 2.5mm !important; font-size: 8pt !important; color: #1a1200 !important; font-family: 'JetBrains Mono', monospace !important; border: none !important; }
         .prayer-table td:first-child { font-family: 'Crimson Pro', Georgia, serif !important; font-size: 8.5pt !important; }
         .date-main { color: #1a1200 !important; font-weight: 700 !important; font-size: 8.5pt !important; }
         .date-sub  { font-size: 6.5pt !important; color: #8a7a60 !important; }
@@ -518,7 +387,7 @@
     <div class="sh-right">
         <div class="sh-clock" id="sh-clock">--:--</div>
         <div class="sh-next-pill" id="sh-pill" style="display:none;">
-            <svg class="svg-icon fill" viewBox="0 0 24 24" style="width:0.7em;height:0.7em;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <svg class="svg-icon fill" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <span class="sp-name" id="sh-pill-name">—</span>&nbsp;<span id="sh-pill-count">—</span>
         </div>
     </div>
@@ -527,7 +396,7 @@
 <div class="notif-popup-overlay no-print" id="notif-popup-overlay">
     <div class="notif-popup-card">
         <div class="npc-header">
-            <div class="npc-mosque"><svg class="svg-icon" viewBox="0 0 24 24" style="width:1.5em;height:1.5em;"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg></div>
+            <div class="npc-mosque"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg></div>
             <div><div class="npc-title" id="npc-prayer-name">Fajr</div><div class="npc-app">Mizan · Islamic Dashboard</div></div>
         </div>
         <div class="npc-body">It is now time for prayer</div>
@@ -542,8 +411,8 @@
 
 <div id="alarm-modal" class="modal-ov">
     <div class="alarm-box">
-        <button class="close-x" id="modal-close-x" aria-label="Close"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <span class="alarm-icon"><svg class="svg-icon" viewBox="0 0 24 24" style="width:1em;height:1em;"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg></span>
+        <button class="close-x" id="modal-close-x"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <span class="alarm-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg></span>
         <div class="alarm-label">It is time for</div><div id="modal-prayer-name" class="alarm-name">—</div><div id="modal-prayer-time" class="alarm-time">—</div>
         <button id="dismiss-alarm-btn" class="alarm-dis">
             <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Dismiss / إغلاق
@@ -557,8 +426,8 @@
         <p style="font-size:0.8rem;color:var(--text-3);">We detected your location as:</p>
         <div class="loc-det"><div id="confirm-city-text">Detecting…</div><div id="confirm-country-text">Please wait</div></div>
         <div class="loc-actions">
-            <button id="btn-deny-loc" class="btn-icon" style="font-family:'Crimson Pro',serif;"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</button>
-            <button id="btn-confirm-loc" class="btn-sm" style="font-family:'Crimson Pro',serif;"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Location</button>
+            <button id="btn-deny-loc" class="btn-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</button>
+            <button id="btn-confirm-loc" class="btn-sm"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Location</button>
         </div>
     </div>
 </div>
@@ -584,8 +453,10 @@
         <div id="tab-daily" class="tab-content">
             <div id="daily-loading" class="loading-blk"><svg class="svg-icon spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg> Loading...</div>
             <div id="daily-loaded" class="hidden">
+                
+                <!-- Daily Inspiration -->
                 <div class="inspiration-card">
-                    <div class="insp-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                    <div class="insp-icon">✨</div>
                     <div class="insp-content">
                         <div class="insp-ar" id="insp-ar"></div>
                         <div class="insp-en" id="insp-en"></div>
@@ -625,6 +496,7 @@
                         <div class="events-grid" id="events-list"></div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -647,8 +519,8 @@
                 <div class="card-header no-print" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
                     <div><h2 id="monthly-title">Monthly Schedule</h2><div class="card-sub">Prayer Times Calendar</div></div>
                     <div style="display:flex;gap:0.4rem;">
-                        <button class="btn-icon" id="excel-btn" style="font-size:0.72rem;padding:0.32rem 0.65rem;"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
-                        <button class="btn-icon" id="print-btn" style="font-size:0.72rem;padding:0.32rem 0.65rem;background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.3);color:var(--gold);"><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
+                        <button class="btn-icon" id="excel-btn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+                        <button class="btn-icon" id="print-btn" style="background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.3);color:var(--gold);"><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
                     </div>
                 </div>
                 <div class="monthly-controls no-print">
@@ -675,6 +547,36 @@
                 <div class="table-footer no-print" id="method-footer">Method: ISNA · Data: aladhan.com</div>
             </div>
             <div id="print-footer" style="display:none;"><div class="pf-ornament"><svg class="svg-icon fill" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg></div><div class="pf-text" id="print-footer-text">Mizan Dashboard</div><div class="pf-arabic">بِسْمِ اللَّهِ</div></div>
+        </div>
+
+        <!-- QIBLA -->
+        <div id="tab-qibla" class="tab-content hidden">
+            <div class="card qibla-card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                    <div><h2>Qibla Direction</h2><div class="card-sub" id="qibla-sub">Locating position…</div></div>
+                    <div class="qibla-bearing-badge" id="qibla-bearing-badge" style="display:none;"><span id="qibla-deg">—</span>°<span class="qibla-bearing-label">from N</span></div>
+                </div>
+                <div class="qibla-mode-row" id="qibla-mode-row" style="display:none;">
+                    <button class="qibla-mode-btn active" data-mode="map" id="qbtn-map"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Map</button>
+                    <button class="qibla-mode-btn" data-mode="compass" id="qbtn-compass"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg> Compass</button>
+                    <button class="qibla-mode-btn" data-mode="camera" id="qbtn-camera"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> AR</button>
+                    <button class="qibla-mode-btn qibla-auto-btn" id="qbtn-auto" title="Auto switch based on orientation"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Auto</button>
+                </div>
+                <div class="qibla-auto-pill" id="qibla-auto-pill" style="display:none;"><span class="qibla-auto-dot"></span>Auto · <span id="qibla-auto-current">Compass</span></div>
+                <div id="qibla-loading" class="qibla-status-block"><svg class="svg-icon spin" viewBox="0 0 24 24" style="font-size:2rem;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg><p>Requesting access…</p></div>
+                <div id="qibla-error" class="qibla-status-block hidden"><svg class="svg-icon" viewBox="0 0 24 24" style="font-size:2.5rem;color:#ef4444;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><p id="qibla-error-msg">Denied.</p><button class="btn-sm" id="qibla-retry-btn">Retry</button></div>
+                <div id="qibla-map-wrap" class="hidden">
+                    <div id="qibla-map"></div>
+                    <div id="qibla-map-pointer" style="display:none; position:absolute; z-index:1000; width:40px; height:40px; pointer-events:none; transition: transform 0.1s ease-out; transform-origin: center center;">
+                        <svg viewBox="0 0 24 24" style="width:100%; height:100%; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+                            <path d="M12 2L4 20l8-4 8 4Z" fill="var(--em-light)" stroke="#fff" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="qibla-map-info"><span>🕋 Mecca: 21.4225° N, 39.8262° E</span><span id="qibla-dist-label"></span></div>
+                </div>
+                <div id="qibla-compass-wrap" class="hidden"><div class="qibla-compass-outer" id="qibla-compass-outer"><canvas id="qibla-compass-canvas" width="320" height="320"></canvas></div><div id="qibla-compass-status" class="qibla-compass-status">Rotate device</div><div class="qibla-orient-hint" id="qibla-orient-hint" style="display:none;">⚠️ Compass unavailable</div></div>
+                <div id="qibla-camera-wrap" class="hidden"><div class="qibla-ar-container"><video id="qibla-video" autoplay playsinline muted></video><div class="qibla-ar-overlay"><div class="qibla-ar-dir-arrow left" id="qibla-dir-left"><svg class="svg-icon" viewBox="0 0 24 24" style="width:100%;height:100%;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div><div class="qibla-ar-kaaba-fixed" id="qibla-ar-kaaba-fixed"><svg class="svg-icon qibla-kaaba-emoji" viewBox="0 0 24 24"><path d="M6 5h12v14H6z M6 9h12 M13 5v14"/></svg><span class="qibla-kaaba-label" id="qibla-kaaba-label">Qibla</span></div><div class="qibla-ar-dir-arrow right" id="qibla-dir-right"><svg class="svg-icon" viewBox="0 0 24 24" style="width:100%;height:100%;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div></div></div><div id="qibla-ar-status" class="qibla-compass-status">Rotate phone to find Qibla.</div></div>
+            </div>
         </div>
 
         <!-- SETTINGS -->
@@ -727,7 +629,7 @@
                         <div class="color-cust-title"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 4.2c1.44 1.06 2.34 2.76 2.34 4.54V21H4v-9.57c0-1.78.9-3.48 2.34-4.54L12 2.69z"/><path d="M12 2.69V21"/></svg> Advanced Tuning</div>
                         <div style="margin-top:0.5rem;margin-bottom:1.2rem;"><div class="field-label" style="margin-bottom:0.5rem;">Presets</div><div class="theme-presets-grid" id="theme-presets-container" style="display:flex;gap:0.5rem;overflow-x:auto;"></div></div>
                         <div class="color-cust-grid">
-                            <div class="color-cust-row"><label class="color-cust-label">Bg</label><input type="color" class="color-swatch" data-var="--bg"></div><div class="color-cust-row"><label class="color-cust-label">Sec Bg</label><input type="color" class="color-swatch" data-var="--bg-2"></div><div class="color-cust-row"><label class="color-cust-label">Surface</label><input type="color" class="color-swatch" data-var="--surface"></div><div class="color-cust-row"><label class="color-cust-label">Accent</label><input type="color" class="color-swatch" data-var="--gold"></div><div class="color-cust-row"><label class="color-cust-label">Highlight</label><input type="color" class="color-swatch" data-var="--em-light"></div><div class="color-cust-row"><label class="color-cust-label">Text</label><input type="color" class="color-swatch" data-var="--text"></div>
+                            <div class="color-cust-row"><label class="color-cust-label">Bg</label><input type="color" class="color-swatch" data-var="--bg"></div><div class="color-cust-row"><label class="color-cust-label">Sec Bg</label><input type="color" class="color-swatch" data-var="--bg-2"></div><div class="color-cust-row"><label class="color-cust-label">Tertiary Bg</label><input type="color" class="color-swatch" data-var="--bg-3"></div><div class="color-cust-row"><label class="color-cust-label">Card Surface</label><input type="color" class="color-swatch" data-var="--surface"></div><div class="color-cust-row"><label class="color-cust-label">Alt Surface</label><input type="color" class="color-swatch" data-var="--surface-2"></div><div class="color-cust-row"><label class="color-cust-label">Accent</label><input type="color" class="color-swatch" data-var="--gold"></div><div class="color-cust-row"><label class="color-cust-label">Highlight</label><input type="color" class="color-swatch" data-var="--em-light"></div><div class="color-cust-row"><label class="color-cust-label">Primary Text</label><input type="color" class="color-swatch" data-var="--text"></div><div class="color-cust-row"><label class="color-cust-label">Secondary Text</label><input type="color" class="color-swatch" data-var="--text-2"></div><div class="color-cust-row"><label class="color-cust-label">Muted Text</label><input type="color" class="color-swatch" data-var="--text-3"></div>
                         </div>
                         <div class="color-cust-actions"><button class="btn-cust-reset" id="btn-reset-colors"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Clear Colors</button></div>
                     </div>
@@ -750,57 +652,58 @@
             </div>
         </div>
 
-        <!-- QIBLA -->
-        <div id="tab-qibla" class="tab-content hidden">
-            <div class="card qibla-card">
-                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
-                    <div><h2>Qibla Direction</h2><div class="card-sub" id="qibla-sub">Locating position…</div></div>
-                    <div class="qibla-bearing-badge" id="qibla-bearing-badge" style="display:none;"><span id="qibla-deg">—</span>°<span class="qibla-bearing-label">from N</span></div>
-                </div>
-                <div class="qibla-mode-row" id="qibla-mode-row" style="display:none;">
-                    <button class="qibla-mode-btn active" data-mode="map" id="qbtn-map"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Map</button>
-                    <button class="qibla-mode-btn" data-mode="compass" id="qbtn-compass"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg> Compass</button>
-                    <button class="qibla-mode-btn" data-mode="camera" id="qbtn-camera"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> AR</button>
-                    <button class="qibla-mode-btn qibla-auto-btn" id="qbtn-auto" title="Auto switch based on orientation"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Auto</button>
-                </div>
-                <div class="qibla-auto-pill" id="qibla-auto-pill" style="display:none;"><span class="qibla-auto-dot"></span>Auto · <span id="qibla-auto-current">Compass</span></div>
-                <div id="qibla-loading" class="qibla-status-block"><svg class="svg-icon spin" viewBox="0 0 24 24" style="font-size:2rem;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg><p>Requesting access…</p></div>
-                <div id="qibla-error" class="qibla-status-block hidden"><svg class="svg-icon" viewBox="0 0 24 24" style="font-size:2.5rem;color:#ef4444;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><p id="qibla-error-msg">Denied.</p><button class="btn-sm" id="qibla-retry-btn">Retry</button></div>
-                <div id="qibla-map-wrap" class="hidden"><div id="qibla-map"></div><div class="qibla-map-info"><span>🕋 Mecca: 21.4225° N, 39.8262° E</span><span id="qibla-dist-label"></span></div></div>
-                <div id="qibla-compass-wrap" class="hidden"><div class="qibla-compass-outer" id="qibla-compass-outer"><canvas id="qibla-compass-canvas" width="320" height="320"></canvas></div><div id="qibla-compass-status" class="qibla-compass-status">Rotate device</div><div class="qibla-orient-hint" id="qibla-orient-hint" style="display:none;">⚠️ Compass unavailable</div></div>
-                <div id="qibla-camera-wrap" class="hidden"><div class="qibla-ar-container"><video id="qibla-video" autoplay playsinline muted></video><div class="qibla-ar-overlay"><div class="qibla-ar-dir-arrow left" id="qibla-dir-left"><svg class="svg-icon" viewBox="0 0 24 24" style="width:100%;height:100%;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div><div class="qibla-ar-kaaba-fixed" id="qibla-ar-kaaba-fixed"><svg class="svg-icon qibla-kaaba-emoji" viewBox="0 0 24 24"><path d="M6 5h12v14H6z M6 9h12 M13 5v14"/></svg><span class="qibla-kaaba-label" id="qibla-kaaba-label">Qibla</span></div><div class="qibla-ar-dir-arrow right" id="qibla-dir-right"><svg class="svg-icon" viewBox="0 0 24 24" style="width:100%;height:100%;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div></div></div><div id="qibla-ar-status" class="qibla-compass-status">Rotate phone to find Qibla.</div></div>
-            </div>
-        </div>
-
     </main>
 </div>
 
 <nav class="bottom-nav no-print" role="navigation" aria-label="Main navigation">
     <div class="bottom-nav-inner">
-        <button class="nav-btn active" data-target="tab-daily" aria-label="Daily"><svg class="nav-icon svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg><span class="nav-label">Daily</span></button>
-        <button class="nav-btn" data-target="tab-monthly" aria-label="Monthly"><svg class="nav-icon svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="nav-label">Monthly</span></button>
-        <button class="nav-btn" data-target="tab-qibla" aria-label="Qibla"><svg class="nav-icon svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><span class="nav-label">Qibla</span></button>
-        <button class="nav-btn" data-target="tab-settings" aria-label="Settings">
-            <svg class="nav-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
-            </svg>
+        <button class="nav-btn active" data-target="tab-daily">
+            <svg class="nav-icon svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg>
+            <span class="nav-label">Daily</span>
+        </button>
+        <button class="nav-btn" data-target="tab-monthly">
+            <svg class="nav-icon svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">Monthly</span>
+        </button>
+        <button class="nav-btn" data-target="tab-qibla">
+            <svg class="nav-icon svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+            <span class="nav-label">Qibla</span>
+        </button>
+        <button class="nav-btn" data-target="tab-settings">
+            <svg class="nav-icon svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.8 1 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span class="nav-label">Settings</span>
         </button>
     </div>
 </nav>
 
 <script>
-const APP_VERSION='1.5.0',APP_DATE='2026-04-13',API_BASE="https://countriesnow.space/api/v0.1";
-let currentPrayerData=null,countdownInterval=null,backgroundWorker=null,notifiedPrayers=new Set(),nextEventString="",marqueeCountdown="";
-let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark',playAdhan:false,notifMuted:false,customColors:{dark:{},light:{}}};
-const NOW=new Date(),CY=NOW.getFullYear(),CM=NOW.getMonth(),CD=NOW.getDate();
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
 
-const SVG_ICONS={moon:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,sun:`<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,bell:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,bellOff:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,blocked:`<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`,mapPin:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,hourglass:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.2 4H2.8M21.2 20H2.8M10 12l-6-6h16l-6 6v0l6 6H4l6-6v0z"/></svg>`,calendar:`<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,mosque:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-1 2v4H6l-2 2v12h16V10l-2-2H13V4l-1-2z"/><path d="M12 12a3 3 0 0 0-3 3v7h6v-7a3 3 0 0 0-3-3z"/></svg>`,sparkle:`<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>`,playFill:`<svg class="svg-icon fill" viewBox="0 0 24 24" style="width:0.7em;height:0.7em;"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,check:`<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,minus:`<svg class="svg-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,x:`<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`};
-const THEME_PRESETS={dark:{default:{'--bg':'#232736','--bg-2':'#2e3446','--bg-3':'#3b4256','--surface':'#282d3e','--surface-2':'#31374a','--gold':'#c9a84c','--em-light':'#4ade80','--text':'#ffffff','--text-2':'#cbd5e1','--text-3':'#94a3b8'},midnight:{'--bg':'#0f172a','--bg-2':'#1e293b','--bg-3':'#334155','--surface':'#1e293b','--surface-2':'#334155','--gold':'#38bdf8','--em-light':'#34d399','--text':'#f8fafc','--text-2':'#cbd5e1','--text-3':'#94a3b8'},forest:{'--bg':'#064e3b','--bg-2':'#065f46','--bg-3':'#047857','--surface':'#065f46','--surface-2':'#047857','--gold':'#fcd34d','--em-light':'#10b981','--text':'#ecfdf5','--text-2':'#a7f3d0','--text-3':'#6ee7b7'}},light:{default:{'--bg':'#f8fafc','--bg-2':'#f1f5f9','--bg-3':'#e2e8f0','--surface':'#ffffff','--surface-2':'#f8fafc','--gold':'#8a6010','--em-light':'#16a34a','--text':'#0f172a','--text-2':'#334155','--text-3':'#64748b'},parchment:{'--bg':'#fef3c7','--bg-2':'#fde68a','--bg-3':'#d97706','--surface':'#fffbeb','--surface-2':'#fef3c7','--gold':'#b45309','--em-light':'#059669','--text':'#451a03','--text-2':'#78350f','--text-3':'#92400e'}}};
-const INSPIRATIONS=[{ar:"فَاذْكُرُونِي أَذْكُرْكُمْ",en:"So remember Me; I will remember you.",ref:"Quran 2:152"},{ar:"إِنَّ مَعَ الْعُسْرِ يُسْرًا",en:"Indeed, with hardship ease.",ref:"Quran 94:6"},{ar:"لا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا",en:"Do not grieve; indeed Allah is with us.",ref:"Quran 9:40"},{ar:"احْفَظِ اللَّهَ يَحْفَظْكَ",en:"Be mindful of Allah, and Allah will protect you.",ref:"Hadith"}];
+const APP_VERSION='1.5.2', APP_DATE='2026-04-13', API_BASE="https://countriesnow.space/api/v0.1";
+let currentPrayerData=null, countdownInterval=null, backgroundWorker=null, notifiedPrayers=new Set(), nextEventString="", marqueeCountdown="";
+let S={country:'',state:'',city:'',method:'2',calendarType:'gregorian',usePopup:false,keepActive:false,theme:'dark',playAdhan:false,notifMuted:false,customColors:{dark:{},light:{}}};
+const NOW=new Date(), CY=NOW.getFullYear(), CM=NOW.getMonth(), CD=NOW.getDate();
+
+const INSPIRATIONS=[
+    {ar:"فَاذْكُرُونِي أَذْكُرْكُمْ",en:"So remember Me; I will remember you.",ref:"Quran 2:152"},
+    {ar:"إِنَّ مَعَ الْعُسْرِ يُسْرًا",en:"Indeed, with hardship ease.",ref:"Quran 94:6"},
+    {ar:"لا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا",en:"Do not grieve; indeed Allah is with us.",ref:"Quran 9:40"},
+    {ar:"احْفَظِ اللَّهَ يَحْفَظْكَ",en:"Be mindful of Allah, and Allah will protect you.",ref:"Hadith"}
+];
 
 let todayHijri={day:null,month:null,year:null};
-async function fetchTodayHijri(){try{const res=await fetch(`https://api.aladhan.com/v1/gToH?date=${CD}-${CM+1}-${CY}`);const json=await res.json();if(json.code===200){todayHijri.day=parseInt(json.data.hijri.day);todayHijri.month=parseInt(json.data.hijri.month.number);todayHijri.year=parseInt(json.data.hijri.year);}}catch(e){}}
+async function fetchTodayHijri(){
+    try {
+        const res=await fetch(`https://api.aladhan.com/v1/gToH?date=${CD}-${CM+1}-${CY}`);
+        const json=await res.json();
+        if(json.code===200) {
+            todayHijri.day=parseInt(json.data.hijri.day);
+            todayHijri.month=parseInt(json.data.hijri.month.number);
+            todayHijri.year=parseInt(json.data.hijri.year);
+        }
+    } catch(e) {}
+}
 
 const GMONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const HMONTHS=["Muharram","Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qi'dah","Dhu al-Hijjah"];
@@ -808,168 +711,707 @@ const HSHORT=["Muh","Saf","R.I","R.II","J.I","J.II","Raj","Sha","Ram","Shw","DhQ
 const PAR={Fajr:'الفجر',Sunrise:'الشروق',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'};
 const EVENTS=[{m:1,d:1,name:"Islamic New Year",ar:"رأس السنة"},{m:9,d:1,name:"Start of Ramadan",ar:"رمضان"},{m:10,d:1,name:"Eid al-Fitr",ar:"عيد الفطر"},{m:12,d:10,name:"Eid al-Adha",ar:"عيد الأضحى"}];
 const CM_DEF={"United States":2,"Canada":2,"United Kingdom":2,"Saudi Arabia":4,"Pakistan":1,"Egypt":5};
-const WK=`let t;self.onmessage=e=>{if(e.data==='start'){if(t)clearInterval(t);t=setInterval(()=>postMessage('tick'),1000);}else if(e.data==='stop')clearInterval(t);};`;
 
-function applyTheme(th){document.documentElement.setAttribute('data-theme',th);S.theme=th;const btn=document.getElementById('theme-toggle-btn');if(btn)btn.innerHTML=th==='dark'?SVG_ICONS.sun:SVG_ICONS.moon;const chk=document.getElementById('theme-chk');if(chk)chk.checked=th==='light';applyCustomColors();renderThemePresets();}
-function toggleTheme(){const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(next);S.theme=next;localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));}
-function hexToRgb(hex){let r=0,g=0,b=0;if(hex.length===4){r=parseInt(hex[1]+hex[1],16);g=parseInt(hex[2]+hex[2],16);b=parseInt(hex[3]+hex[3],16);}else if(hex.length>=7){r=parseInt(hex.slice(1,3),16);g=parseInt(hex.slice(3,5),16);b=parseInt(hex.slice(5,7),16);}return `${r},${g},${b}`;}
-function rgbStrToHex(str){const match=str.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);if(!match)return str;const r=parseInt(match[1]).toString(16).padStart(2,'0'),g=parseInt(match[2]).toString(16).padStart(2,'0'),b=parseInt(match[3]).toString(16).padStart(2,'0');return `#${r}${g}${b}`;}
-function clearInlineColors(){const vars=['--bg','--bg-2','--bg-3','--surface','--surface-2','--gold','--gold-light','--emerald','--em-light','--em-glow','--text','--text-2','--text-3','--border','--border-sub'];vars.forEach(v=>document.documentElement.style.removeProperty(v));}
-function applyCustomColors(){clearInlineColors();const themeColors=S.customColors?.[S.theme];if(themeColors){for(const [key,value] of Object.entries(themeColors))document.documentElement.style.setProperty(key,value);}setTimeout(()=>{const styles=getComputedStyle(document.documentElement);document.querySelectorAll('input.color-swatch').forEach(input=>{const v=input.dataset.var;let val=themeColors?.[v]||styles.getPropertyValue(v).trim();if(val.startsWith('rgba')||val.startsWith('rgb'))val=rgbStrToHex(val);if(val&&val.length>=7)input.value=val.substring(0,7);});const meta=document.getElementById('theme-color-meta');const bgVal=themeColors?.['--bg']||styles.getPropertyValue('--bg').trim();if(meta&&bgVal)meta.content=bgVal.substring(0,7);},10);}
-function initColorCustomizer(){if(!S.customColors)S.customColors={dark:{},light:{}};applyCustomColors();document.querySelectorAll('input.color-swatch').forEach(input=>{input.addEventListener('input',(e)=>{const val=e.target.value;const v=input.dataset.var;document.documentElement.style.setProperty(v,val);if(!S.customColors[S.theme])S.customColors[S.theme]={};S.customColors[S.theme][v]=val;if(v==='--em-light'){const glow=`rgba(${hexToRgb(val)},0.15)`;document.documentElement.style.setProperty('--em-glow',glow);S.customColors[S.theme]['--em-glow']=glow;}if(v==='--gold'){const borderStr=`rgba(${hexToRgb(val)},0.25)`;document.documentElement.style.setProperty('--border',borderStr);S.customColors[S.theme]['--border']=borderStr;}});input.addEventListener('change',saveSettings);});document.getElementById('btn-reset-colors')?.addEventListener('click',()=>{if(confirm('Are you sure you want to clear your custom colors?')){clearInlineColors();S.customColors[S.theme]={};saveSettings();applyCustomColors();}});renderThemePresets();}
-function renderThemePresets(){const cont=document.getElementById('theme-presets-container');if(!cont)return;const presets=THEME_PRESETS[S.theme]||THEME_PRESETS.dark;cont.innerHTML=Object.keys(presets).map(p=>`<button class="preset-btn" data-preset="${p}">${p.charAt(0).toUpperCase()+p.slice(1)}</button>`).join('');cont.querySelectorAll('.preset-btn').forEach(btn=>{btn.addEventListener('click',(e)=>{const preset=presets[e.target.dataset.preset];if(!S.customColors)S.customColors={dark:{},light:{}};S.customColors[S.theme]={...preset};if(preset['--em-light'])S.customColors[S.theme]['--em-glow']=`rgba(${hexToRgb(preset['--em-light'])},0.15)`;if(preset['--gold']&&!preset['--border'])S.customColors[S.theme]['--border']=`rgba(${hexToRgb(preset['--gold'])},0.25)`;saveSettings();applyCustomColors();});});}
-function initTabs(){document.querySelectorAll('.nav-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.dataset.target!=='tab-qibla'&&window._qiblaInited)stopAutoMode();document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));document.getElementById(btn.dataset.target).classList.remove('hidden');});});}
-function switchTab(id){document.querySelector(`.nav-btn[data-target="${id}"]`)?.click();}
-function loadSettings() {
-    const s=localStorage.getItem('islamic_dashboard_settings');
-    if(s){S={...S,...JSON.parse(s)};if(!S.customColors)S.customColors={dark:{},light:{}};return true;}return false;
+function applyTheme(th){
+    document.documentElement.setAttribute('data-theme',th); S.theme=th;
+    const chk=$('theme-chk'); if(chk) chk.checked=th==='light';
+    applyCustomColors();
 }
-function saveSettings(){S.country=document.getElementById('country-select').value;S.state=document.getElementById('state-select').value;S.city=document.getElementById('city-input').value;S.method=document.getElementById('method-select').value;const activePill=document.querySelector('#cal-system-pills .cal-pill.active');S.calendarType=activePill?activePill.dataset.cal:(S.calendarType||'gregorian');const cSel=document.getElementById('calendar-type-select');if(cSel)cSel.value=S.calendarType;S.usePopup=document.getElementById('use-popup-window').checked;S.keepActive=document.getElementById('keep-active-bg').checked;S.playAdhan=document.getElementById('play-adhan-sound')?.checked||false;localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));const btn=document.getElementById('btn-save-settings'),orig=btn.innerHTML;btn.innerHTML=`<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Saved`;btn.style.background='linear-gradient(135deg,#1a6644,#2aad7e)';setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);syncUI();refreshAll();}
-function syncUI(){const loc=S.city?`${S.city}, ${S.country}`:'Set location in Settings';const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};setEl('header-location',loc);setEl('loc-strip-text',loc);document.getElementById('use-popup-window').checked=S.usePopup;document.getElementById('keep-active-bg').checked=S.keepActive;const padEl=document.getElementById('play-adhan-sound');if(padEl)padEl.checked=S.playAdhan||false;updateNotifStatusUI();applyTheme(S.theme||'dark');syncCalPills();const ms=document.getElementById('method-select');if(ms&&ms.selectedIndex>=0)setEl('method-footer',`Method: ${ms.options[ms.selectedIndex].text} · Data: aladhan.com`);}
-function loadFavs(){const favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');['favorites-select','top-favorites-select','monthly-favorites-select'].forEach(id=>{const sel=document.getElementById(id);if(!sel)return;sel.innerHTML=`<option value="">${id==='favorites-select'?'Select saved location…':'Quick load…'}</option>`;favs.forEach((f,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${f.city}, ${f.country}`;sel.appendChild(o);});});const db=document.getElementById('btn-delete-favorite');if(db)db.disabled=true;}
-function saveFav(){const country=document.getElementById('country-select').value,city=document.getElementById('city-input').value;if(!country||!city){alert('Please set a location first.');return;}let favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');const idx=favs.findIndex(f=>f.city===city&&f.country===country);const fav={country,state:document.getElementById('state-select').value,city,method:document.getElementById('method-select').value,calendarType:document.getElementById('calendar-type-select').value};if(idx>=0)favs[idx]=fav;else favs.push(fav);localStorage.setItem('islamic_dashboard_favorites',JSON.stringify(favs));loadFavs();}
-function delFav(){const sel=document.getElementById('favorites-select');if(!sel.value||!confirm('Delete this favorite?'))return;let favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');favs.splice(sel.value,1);localStorage.setItem('islamic_dashboard_favorites',JSON.stringify(favs));loadFavs();sel.value='';}
-async function applyFav(idx){if(idx===''||idx===null||idx===undefined)return;const favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');const fav=favs[idx];if(!fav)return;await populateLoc(fav.country,fav.state,fav.city);document.getElementById('method-select').value=fav.method||'2';document.getElementById('calendar-type-select').value=fav.calendarType||'gregorian';saveSettings();}
-async function firstTime(){const modal=document.getElementById('location-confirm-modal');modal.classList.add('show');try{const res=await fetch('https://get.geojs.io/v1/ip/geo.json');const data=await res.json();if(data&&data.city){document.getElementById('confirm-city-text').textContent=data.city;document.getElementById('confirm-country-text').textContent=`${data.region}, ${data.country}`;document.getElementById('btn-confirm-loc').onclick=async()=>{modal.classList.remove('show');await populateLoc(data.country,data.region,data.city);saveSettings();};}else throw 0;}catch(e){document.getElementById('confirm-city-text').textContent='Could not detect';document.getElementById('confirm-country-text').textContent='Please set manually';document.getElementById('btn-confirm-loc').style.display='none';}document.getElementById('btn-deny-loc').onclick=()=>{modal.classList.remove('show');switchTab('tab-settings');};}
-async function populateLoc(country,state,city){const cSel=document.getElementById('country-select');for(let i=0;i<cSel.options.length;i++){if(cSel.options[i].value===country){cSel.selectedIndex=i;break;}}const def=CM_DEF[country];if(def)document.getElementById('method-select').value=def;await loadStates(state,city,true);document.getElementById('city-input').value=city;}
-function initCalPills(){document.querySelectorAll('#cal-system-pills .cal-pill').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#cal-system-pills .cal-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');S.calendarType=btn.dataset.cal;const cSel=document.getElementById('calendar-type-select');if(cSel)cSel.value=S.calendarType;updateMonthYear();});});}
-function syncCalPills(){const ct=S.calendarType||'gregorian';document.querySelectorAll('#cal-system-pills .cal-pill').forEach(b=>{b.classList.toggle('active',b.dataset.cal===ct);});}
-function doPrint(){const mSel=document.getElementById('month-select');const ySel=document.getElementById('year-select');const ct=S.calendarType||'gregorian';const mName=ct==='gregorian'?GMONTHS[parseInt(mSel.value)-1]||'':HMONTHS[parseInt(mSel.value)-1]||'';const methodSel=document.getElementById('method-select');const methodTxt=methodSel&&methodSel.selectedIndex>=0?methodSel.options[methodSel.selectedIndex].text:S.method;const phMonth=document.getElementById('print-month-label');const phLoc=document.getElementById('print-loc-label');const phMeth=document.getElementById('print-method-label');const pfText=document.getElementById('print-footer-text');if(phMonth)phMonth.textContent=`${mName} ${ySel.value}`;if(phLoc)phLoc.textContent=S.city?`${S.city}, ${S.country}`:'Location not set';if(phMeth)phMeth.textContent=`Calculation: ${methodTxt} · Calendar: ${ct==='gregorian'?'Gregorian':'Hijri'} · Data: aladhan.com`;if(pfText)pfText.textContent=`Mizan Islamic Dashboard · ${mName} ${ySel.value} · aladhan.com`;window.print();}
-function updateTicker(){const parts=[];if(S.city)parts.push(`<span class="ticker-item">${SVG_ICONS.mapPin} ${S.city}, ${S.country}</span>`);if(marqueeCountdown)parts.push(`<span class="ticker-item">${SVG_ICONS.hourglass} ${marqueeCountdown}</span>`);if(nextEventString)parts.push(`<span class="ticker-item">${SVG_ICONS.moon} ${nextEventString}</span>`);parts.push(`<span class="ticker-item">${SVG_ICONS.calendar} ${new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'})}</span>`);parts.push(`<span class="ticker-item">${SVG_ICONS.sparkle} Mizan · ميزان</span>`);const t=document.getElementById('ticker-track');if(t)t.innerHTML=parts.join('');}
-function fmtT(ts){if(!ts)return"--:--";const[h,m]=ts.split(' ')[0].split(':').map(Number);const suf=h>=12?'PM':'AM',h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} <span class="ampm">${suf}</span>`;}
-function loadDayPrefs(){const saved=localStorage.getItem('islamic_dashboard_day_range');if(saved){const{startDay,endDay}=JSON.parse(saved);return{startDay:startDay||CD,endDay:endDay||32};}return{startDay:CD,endDay:32};}
-function saveDayPrefs(){const sd=document.getElementById('start-day-select').value;const ed=document.getElementById('end-day-select').value;localStorage.setItem('islamic_dashboard_day_range',JSON.stringify({startDay:parseInt(sd),endDay:parseInt(ed)}));}
-function populateDays(){const prefs=loadDayPrefs();['start-day-select','end-day-select'].forEach(id=>{const sel=document.getElementById(id);const inSession=sel.value&&sel.value!=='';sel.innerHTML='';if(id==='end-day-select'){const o=document.createElement('option');o.value=32;o.textContent='End of Month';sel.appendChild(o);}for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i;sel.appendChild(o);}if(inSession){sel.value=inSession;}else{sel.value=id==='start-day-select'?prefs.startDay:prefs.endDay;}});}
-function initDayListeners(){document.getElementById('start-day-select').addEventListener('change',saveDayPrefs);document.getElementById('end-day-select').addEventListener('change',saveDayPrefs);}
-function updateMonthYear(){const type=S.calendarType||'gregorian';syncCalPills();const mSel=document.getElementById('month-select'),ySel=document.getElementById('year-select');const pM=mSel.value,pY=ySel.value;mSel.innerHTML='';const names=type==='gregorian'?GMONTHS:HMONTHS;names.forEach((n,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=n;mSel.appendChild(o);});ySel.innerHTML='';let defaultMonth,defaultYear;if(type==='gregorian'){defaultMonth=CM+1;defaultYear=CY;}else{defaultMonth=todayHijri.month||Math.max(1,Math.round(((CY-622)*12.3683+(CM+1))%12)||12);defaultYear=todayHijri.year||Math.round((CY+(CM/12)-622)*1.0307);}const yearBase=defaultYear;for(let y=yearBase-5;y<=yearBase+12;y++){const o=document.createElement('option');o.value=y;o.textContent=y;ySel.appendChild(o);}mSel.value=pM||defaultMonth;ySel.value=pY||defaultYear;const mName=names[parseInt(mSel.value)-1]||'';document.getElementById('monthly-title').textContent=`${mName} ${ySel.value}`;const thDate=document.getElementById('th-date');if(thDate)thDate.textContent=type==='gregorian'?'Date / التاريخ':'Hijri Date / التاريخ الهجري';}
-function jumpToToday(){const type=S.calendarType||'gregorian';const mSel=document.getElementById('month-select');const ySel=document.getElementById('year-select');if(type==='gregorian'){mSel.value=CM+1;ySel.value=CY;document.getElementById('start-day-select').value=CD;document.getElementById('end-day-select').value=32;}else{if(todayHijri.month){mSel.value=todayHijri.month;ySel.value=todayHijri.year;document.getElementById('start-day-select').value=todayHijri.day;document.getElementById('end-day-select').value=32;}else{fetchTodayHijri().then(()=>{if(todayHijri.month){updateMonthYear();mSel.value=todayHijri.month;ySel.value=todayHijri.year;document.getElementById('start-day-select').value=todayHijri.day;document.getElementById('end-day-select').value=32;fetchMonthly();}});return;}}saveDayPrefs();fetchMonthly();}
-function initInspiration() {const dayOfYear=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/86400000);const ins=INSPIRATIONS[dayOfYear%INSPIRATIONS.length];document.getElementById('insp-ar').textContent=ins.ar;document.getElementById('insp-en').textContent=ins.en;document.getElementById('insp-ref').textContent=ins.ref;}
 
-async function refreshAll(){updateMonthYear();populateDays();initInspiration();await fetchDaily();await fetchMonthly();calcEvents();updateTicker();}
-async function fetchDaily(){const{city,country,state,method}=S;const ld=document.getElementById('daily-loading');const ldd=document.getElementById('daily-loaded');if(!city){ld.innerHTML=`<svg class="svg-icon" viewBox="0 0 24 24" style="font-size:2rem;color:var(--gold);margin-bottom:0.5rem;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><br><br>Please set your location in Settings`;ld.classList.remove('hidden');ldd.classList.add('hidden');const tk=document.getElementById('ticker-track');if(tk)tk.innerHTML=`<span class="ticker-item">${SVG_ICONS.mapPin} Please set location</span>`;return;}ld.innerHTML=`<svg class="svg-icon spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg> Loading times…`;ld.classList.remove('hidden');ldd.classList.add('hidden');const d=NOW;const cacheKey=`mizan_daily_${d.getDate()}_${d.getMonth()}_${city}`;const url=`https://api.aladhan.com/v1/timingsByCity/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state||'')}&method=${method}`;let json=null;try{const res=await fetch(url);json=await res.json();if(json.code!==200)throw 0;localStorage.setItem(cacheKey,JSON.stringify(json));}catch(e){const cached=localStorage.getItem(cacheKey);if(cached){json=JSON.parse(cached);}else{ld.innerHTML=`Error loading times.`;return;}}const{timings,date,meta}=json.data;document.getElementById('clock-date').textContent=date.readable;document.getElementById('clock-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`;document.getElementById('header-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;const trkKey=`mizan_trk_${d.getDate()}_${d.getMonth()}`;const trackerData=JSON.parse(localStorage.getItem(trkKey)||'{}');const plist=[{key:'Fajr',time:timings.Fajr},{key:'Sunrise',time:timings.Sunrise,sec:true},{key:'Dhuhr',time:timings.Dhuhr},{key:'Asr',time:timings.Asr},{key:'Maghrib',time:timings.Maghrib},{key:'Isha',time:timings.Isha}];document.getElementById('daily-list').innerHTML=plist.map(p=>{const stat=trackerData[p.key]||0;let statCls='',statIco='';if(stat===1){statCls=' trk-1';statIco=SVG_ICONS.check;}if(stat===2){statCls=' trk-2';statIco=SVG_ICONS.minus;}if(stat===3){statCls=' trk-3';statIco=SVG_ICONS.x;}return `<li class="prayer-item${p.sec?' is-sec':''}" data-prayer="${p.key}"><div style="display:flex; align-items:center; gap:10px;">${p.sec?'':`<button class="prayer-tracker-btn${statCls}" data-prayer="${p.key}" data-status="${stat}">${statIco}</button>`}<div><div class="p-name">${p.key}</div><span class="p-name-ar">${PAR[p.key]||''}</span></div></div><div class="p-time" dir="ltr">${fmtT(p.time)}</div></li>`;}).join('');document.querySelectorAll('.prayer-tracker-btn').forEach(btn=>{btn.addEventListener('click',(e)=>{const pKey=btn.dataset.prayer;let st=parseInt(btn.dataset.status);st=(st+1)%4;const curData=JSON.parse(localStorage.getItem(trkKey)||'{}');curData[pKey]=st;localStorage.setItem(trkKey,JSON.stringify(curData));btn.dataset.status=st;btn.className='prayer-tracker-btn'+(st===1?' trk-1':st===2?' trk-2':st===3?' trk-3':'');btn.innerHTML=st===1?SVG_ICONS.check:st===2?SVG_ICONS.minus:st===3?SVG_ICONS.x:'';});});ld.classList.add('hidden');ldd.classList.remove('hidden');startCountdown(timings,meta.timezone);}
+function toggleTheme(){
+    const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    applyTheme(next); S.theme=next;
+    localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));
+}
+
+function hexToRgb(hex){
+    let r=0,g=0,b=0;
+    if(hex.length===4){r=parseInt(hex[1]+hex[1],16);g=parseInt(hex[2]+hex[2],16);b=parseInt(hex[3]+hex[3],16);}
+    else if(hex.length>=7){r=parseInt(hex.slice(1,3),16);g=parseInt(hex.slice(3,5),16);b=parseInt(hex.slice(5,7),16);}
+    return `${r},${g},${b}`;
+}
+
+function rgbStrToHex(str){
+    const match=str.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if(!match)return str;
+    const r=parseInt(match[1]).toString(16).padStart(2,'0'),g=parseInt(match[2]).toString(16).padStart(2,'0'),b=parseInt(match[3]).toString(16).padStart(2,'0');
+    return `#${r}${g}${b}`;
+}
+
+function clearInlineColors(){
+    const vars=['--bg','--bg-2','--bg-3','--surface','--surface-2','--gold','--gold-light','--emerald','--em-light','--em-glow','--text','--text-2','--text-3','--border','--border-sub'];
+    vars.forEach(v=>document.documentElement.style.removeProperty(v));
+}
+
+function applyCustomColors(){
+    clearInlineColors();
+    const themeColors=S.customColors?.[S.theme];
+    if(themeColors){
+        for(const [key,value] of Object.entries(themeColors)) document.documentElement.style.setProperty(key,value);
+    }
+    setTimeout(()=>{
+        const styles=getComputedStyle(document.documentElement);
+        $$('input.color-swatch').forEach(input=>{
+            const v=input.dataset.var; let val=themeColors?.[v]||styles.getPropertyValue(v).trim();
+            if(val.startsWith('rgba')||val.startsWith('rgb')) val=rgbStrToHex(val);
+            if(val&&val.length>=7) input.value=val.substring(0,7);
+        });
+        const meta=$('theme-color-meta');
+        const bgVal=themeColors?.['--bg']||styles.getPropertyValue('--bg').trim();
+        if(meta&&bgVal) meta.content=bgVal.substring(0,7);
+    },10);
+}
+
+function initColorCustomizer(){
+    if(!S.customColors) S.customColors={dark:{},light:{}};
+    applyCustomColors();
+    $$('input.color-swatch').forEach(input=>{
+        input.addEventListener('input', e => {
+            const val=e.target.value; const v=input.dataset.var;
+            document.documentElement.style.setProperty(v,val);
+            if(!S.customColors[S.theme]) S.customColors[S.theme]={};
+            S.customColors[S.theme][v]=val;
+            if(v==='--em-light'){
+                const glow=`rgba(${hexToRgb(val)},0.15)`;
+                document.documentElement.style.setProperty('--em-glow',glow);
+                S.customColors[S.theme]['--em-glow']=glow;
+            }
+            if(v==='--gold'){
+                const borderStr=`rgba(${hexToRgb(val)},0.25)`;
+                document.documentElement.style.setProperty('--border',borderStr);
+                S.customColors[S.theme]['--border']=borderStr;
+            }
+        });
+        input.addEventListener('change',saveSettings);
+    });
+    $('btn-reset-colors')?.addEventListener('click', () => {
+        if(confirm('Are you sure you want to clear your custom colors?')){
+            clearInlineColors(); S.customColors[S.theme]={}; saveSettings(); applyCustomColors();
+        }
+    });
+}
+
+function initTabs(){
+    $$('.nav-btn').forEach(btn=>{
+        btn.addEventListener('click', () => {
+            if(btn.dataset.target!=='tab-qibla' && window._qiblaInited) stopAutoMode();
+            $$('.nav-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            $$('.tab-content').forEach(c=>c.classList.add('hidden'));
+            $(btn.dataset.target).classList.remove('hidden');
+        });
+    });
+}
+
+function switchTab(id) { document.querySelector(`.nav-btn[data-target="${id}"]`)?.click(); }
+
+function loadSettings(){
+    const s=localStorage.getItem('islamic_dashboard_settings');
+    if(s){
+        S={...S,...JSON.parse(s)};
+        if(!S.customColors) S.customColors={dark:{},light:{}};
+        return true;
+    }
+    return false;
+}
+
+function saveSettings(){
+    S.country=$('country-select').value; S.state=$('state-select').value;
+    S.city=$('city-input').value; S.method=$('method-select').value;
+    const activePill=document.querySelector('#cal-system-pills .cal-pill.active');
+    S.calendarType=activePill?activePill.dataset.cal:(S.calendarType||'gregorian');
+    if($('calendar-type-select')) $('calendar-type-select').value=S.calendarType;
+    S.usePopup=$('use-popup-window').checked; S.keepActive=$('keep-active-bg').checked;
+    S.playAdhan=$('play-adhan-sound')?.checked||false;
+    localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));
+    
+    const btn=$('btn-save-settings'),orig=btn.innerHTML;
+    btn.innerHTML=`Saved`; btn.style.background='linear-gradient(135deg,#1a6644,#2aad7e)';
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);
+    syncUI(); refreshAll();
+}
+
+function syncUI(){
+    const loc=S.city?`${S.city}, ${S.country}`:'Set location in Settings';
+    if($('header-location')) $('header-location').textContent=loc;
+    if($('loc-strip-text')) $('loc-strip-text').textContent=loc;
+    $('use-popup-window').checked=S.usePopup; $('keep-active-bg').checked=S.keepActive;
+    if($('play-adhan-sound')) $('play-adhan-sound').checked=S.playAdhan||false;
+    updateNotifStatusUI(); applyTheme(S.theme||'dark'); syncCalPills();
+    const ms=$('method-select');
+    if(ms&&ms.selectedIndex>=0 && $('method-footer')) $('method-footer').textContent=`Method: ${ms.options[ms.selectedIndex].text} · Data: aladhan.com`;
+}
+
+function loadFavs(){
+    const favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');
+    ['favorites-select','top-favorites-select','monthly-favorites-select'].forEach(id=>{
+        const sel=$(id); if(!sel) return;
+        sel.innerHTML=`<option value="">${id==='favorites-select'?'Select saved location…':'Quick load…'}</option>`;
+        favs.forEach((f,i)=>{
+            const o=document.createElement('option'); o.value=i; o.textContent=`${f.city}, ${f.country}`; sel.appendChild(o);
+        });
+    });
+    if($('btn-delete-favorite')) $('btn-delete-favorite').disabled=true;
+}
+
+function saveFav(){
+    const country=$('country-select').value, city=$('city-input').value;
+    if(!country||!city){alert('Please set a location first.');return;}
+    let favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');
+    const idx=favs.findIndex(f=>f.city===city&&f.country===country);
+    const fav={country,state:$('state-select').value,city,method:$('method-select').value,calendarType:$('calendar-type-select').value};
+    if(idx>=0) favs[idx]=fav; else favs.push(fav);
+    localStorage.setItem('islamic_dashboard_favorites',JSON.stringify(favs));
+    loadFavs();
+}
+
+function delFav(){
+    const sel=$('favorites-select'); if(!sel.value||!confirm('Delete this favorite?')) return;
+    let favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');
+    favs.splice(sel.value,1); localStorage.setItem('islamic_dashboard_favorites',JSON.stringify(favs));
+    loadFavs(); sel.value='';
+}
+
+async function applyFav(idx){
+    if(idx===''||idx===null||idx===undefined) return;
+    const favs=JSON.parse(localStorage.getItem('islamic_dashboard_favorites')||'[]');
+    const fav=favs[idx]; if(!fav) return;
+    await populateLoc(fav.country,fav.state,fav.city);
+    $('method-select').value=fav.method||'2'; $('calendar-type-select').value=fav.calendarType||'gregorian';
+    saveSettings();
+}
+
+async function firstTime(){
+    const modal=$('location-confirm-modal'); modal.classList.add('show');
+    try {
+        const res=await fetch('https://get.geojs.io/v1/ip/geo.json'); const data=await res.json();
+        if(data&&data.city){
+            $('confirm-city-text').textContent=data.city; $('confirm-country-text').textContent=`${data.region}, ${data.country}`;
+            $('btn-confirm-loc').onclick=async()=>{ modal.classList.remove('show'); await populateLoc(data.country,data.region,data.city); saveSettings(); };
+        } else throw 0;
+    } catch(e) {
+        $('confirm-city-text').textContent='Could not detect'; $('confirm-country-text').textContent='Please set manually'; $('btn-confirm-loc').style.display='none';
+    }
+    $('btn-deny-loc').onclick=()=>{ modal.classList.remove('show'); switchTab('tab-settings'); };
+}
+
+async function populateLoc(country,state,city){
+    const cSel=$('country-select');
+    for(let i=0;i<cSel.options.length;i++) if(cSel.options[i].value===country){cSel.selectedIndex=i;break;}
+    const def=CM_DEF[country]; if(def) $('method-select').value=def;
+    await loadStates(state,city,true); $('city-input').value=city;
+}
+
+function initCalPills(){
+    $$('#cal-system-pills .cal-pill').forEach(btn=>{
+        btn.addEventListener('click', () => {
+            $$('#cal-system-pills .cal-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+            S.calendarType=btn.dataset.cal; if($('calendar-type-select')) $('calendar-type-select').value=S.calendarType; updateMonthYear();
+        });
+    });
+}
+
+function syncCalPills(){
+    const ct=S.calendarType||'gregorian';
+    $$('#cal-system-pills .cal-pill').forEach(b=>{ b.classList.toggle('active',b.dataset.cal===ct); });
+}
+
+function updateTicker(){
+    const parts=[];
+    if(S.city) parts.push(`<span class="ticker-item">📍 ${S.city}, ${S.country}</span>`);
+    if(marqueeCountdown) parts.push(`<span class="ticker-item">⏳ ${marqueeCountdown}</span>`);
+    if(nextEventString) parts.push(`<span class="ticker-item">🌙 ${nextEventString}</span>`);
+    parts.push(`<span class="ticker-item">📅 ${new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'})}</span>`);
+    const t=$('ticker-track'); if(t) t.innerHTML=parts.join('');
+}
+
+function fmtT(ts){
+    if(!ts) return"--:--";
+    const[h,m]=ts.split(' ')[0].split(':').map(Number);
+    const suf=h>=12?'PM':'AM', h12=h%12||12;
+    return `${h12}:${String(m).padStart(2,'0')} <span class="ampm">${suf}</span>`;
+}
+
+function loadDayPrefs(){
+    const saved=localStorage.getItem('islamic_dashboard_day_range');
+    if(saved){const{startDay,endDay}=JSON.parse(saved);return{startDay:startDay||CD,endDay:endDay||32};}
+    return{startDay:CD,endDay:32};
+}
+
+function saveDayPrefs(){
+    const sd=$('start-day-select').value, ed=$('end-day-select').value;
+    localStorage.setItem('islamic_dashboard_day_range',JSON.stringify({startDay:parseInt(sd),endDay:parseInt(ed)}));
+}
+
+function populateDays(){
+    const prefs=loadDayPrefs();
+    ['start-day-select','end-day-select'].forEach(id=>{
+        const sel=$(id); const inSession=sel.value&&sel.value!==''; sel.innerHTML='';
+        if(id==='end-day-select'){const o=document.createElement('option');o.value=32;o.textContent='End of Month';sel.appendChild(o);}
+        for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i;sel.appendChild(o);}
+        if(inSession) sel.value=inSession; else sel.value=id==='start-day-select'?prefs.startDay:prefs.endDay;
+    });
+}
+
+function initDayListeners(){
+    $('start-day-select').addEventListener('change',saveDayPrefs); $('end-day-select').addEventListener('change',saveDayPrefs);
+}
+
+function updateMonthYear(){
+    const type=S.calendarType||'gregorian'; syncCalPills();
+    const mSel=$('month-select'), ySel=$('year-select'); const pM=mSel.value, pY=ySel.value;
+    mSel.innerHTML=''; const names=type==='gregorian'?GMONTHS:HMONTHS;
+    names.forEach((n,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=n;mSel.appendChild(o);});
+    ySel.innerHTML=''; let defaultMonth, defaultYear;
+    if(type==='gregorian'){defaultMonth=CM+1;defaultYear=CY;}
+    else{defaultMonth=todayHijri.month||Math.max(1,Math.round(((CY-622)*12.3683+(CM+1))%12)||12);defaultYear=todayHijri.year||Math.round((CY+(CM/12)-622)*1.0307);}
+    const yearBase=defaultYear;
+    for(let y=yearBase-5;y<=yearBase+12;y++){const o=document.createElement('option');o.value=y;o.textContent=y;ySel.appendChild(o);}
+    mSel.value=pM||defaultMonth; ySel.value=pY||defaultYear;
+    const mName=names[parseInt(mSel.value)-1]||''; $('monthly-title').textContent=`${mName} ${ySel.value}`;
+    if($('th-date')) $('th-date').textContent=type==='gregorian'?'Date / التاريخ':'Hijri Date / التاريخ الهجري';
+}
+
+function jumpToToday(){
+    const type=S.calendarType||'gregorian'; const mSel=$('month-select'), ySel=$('year-select');
+    if(type==='gregorian'){
+        mSel.value=CM+1; ySel.value=CY; $('start-day-select').value=CD; $('end-day-select').value=32;
+    } else {
+        if(todayHijri.month){
+            mSel.value=todayHijri.month; ySel.value=todayHijri.year; $('start-day-select').value=todayHijri.day; $('end-day-select').value=32;
+        } else {
+            fetchTodayHijri().then(()=>{
+                if(todayHijri.month){ updateMonthYear(); mSel.value=todayHijri.month; ySel.value=todayHijri.year; $('start-day-select').value=todayHijri.day; $('end-day-select').value=32; fetchMonthly(); }
+            });
+            return;
+        }
+    }
+    saveDayPrefs(); fetchMonthly();
+}
+
+function initInspiration() {
+    const dayOfYear=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/86400000);
+    const ins=INSPIRATIONS[dayOfYear%INSPIRATIONS.length];
+    $('insp-ar').textContent=ins.ar; $('insp-en').textContent=ins.en; $('insp-ref').textContent=ins.ref;
+}
+
+async function refreshAll(){ updateMonthYear(); populateDays(); initInspiration(); await fetchDaily(); await fetchMonthly(); calcEvents(); updateTicker(); }
+
+async function fetchDaily(){
+    const{city,country,state,method}=S; const ld=$('daily-loading'), ldd=$('daily-loaded');
+    if(!city){
+        ld.innerHTML=`📍 Please set your location in Settings`; ld.classList.remove('hidden'); ldd.classList.add('hidden');
+        if($('ticker-track')) $('ticker-track').innerHTML=`<span class="ticker-item">📍 Please set location</span>`; return;
+    }
+    ld.innerHTML=`Loading times…`; ld.classList.remove('hidden'); ldd.classList.add('hidden');
+    const d=NOW, cacheKey=`mizan_daily_${d.getDate()}_${d.getMonth()}_${city}`;
+    const url=`https://api.aladhan.com/v1/timingsByCity/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state||'')}&method=${method}`;
+    let json=null;
+    try{
+        const res=await fetch(url); json=await res.json(); if(json.code!==200)throw 0; localStorage.setItem(cacheKey,JSON.stringify(json));
+    }catch(e){
+        const cached=localStorage.getItem(cacheKey); if(cached) json=JSON.parse(cached); else { ld.innerHTML=`Error loading times.`; return; }
+    }
+    const{timings,date,meta}=json.data;
+    $('clock-date').textContent=date.readable; $('clock-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`; $('header-hijri').textContent=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;
+    const plist=[{key:'Fajr',time:timings.Fajr},{key:'Sunrise',time:timings.Sunrise,sec:true},{key:'Dhuhr',time:timings.Dhuhr},{key:'Asr',time:timings.Asr},{key:'Maghrib',time:timings.Maghrib},{key:'Isha',time:timings.Isha}];
+    $('daily-list').innerHTML=plist.map(p=>`<li class="prayer-item${p.sec?' is-sec':''}" data-prayer="${p.key}"><div><div class="p-name">${p.key}</div><span class="p-name-ar">${PAR[p.key]||''}</span></div><div class="p-time" dir="ltr">${fmtT(p.time)}</div></li>`).join('');
+    ld.classList.add('hidden'); ldd.classList.remove('hidden'); startCountdown(timings,meta.timezone);
+}
 
 let prayerScheduleTimeouts=[];
-function clearPrayerSchedule(){prayerScheduleTimeouts.forEach(id=>clearTimeout(id));prayerScheduleTimeouts=[];}
-function schedulePrayerNotifications(timings,timezone){clearPrayerSchedule();const prayerKeys=['Fajr','Dhuhr','Asr','Maghrib','Isha'];prayerKeys.forEach(key=>{const [ph,pm]=timings[key].split(' ')[0].split(':').map(Number);const now=new Date();const opts={timeZone:timezone,year:'numeric',month:'numeric',day:'numeric',hour12:false,hour:'numeric',minute:'numeric',second:'numeric'};const parts=new Intl.DateTimeFormat('en-US',opts).formatToParts(now);const g=t=>parseInt(parts.find(p=>p.type===t).value);const local=new Date(g('year'),g('month')-1,g('day'),ph,pm,0,0);let msUntil=local-now;if(msUntil<-60000)msUntil+=86400000;if(msUntil<0)msUntil=0;const id=setTimeout(()=>{const nk=`${key}-${new Date().toDateString()}`;if(!notifiedPrayers.has(nk)){notifiedPrayers.add(nk);fireNotification(key,false);}},msUntil);prayerScheduleTimeouts.push(id);});}
-let keepAliveAudio=null;
-function startAudioKeepalive(){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const buf=ctx.createBuffer(1,1,22050);function ping(){const src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);src.start(0);}keepAliveAudio=setInterval(ping,25000);}catch(e){}}
-let heartbeatInterval=null;
-function startHeartbeat(timings,timezone){if(heartbeatInterval)clearInterval(heartbeatInterval);heartbeatInterval=setInterval(()=>{const prayerKeys=['Fajr','Dhuhr','Asr','Maghrib','Isha'];const now=new Date();const opts={timeZone:timezone,year:'numeric',month:'numeric',day:'numeric',hour12:false,hour:'numeric',minute:'numeric',second:'numeric'};const parts=new Intl.DateTimeFormat('en-US',opts).formatToParts(now);const g=t=>parseInt(parts.find(p=>p.type===t).value);const local=new Date(g('year'),g('month')-1,g('day'),g('hour'),g('minute'),g('second'));prayerKeys.forEach(key=>{const [ph,pm]=timings[key].split(' ')[0].split(':').map(Number);const pTime=new Date(local);pTime.setHours(ph,pm,0,0);const diff=local-pTime;const nk=`${key}-${local.toDateString()}`;if(diff>=0&&diff<=90000&&!notifiedPrayers.has(nk)){notifiedPrayers.add(nk);fireNotification(key,false);}});},30000);}
+function clearPrayerSchedule(){ prayerScheduleTimeouts.forEach(id=>clearTimeout(id)); prayerScheduleTimeouts=[]; }
+function schedulePrayerNotifications(timings,timezone){
+    clearPrayerSchedule(); const prayerKeys=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+    prayerKeys.forEach(key=>{
+        const [ph,pm]=timings[key].split(' ')[0].split(':').map(Number); const now=new Date();
+        const opts={timeZone:timezone,year:'numeric',month:'numeric',day:'numeric',hour12:false,hour:'numeric',minute:'numeric',second:'numeric'};
+        const parts=new Intl.DateTimeFormat('en-US',opts).formatToParts(now); const g=t=>parseInt(parts.find(p=>p.type===t).value);
+        const local=new Date(g('year'),g('month')-1,g('day'),ph,pm,0,0);
+        let msUntil=local-now; if(msUntil<-60000)msUntil+=86400000; if(msUntil<0)msUntil=0;
+        const id=setTimeout(()=>{ const nk=`${key}-${new Date().toDateString()}`; if(!notifiedPrayers.has(nk)){ notifiedPrayers.add(nk); fireNotification(key,false); } },msUntil);
+        prayerScheduleTimeouts.push(id);
+    });
+}
 
-function startCountdown(timings,timezone){if(countdownInterval)clearInterval(countdownInterval);if(backgroundWorker){backgroundWorker.terminate();backgroundWorker=null;}schedulePrayerNotifications(timings,timezone);startHeartbeat(timings,timezone);if(!keepAliveAudio)startAudioKeepalive();const keys=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];const pad=n=>String(n).padStart(2,'0');const fmt=ms=>{const h=Math.floor(ms/3600000);const m=Math.floor((ms%3600000)/60000);const s=Math.floor((ms%60000)/1000);return `${pad(h)}:${pad(m)}:${pad(s)}`;};const tick=()=>{const now=new Date();const opts={timeZone:timezone,year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hour12:false};const parts=new Intl.DateTimeFormat('en-US',opts).formatToParts(now);const g=t=>parseInt(parts.find(p=>p.type===t).value);const local=new Date(g('year'),g('month')-1,g('day'),g('hour'),g('minute'),g('second'));const h=local.getHours(),m=local.getMinutes();const clk=document.getElementById('big-clock');if(clk)clk.innerHTML=`${pad(h%12||12)}:${pad(m)}<span class="ampm">${h>=12?'PM':'AM'}</span>`;const pObjs=keys.map(k=>{const [ph,pm]=timings[k].split(' ')[0].split(':').map(Number);const d=new Date(local);d.setHours(ph,pm,0,0);return{key:k,date:d};});let next=pObjs.find(p=>p.date>local);if(!next){next={...pObjs[0]};next.date=new Date(next.date);next.date.setDate(next.date.getDate()+1);}let prev=null;for(let i=pObjs.length-1;i>=0;i--){if(pObjs[i].date<=local){prev=pObjs[i];break;}}if(!prev){prev={...pObjs[pObjs.length-1]};prev.date=new Date(prev.date);prev.date.setDate(prev.date.getDate()-1);}const dN=next.date-local;const dP=prev?local-prev.date:0;const pill=document.getElementById('next-pill');if(pill){pill.style.display='inline-flex';document.getElementById('pill-name').textContent=next.key;document.getElementById('pill-countdown').textContent=`-${fmt(dN)}`;}marqueeCountdown=`Next: ${next.key} -${fmt(dN)}`;document.title=`${next.key} -${fmt(dN)} · Mizan`;document.querySelectorAll('#daily-list .prayer-item').forEach(li=>{li.classList.remove('is-next','is-past');li.querySelectorAll('.p-badge').forEach(b=>b.remove());});const nLi=document.querySelector(`li[data-prayer="${next.key}"]`);if(nLi){nLi.classList.add('is-next');const b=document.createElement('span');b.className='p-badge';b.textContent=`-${fmt(dN)}`;nLi.querySelector('.p-name').appendChild(b);}if(prev&&prev.key!==next.key){const pLi=document.querySelector(`li[data-prayer="${prev.key}"]`);if(pLi){const b=document.createElement('span');b.className='p-badge past';b.textContent=`+${fmt(dP)}`;pLi.querySelector('.p-name').appendChild(b);}}pObjs.forEach(p=>{if(p.date<=local&&p.key!==next.key){const li=document.querySelector(`li[data-prayer="${p.key}"]`);if(li&&!li.classList.contains('is-sec'))li.classList.add('is-past');}});updateScrollHeader(`${pad(h%12||12)}:${pad(m)} ${h>=12?'PM':'AM'}`,next.key,`-${fmt(dN)}`);updateTicker();};tick();countdownInterval=setInterval(tick,1000);if(S.keepActive){const blob=new Blob([WK],{type:'application/javascript'});backgroundWorker=new Worker(URL.createObjectURL(blob));backgroundWorker.onmessage=tick;backgroundWorker.postMessage('start');}}
+function startCountdown(timings,timezone){
+    if(countdownInterval) clearInterval(countdownInterval);
+    schedulePrayerNotifications(timings,timezone);
+    const keys=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha']; const pad=n=>String(n).padStart(2,'0');
+    const fmt=ms=>{const h=Math.floor(ms/3600000);const m=Math.floor((ms%3600000)/60000);const s=Math.floor((ms%60000)/1000);return `${pad(h)}:${pad(m)}:${pad(s)}`;};
+    
+    const tick=()=>{
+        const now=new Date(); const opts={timeZone:timezone,year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hour12:false};
+        const parts=new Intl.DateTimeFormat('en-US',opts).formatToParts(now); const g=t=>parseInt(parts.find(p=>p.type===t).value);
+        const local=new Date(g('year'),g('month')-1,g('day'),g('hour'),g('minute'),g('second'));
+        const h=local.getHours(), m=local.getMinutes(); const clk=$('big-clock');
+        if(clk) clk.innerHTML=`${pad(h%12||12)}:${pad(m)}<span class="ampm">${h>=12?'PM':'AM'}</span>`;
+        
+        const pObjs=keys.map(k=>{ const [ph,pm]=timings[k].split(' ')[0].split(':').map(Number); const d=new Date(local); d.setHours(ph,pm,0,0); return{key:k,date:d}; });
+        let next=pObjs.find(p=>p.date>local);
+        if(!next){ next={...pObjs[0]}; next.date=new Date(next.date); next.date.setDate(next.date.getDate()+1); }
+        let prev=null;
+        for(let i=pObjs.length-1;i>=0;i--){ if(pObjs[i].date<=local){prev=pObjs[i];break;} }
+        if(!prev){ prev={...pObjs[pObjs.length-1]}; prev.date=new Date(prev.date); prev.date.setDate(prev.date.getDate()-1); }
+        
+        const dN=next.date-local; const dP=prev?local-prev.date:0; const pill=$('next-pill');
+        if(pill){ pill.style.display='inline-flex'; $('pill-name').textContent=next.key; $('pill-countdown').textContent=`-${fmt(dN)}`; }
+        marqueeCountdown=`Next: ${next.key} -${fmt(dN)}`; document.title=`${next.key} -${fmt(dN)} · Mizan`;
+        
+        $$('#daily-list .prayer-item').forEach(li=>{ li.classList.remove('is-next','is-past'); li.querySelectorAll('.p-badge').forEach(b=>b.remove()); });
+        const nLi=document.querySelector(`li[data-prayer="${next.key}"]`);
+        if(nLi){ nLi.classList.add('is-next'); const b=document.createElement('span'); b.className='p-badge'; b.textContent=`-${fmt(dN)}`; nLi.querySelector('.p-name').appendChild(b); }
+        if(prev&&prev.key!==next.key){ const pLi=document.querySelector(`li[data-prayer="${prev.key}"]`); if(pLi){ const b=document.createElement('span'); b.className='p-badge past'; b.textContent=`+${fmt(dP)}`; pLi.querySelector('.p-name').appendChild(b); } }
+        pObjs.forEach(p=>{ if(p.date<=local&&p.key!==next.key){ const li=document.querySelector(`li[data-prayer="${p.key}"]`); if(li&&!li.classList.contains('is-sec')) li.classList.add('is-past'); } });
+        if($('sh-clock')) $('sh-clock').textContent=`${pad(h%12||12)}:${pad(m)} ${h>=12?'PM':'AM'}`; updateTicker();
+    };
+    tick(); countdownInterval=setInterval(tick,1000);
+}
 
-const isMobile=()=>window.innerWidth<640;
-function initMobileFullscreen(){if(!isMobile())return;const body=document.body;const header=document.getElementById('scroll-header');const daily=document.getElementById('tab-daily');let ticking=false;function setDailyActive(on){if(on){body.classList.add('daily-active');body.classList.remove('daily-scrolled');}else{body.classList.remove('daily-active','daily-scrolled');}}document.querySelectorAll('.nav-btn').forEach(btn=>{btn.addEventListener('click',()=>{setDailyActive(btn.dataset.target==='tab-daily');});});setDailyActive(true);function onDailyScroll(){if(!ticking){requestAnimationFrame(()=>{const scrollY=daily.scrollTop;const THRESHOLD=60;if(scrollY>THRESHOLD){header.classList.add('visible');body.classList.add('header-visible');}else{header.classList.remove('visible');body.classList.remove('header-visible');}ticking=false;});ticking=true;}}daily.addEventListener('scroll',onDailyScroll,{passive:true});}
-function updateScrollHeader(clockText,nextName,nextCountdown){const shClock=document.getElementById('sh-clock');const shPill=document.getElementById('sh-pill');const shName=document.getElementById('sh-pill-name');const shCount=document.getElementById('sh-pill-count');const shLoc=document.getElementById('sh-loc');if(shClock)shClock.textContent=clockText;if(shLoc)shLoc.textContent=S.city?`${S.city}, ${S.country}`:'—';if(shPill&&nextName){shPill.style.display='inline-flex';if(shName)shName.textContent=nextName;if(shCount)shCount.textContent=nextCountdown;}}
+function playAdhanTone(){
+    try{
+        const ctx=new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==='suspended') ctx.resume();
+        const notes=[{f:392,t:0,d:0.5},{f:440,t:0.55,d:0.45},{f:494,t:1.05,d:0.7},{f:440,t:1.8,d:0.4},{f:392,t:2.25,d:0.75}];
+        notes.forEach(n=>{
+            const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value=n.f; osc.type='sine'; gain.gain.setValueAtTime(0,ctx.currentTime+n.t); gain.gain.linearRampToValueAtTime(0.3,ctx.currentTime+n.t+0.06); gain.gain.linearRampToValueAtTime(0,ctx.currentTime+n.t+n.d);
+            osc.start(ctx.currentTime+n.t); osc.stop(ctx.currentTime+n.t+n.d+0.1);
+        });
+    }catch(e){}
+}
 
-function playAdhanTone(){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();const notes=[{f:392,t:0,d:0.5},{f:440,t:0.55,d:0.45},{f:494,t:1.05,d:0.7},{f:440,t:1.8,d:0.4},{f:392,t:2.25,d:0.75}];notes.forEach(n=>{const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=n.f;osc.type='sine';gain.gain.setValueAtTime(0,ctx.currentTime+n.t);gain.gain.linearRampToValueAtTime(0.3,ctx.currentTime+n.t+0.06);gain.gain.linearRampToValueAtTime(0,ctx.currentTime+n.t+n.d);osc.start(ctx.currentTime+n.t);osc.stop(ctx.currentTime+n.t+n.d+0.1);});}catch(e){}}
 let pcPopupTimer=null;
-function showPcPopup(prayerName,timeStr){const ov=document.getElementById('notif-popup-overlay');const nEl=document.getElementById('npc-prayer-name');const tEl=document.getElementById('npc-time');if(!ov)return;if(nEl)nEl.textContent=prayerName;if(tEl)tEl.innerHTML=`${SVG_ICONS.clock||''} ${timeStr||new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;ov.classList.add('show');if(pcPopupTimer)clearTimeout(pcPopupTimer);pcPopupTimer=setTimeout(()=>ov.classList.remove('show'),45000);}
-function notifIsEffectivelyOn(){return 'Notification' in window&&Notification.permission==='granted'&&!S.notifMuted;}
-function updateNotifStatusUI(){const card=document.getElementById('notif-master-card');const icon=document.getElementById('nmc-icon');const label=document.getElementById('nmc-label');const sub=document.getElementById('nmc-sub');const toggle=document.getElementById('notif-master-toggle');const wrap=document.querySelector('.nmc-toggle-wrap');const opts=document.getElementById('notif-sub-options');if(!('Notification' in window)){if(card)card.className='notif-master-card state-off';if(icon)icon.innerHTML=SVG_ICONS.blocked;if(label)label.textContent='Notifications';if(sub)sub.textContent='Not supported in this browser. Try Chrome or Firefox.';if(toggle){toggle.checked=false;toggle.disabled=true;}if(wrap)wrap.classList.add('blocked');if(opts)opts.classList.add('hidden-opts');return;}const perm=Notification.permission;const isOn=notifIsEffectivelyOn();if(toggle){toggle.checked=isOn;toggle.disabled=false;}if(wrap)wrap.classList.remove('blocked');if(perm==='denied'){if(card)card.className='notif-master-card state-blocked';if(icon)icon.innerHTML=SVG_ICONS.bellOff;if(label)label.textContent='Notifications';if(sub)sub.textContent='Blocked by browser. Tap 🔒 in address bar → Site settings → Allow, then reload.';if(toggle){toggle.checked=false;toggle.disabled=true;}if(wrap)wrap.classList.add('blocked');if(opts)opts.classList.add('hidden-opts');return;}if(isOn){if(card)card.className='notif-master-card state-on';if(icon)icon.innerHTML=SVG_ICONS.bell;if(label)label.textContent='Notifications';if(sub)sub.textContent='Prayer alerts are active — keep this tab open.';if(opts)opts.classList.remove('hidden-opts');}else{if(card)card.className='notif-master-card state-off';if(icon)icon.innerHTML=SVG_ICONS.bellOff;if(label)label.textContent='Notifications';if(sub)sub.textContent=perm==='granted'?'Alerts are off. Flip the switch to re-enable.':'Flip the switch to enable prayer time alerts.';if(opts)opts.classList.add('hidden-opts');}}
-async function handleMasterToggle(wantsOn){if(!('Notification' in window))return;if(wantsOn){if(Notification.permission!=='granted'){const perm=await new Promise(resolve=>{const r=Notification.requestPermission(p=>resolve(p));if(r&&typeof r.then==='function')r.then(p=>resolve(p));});if(perm!=='granted'){S.notifMuted=true;updateNotifStatusUI();saveSettings();return;}}S.notifMuted=false;}else{S.notifMuted=true;}localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S));updateNotifStatusUI();}
-async function fireNotification(prayerName,isTest=false){if(!isTest&&S.notifMuted)return;const mobile=isMobile();const timeStr=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});const title=`🕌 ${prayerName}${isTest?' (Test)':''}`;const body=isTest?'Test alert from Mizan. الله أكبر':`It is now time for ${prayerName} prayer. الله أكبر`;if('Notification' in window&&Notification.permission==='granted'){const opts={body,tag:`mizan-${prayerName}-${new Date().toDateString()}`,requireInteraction:true,silent:false};if(mobile)opts.vibrate=[400,150,400,150,800];try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.ready.catch(()=>null);if(reg&&reg.showNotification)reg.showNotification(title,opts);else new Notification(title,opts);}else{new Notification(title,opts);}}catch(e){try{new Notification(title,{body,tag:opts.tag});}catch(e2){}}}if(!mobile)showPcPopup(prayerName,timeStr);if(S.usePopup||mobile)triggerAlarm(prayerName,isTest);if(S.playAdhan||isTest)playAdhanTone();}
-function triggerAlarm(prayerKey,isTest=false){const modal=document.getElementById('alarm-modal');document.getElementById('modal-prayer-name').textContent=prayerKey;document.getElementById('modal-prayer-time').textContent=isTest?'Test Alert · اختبار':`Time for ${prayerKey} · حان وقت الصلاة`;modal.classList.add('show');}
-async function testNotification(){const btn=document.getElementById('btn-test-notif');if(btn){btn.classList.add('testing');setTimeout(()=>btn.classList.remove('testing'),1500);}try{const ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')await ctx.resume();}catch(e){}if(!notifIsEffectivelyOn()&&'Notification' in window&&Notification.permission==='default'){await handleMasterToggle(true);}const prayerName=document.getElementById('pill-name')?.textContent?.trim()||'Fajr';await fireNotification(prayerName,true);}
+function showPcPopup(prayerName,timeStr){
+    const ov=$('notif-popup-overlay'), nEl=$('npc-prayer-name'), tEl=$('npc-time');
+    if(!ov) return; if(nEl) nEl.textContent=prayerName; if(tEl) tEl.innerHTML=`🕒 ${timeStr||new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+    ov.classList.add('show'); if(pcPopupTimer) clearTimeout(pcPopupTimer); pcPopupTimer=setTimeout(()=>ov.classList.remove('show'),45000);
+}
 
-async function fetchMonthly(){const{city,country,state,method}=S;const calendarType=S.calendarType||'gregorian';if(!city)return;const month=document.getElementById('month-select').value,year=document.getElementById('year-select').value;const sd=parseInt(document.getElementById('start-day-select').value)||1,ed=parseInt(document.getElementById('end-day-select').value)||32;const body=document.getElementById('prayer-table-body');body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)"><svg class="svg-icon spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg></td></tr>`;const ep=calendarType==='gregorian'?'calendarByCity':'hijriCalendarByCity';const url=`https://api.aladhan.com/v1/${ep}/${year}/${month}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state||'')}&method=${method}`;const names=calendarType==='gregorian'?GMONTHS:HMONTHS;const mName=names[parseInt(month)-1]||'';document.getElementById('monthly-title').textContent=`${mName} ${year}`;const cacheKey=`mizan_month_${year}_${month}_${ep}_${city}`;let data=null;try{const res=await fetch(url);data=await res.json();if(data.code===200)localStorage.setItem(cacheKey,JSON.stringify(data));}catch{const cached=localStorage.getItem(cacheKey);if(cached)data=JSON.parse(cached);}if(data&&data.code===200&&data.data){const filtered=data.data.filter(d=>{const n=parseInt(calendarType==='gregorian'?d.date.gregorian.day:d.date.hijri.day);return ed===32?n>=sd:n>=sd&&n<=ed;});currentPrayerData=filtered;renderTable(filtered,calendarType);}else{body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:#ef4444">Network error or no data found.</td></tr>`;}}
-function renderTable(arr,calType){const body=document.getElementById('prayer-table-body');if(!arr.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)">No matching dates.</td></tr>`;return;}const todayGreg=`${String(CD).padStart(2,'0')}-${String(CM+1).padStart(2,'0')}-${CY}`;const todayHijriStr=todayHijri.year?`${String(todayHijri.day).padStart(2,'0')}-${String(todayHijri.month).padStart(2,'0')}-${todayHijri.year}`:null;body.innerHTML='';arr.forEach(d=>{const{date,timings}=d;let dm,ds,wk,isToday=false;if(calType==='gregorian'){dm=date.readable;ds=`${date.hijri.day} ${date.hijri.month.en}`;wk=date.gregorian.weekday.en;isToday=(date.gregorian.date===todayGreg);}else{dm=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;ds=date.gregorian.date;wk=date.gregorian.weekday.en;if(todayHijriStr){const rowHijriStr=`${String(parseInt(date.hijri.day)).padStart(2,'0')}-${String(parseInt(date.hijri.month.number)).padStart(2,'0')}-${date.hijri.year}`;isToday=(rowHijriStr===todayHijriStr);}else{isToday=(date.gregorian.date===todayGreg);}}const isFri=wk==='Friday';const tr=document.createElement('tr');if(isToday)tr.classList.add('is-today');if(isFri)tr.classList.add('is-friday');tr.innerHTML=`<td><div class="date-main">${dm}${isToday?` <span class="today-badge" style="font-size:0.58em;background:var(--em-glow);color:var(--em-light);padding:1px 6px;border-radius:4px;margin-left:4px;font-weight:700;">Today</span>`:''}</div><div class="date-sub">${wk} · ${ds}</div></td><td class="prayer-col">${fmtT(timings.Fajr)}</td><td class="sunrise-col">${fmtT(timings.Sunrise)}</td><td class="prayer-col">${fmtT(timings.Dhuhr)}</td><td class="prayer-col">${fmtT(timings.Asr)}</td><td class="prayer-col">${fmtT(timings.Maghrib)}</td><td class="prayer-col">${fmtT(timings.Isha)}</td>`;body.appendChild(tr);});}
+function notifIsEffectivelyOn(){ return 'Notification' in window&&Notification.permission==='granted'&&!S.notifMuted; }
 
-async function calcEvents(){const lEl=document.getElementById('events-list');const ldEl=document.getElementById('events-loading');const cont=document.getElementById('events-grid-container');const hY=todayHijri.year||Math.round((CY+(CM/12)-622)*1.0307);const curM=todayHijri.month||Math.max(1,Math.round(((CY-622)*12.3683+(CM+1))%12)||12);const curD=todayHijri.day||15;document.getElementById('events-year-label').textContent=`${hY} AH / ${CY} CE`;cont.classList.add('hidden');ldEl.classList.remove('hidden');const now=new Date();now.setHours(0,0,0,0);const results=await Promise.all(EVENTS.map(async(e)=>{let targetYear=hY;if(e.m<curM||(e.m===curM&&e.d<curD))targetYear=hY+1;const monthDiff=(targetYear-hY)*12+(e.m-curM);const dayDiff=e.d-curD;const totalDaysApprox=Math.round(monthDiff*29.53059+dayDiff);const approxGregDate=new Date(now.getTime()+totalDaysApprox*86400000);approxGregDate.setHours(0,0,0,0);let gregDate=approxGregDate;const pd=(n)=>String(n).padStart(2,'0');let gregStr=`${pd(approxGregDate.getDate())}-${pd(approxGregDate.getMonth()+1)}-${approxGregDate.getFullYear()}`;try{const controller=new AbortController();const timeoutId=setTimeout(()=>controller.abort(),3500);const res=await fetch(`https://api.aladhan.com/v1/hToG?date=${pd(e.d)}-${pd(e.m)}-${targetYear}`,{signal:controller.signal});clearTimeout(timeoutId);const d=await res.json();if(d.code===200){const [gD,gM,gY]=d.data.gregorian.date.split('-');gregDate=new Date(parseInt(gY),parseInt(gM)-1,parseInt(gD));gregStr=d.data.gregorian.date;}}catch(err){}return{...e,gregDate,gregStr};}));results.sort((a,b)=>a.gregDate-b.gregDate);let nextIdx=-1;lEl.innerHTML=results.map((e,i)=>{const diff=Math.ceil((e.gregDate-now)/86400000);if(diff>=0&&nextIdx===-1)nextIdx=i;const isNext=i===nextIdx;const isPast=diff<0;if(isNext){nextEventString=`${e.name} in ${diff} day${diff===1?'':'s'}`;const el=document.getElementById('next-event-disp');if(el)el.innerHTML=`${SVG_ICONS.moon} ${nextEventString}`;}let badge='';if(diff===0)badge=`<span class="ev-badge badge-next">Today</span>`;else if(isPast)badge=`<span class="ev-badge badge-past">${Math.abs(diff)}d ago</span>`;else if(diff<=30)badge=`<span class="ev-badge badge-soon">+${diff} days</span>`;else badge=`<span class="ev-badge" style="background:var(--surface-2);color:var(--text-3);border:1px solid var(--border-sub)">+${diff}d</span>`;if(isNext&&!isPast)badge=`<span class="ev-badge badge-next" style="display:flex;align-items:center;gap:4px;width:fit-content;">${SVG_ICONS.playFill} Next Event</span>`;return `<div class="event-card${isNext?' is-next':''}${isPast?' is-past':''}"><div class="ev-date-block"><div class="ev-day">${e.d}</div><div class="ev-month">${HSHORT[e.m-1]}</div></div><div><div class="ev-name">${e.name}</div><div class="ev-name-ar">${e.ar}</div><div class="ev-greg">${e.gregStr}</div>${badge}</div></div>`;}).join('');if(nextIdx===-1){nextEventString="No upcoming events";const el=document.getElementById('next-event-disp');if(el)el.innerHTML=`${SVG_ICONS.moon} ${nextEventString}`;}ldEl.classList.add('hidden');cont.classList.remove('hidden');}
+function updateNotifStatusUI(){
+    const card=$('notif-master-card'), icon=$('nmc-icon'), label=$('nmc-label'), sub=$('nmc-sub'), toggle=$('notif-master-toggle'), wrap=document.querySelector('.nmc-toggle-wrap'), opts=$('notif-sub-options');
+    if(!('Notification' in window)){ if(card) card.className='notif-master-card state-off'; if(label) label.textContent='Notifications'; if(sub) sub.textContent='Not supported.'; if(toggle){toggle.checked=false;toggle.disabled=true;} if(wrap) wrap.classList.add('blocked'); if(opts) opts.classList.add('hidden-opts'); return; }
+    const perm=Notification.permission; const isOn=notifIsEffectivelyOn();
+    if(toggle){ toggle.checked=isOn; toggle.disabled=false; } if(wrap) wrap.classList.remove('blocked');
+    if(perm==='denied'){ if(card) card.className='notif-master-card state-blocked'; if(label) label.textContent='Notifications'; if(sub) sub.textContent='Blocked by browser.'; if(toggle){toggle.checked=false;toggle.disabled=true;} if(wrap) wrap.classList.add('blocked'); if(opts) opts.classList.add('hidden-opts'); return; }
+    if(isOn){ if(card) card.className='notif-master-card state-on'; if(label) label.textContent='Notifications'; if(sub) sub.textContent='Active.'; if(opts) opts.classList.remove('hidden-opts'); }
+    else { if(card) card.className='notif-master-card state-off'; if(label) label.textContent='Notifications'; if(sub) sub.textContent=perm==='granted'?'Alerts are off.':'Enable alerts.'; if(opts) opts.classList.add('hidden-opts'); }
+}
 
-function exportExcel(){if(!currentPrayerData?.length){alert('Load data first.');return;}const rows=[['Date','Weekday','Hijri Date','Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha']];currentPrayerData.forEach(d=>{const c=t=>t.split(' ')[0];rows.push([d.date.gregorian.date,d.date.gregorian.weekday.en,`${d.date.hijri.day} ${d.date.hijri.month.en} ${d.date.hijri.year}`,c(d.timings.Fajr),c(d.timings.Sunrise),c(d.timings.Dhuhr),c(d.timings.Asr),c(d.timings.Maghrib),c(d.timings.Isha)]);});const ws=XLSX.utils.aoa_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Prayer Times');XLSX.writeFile(wb,`prayer-times-${S.city||'export'}-${Date.now()}.xlsx`);}
+async function handleMasterToggle(wantsOn){
+    if(!('Notification' in window)) return;
+    if(wantsOn){
+        if(Notification.permission!=='granted'){
+            const perm=await new Promise(resolve=>{const r=Notification.requestPermission(p=>resolve(p));if(r&&typeof r.then==='function')r.then(p=>resolve(p));});
+            if(perm!=='granted'){ S.notifMuted=true; updateNotifStatusUI(); saveSettings(); return; }
+        }
+        S.notifMuted=false;
+    } else { S.notifMuted=true; }
+    localStorage.setItem('islamic_dashboard_settings',JSON.stringify(S)); updateNotifStatusUI();
+}
 
-async function loadStates(autoState,autoCity,fallback){const country=document.getElementById('country-select').value,sSel=document.getElementById('state-select');sSel.innerHTML='<option>Loading…</option>';sSel.disabled=true;try{const res=await fetch(`${API_BASE}/countries/states`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country})});const data=await res.json();sSel.innerHTML='<option value="">Select state</option>';sSel.disabled=false;if(!data.error&&data.data?.states?.length){data.data.states.forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=s.name;sSel.appendChild(o);});if(autoState){let found=-1;for(let i=0;i<sSel.options.length;i++)if(sSel.options[i].value===autoState){found=i;break;}if(found===-1)for(let i=0;i<sSel.options.length;i++)if(sSel.options[i].value.includes(autoState)||autoState.includes(sSel.options[i].value)){found=i;break;}if(found>-1){sSel.selectedIndex=found;await loadCities(autoCity,fallback);}}}else sSel.innerHTML='<option value="">N/A</option>';}catch{sSel.innerHTML='<option value="">Error</option>';}}
-async function loadCities(autoCity,fallback){const country=document.getElementById('country-select').value,state=document.getElementById('state-select').value;const dl=document.getElementById('cities-datalist');dl.innerHTML='';try{const res=await fetch(`${API_BASE}/countries/state/cities`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country,state})});const data=await res.json();if(!data.error&&data.data?.length){data.data.forEach(c=>{const o=document.createElement('option');o.value=c;dl.appendChild(o);});if(autoCity)document.getElementById('city-input').value=autoCity;else if(fallback)document.getElementById('city-input').value=data.data[0];}}catch{}}
+async function fireNotification(prayerName,isTest=false){
+    if(!isTest&&S.notifMuted) return;
+    const timeStr=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const title=`🕌 ${prayerName}${isTest?' (Test)':''}`, body=isTest?'Test alert. الله أكبر':`It is now time for ${prayerName} prayer. الله أكبر`;
+    if('Notification' in window&&Notification.permission==='granted'){
+        const opts={body,tag:`mizan-${prayerName}-${new Date().toDateString()}`,requireInteraction:true,silent:false};
+        try{ if('serviceWorker' in navigator){ const reg=await navigator.serviceWorker.ready.catch(()=>null); if(reg&&reg.showNotification) reg.showNotification(title,opts); else new Notification(title,opts); } else { new Notification(title,opts); } }catch(e){ try{new Notification(title,{body,tag:opts.tag});}catch(e2){} }
+    }
+    showPcPopup(prayerName,timeStr);
+    if(S.usePopup) {
+        const modal=$('alarm-modal'); $('modal-prayer-name').textContent=prayerKey; $('modal-prayer-time').textContent=isTest?'Test Alert':`Time for ${prayerKey}`; modal.classList.add('show');
+    }
+    if(S.playAdhan||isTest) playAdhanTone();
+}
+
+async function testNotification(){
+    const btn=$('btn-test-notif'); if(btn){btn.classList.add('testing'); setTimeout(()=>btn.classList.remove('testing'),1500);}
+    try{const ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')await ctx.resume();}catch(e){}
+    if(!notifIsEffectivelyOn()&&'Notification' in window&&Notification.permission==='default') await handleMasterToggle(true);
+    const prayerName=$('pill-name')?.textContent?.trim()||'Fajr'; await fireNotification(prayerName,true);
+}
+
+async function fetchMonthly(){
+    const{city,country,state,method}=S; const calendarType=S.calendarType||'gregorian'; if(!city) return;
+    const month=$('month-select').value, year=$('year-select').value;
+    const sd=parseInt($('start-day-select').value)||1, ed=parseInt($('end-day-select').value)||32;
+    const body=$('prayer-table-body'); body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)">Loading...</td></tr>`;
+    const ep=calendarType==='gregorian'?'calendarByCity':'hijriCalendarByCity';
+    const url=`https://api.aladhan.com/v1/${ep}/${year}/${month}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state||'')}&method=${method}`;
+    const names=calendarType==='gregorian'?GMONTHS:HMONTHS; const mName=names[parseInt(month)-1]||''; $('monthly-title').textContent=`${mName} ${year}`;
+    const cacheKey=`mizan_month_${year}_${month}_${ep}_${city}`; let data=null;
+    try{ const res=await fetch(url); data=await res.json(); if(data.code===200) localStorage.setItem(cacheKey,JSON.stringify(data)); }
+    catch(e){ const cached=localStorage.getItem(cacheKey); if(cached) data=JSON.parse(cached); }
+    if(data&&data.code===200&&data.data){ const filtered=data.data.filter(d=>{const n=parseInt(calendarType==='gregorian'?d.date.gregorian.day:d.date.hijri.day);return ed===32?n>=sd:n>=sd&&n<=ed;}); currentPrayerData=filtered; renderTable(filtered,calendarType); }
+    else{ body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:#ef4444">Network error or no data found.</td></tr>`; }
+}
+
+function renderTable(arr,calType){
+    const body=$('prayer-table-body'); if(!arr.length){ body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)">No matching dates.</td></tr>`; return; }
+    const todayGreg=`${String(CD).padStart(2,'0')}-${String(CM+1).padStart(2,'0')}-${CY}`;
+    const todayHijriStr=todayHijri.year?`${String(todayHijri.day).padStart(2,'0')}-${String(todayHijri.month).padStart(2,'0')}-${todayHijri.year}`:null;
+    body.innerHTML='';
+    arr.forEach(d=>{
+        const{date,timings}=d; let dm,ds,wk,isToday=false;
+        if(calType==='gregorian'){dm=date.readable;ds=`${date.hijri.day} ${date.hijri.month.en}`;wk=date.gregorian.weekday.en;isToday=(date.gregorian.date===todayGreg);}
+        else{dm=`${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year}`;ds=date.gregorian.date;wk=date.gregorian.weekday.en;if(todayHijriStr){const rowHijriStr=`${String(parseInt(date.hijri.day)).padStart(2,'0')}-${String(parseInt(date.hijri.month.number)).padStart(2,'0')}-${date.hijri.year}`;isToday=(rowHijriStr===todayHijriStr);}else{isToday=(date.gregorian.date===todayGreg);}}
+        const isFri=wk==='Friday'; const tr=document.createElement('tr'); if(isToday) tr.classList.add('is-today'); if(isFri) tr.classList.add('is-friday');
+        tr.innerHTML=`<td><div class="date-main">${dm}${isToday?` <span class="today-badge" style="font-size:0.58em;background:var(--em-glow);color:var(--em-light);padding:1px 6px;border-radius:4px;margin-left:4px;font-weight:700;">Today</span>`:''}</div><div class="date-sub">${wk} · ${ds}</div></td><td class="prayer-col">${fmtT(timings.Fajr)}</td><td class="sunrise-col">${fmtT(timings.Sunrise)}</td><td class="prayer-col">${fmtT(timings.Dhuhr)}</td><td class="prayer-col">${fmtT(timings.Asr)}</td><td class="prayer-col">${fmtT(timings.Maghrib)}</td><td class="prayer-col">${fmtT(timings.Isha)}</td>`; body.appendChild(tr);
+    });
+}
+
+async function calcEvents(){
+    const lEl=$('events-list'), ldEl=$('events-loading'), cont=$('events-grid-container');
+    const hY=todayHijri.year||Math.round((CY+(CM/12)-622)*1.0307); const curM=todayHijri.month||Math.max(1,Math.round(((CY-622)*12.3683+(CM+1))%12)||12); const curD=todayHijri.day||15;
+    if($('events-year-label')) $('events-year-label').textContent=`${hY} AH / ${CY} CE`;
+    if(cont) cont.classList.add('hidden'); if(ldEl) ldEl.classList.remove('hidden');
+    const now=new Date(); now.setHours(0,0,0,0);
+    const results=await Promise.all(EVENTS.map(async(e)=>{
+        let targetYear=hY; if(e.m<curM||(e.m===curM&&e.d<curD)) targetYear=hY+1;
+        const monthDiff=(targetYear-hY)*12+(e.m-curM); const dayDiff=e.d-curD; const totalDaysApprox=Math.round(monthDiff*29.53059+dayDiff);
+        const approxGregDate=new Date(now.getTime()+totalDaysApprox*86400000); approxGregDate.setHours(0,0,0,0);
+        let gregDate=approxGregDate; const pd=(n)=>String(n).padStart(2,'0'); let gregStr=`${pd(approxGregDate.getDate())}-${pd(approxGregDate.getMonth()+1)}-${approxGregDate.getFullYear()}`;
+        try{
+            const controller=new AbortController(); const timeoutId=setTimeout(()=>controller.abort(),3500);
+            const res=await fetch(`https://api.aladhan.com/v1/hToG?date=${pd(e.d)}-${pd(e.m)}-${targetYear}`,{signal:controller.signal});
+            clearTimeout(timeoutId); const d=await res.json();
+            if(d.code===200){ const [gD,gM,gY]=d.data.gregorian.date.split('-'); gregDate=new Date(parseInt(gY),parseInt(gM)-1,parseInt(gD)); gregStr=d.data.gregorian.date; }
+        }catch(err){}
+        return{...e,gregDate,gregStr};
+    }));
+    results.sort((a,b)=>a.gregDate-b.gregDate); let nextIdx=-1;
+    if(lEl) lEl.innerHTML=results.map((e,i)=>{
+        const diff=Math.ceil((e.gregDate-now)/86400000); if(diff>=0&&nextIdx===-1) nextIdx=i; const isNext=i===nextIdx; const isPast=diff<0;
+        if(isNext){ nextEventString=`${e.name} in ${diff} day${diff===1?'':'s'}`; const el=$('next-event-disp'); if(el) el.innerHTML=`✨ ${nextEventString}`; }
+        let badge=''; if(diff===0) badge=`<span class="ev-badge badge-next">Today</span>`; else if(isPast) badge=`<span class="ev-badge badge-past">${Math.abs(diff)}d ago</span>`; else if(diff<=30) badge=`<span class="ev-badge badge-soon">+${diff} days</span>`; else badge=`<span class="ev-badge" style="background:var(--surface-2);color:var(--text-3);border:1px solid var(--border-sub)">+${diff}d</span>`;
+        if(isNext&&!isPast) badge=`<span class="ev-badge badge-next" style="display:flex;align-items:center;gap:4px;width:fit-content;">▶ Next Event</span>`;
+        return `<div class="event-card${isNext?' is-next':''}${isPast?' is-past':''}"><div class="ev-date-block"><div class="ev-day">${e.d}</div><div class="ev-month">${HSHORT[e.m-1]}</div></div><div><div class="ev-name">${e.name}</div><div class="ev-name-ar">${e.ar}</div><div class="ev-greg">${e.gregStr}</div>${badge}</div></div>`;
+    }).join('');
+    if(nextIdx===-1){ nextEventString="No upcoming events"; const el=$('next-event-disp'); if(el) el.innerHTML=`✨ ${nextEventString}`; }
+    if(ldEl) ldEl.classList.add('hidden'); if(cont) cont.classList.remove('hidden');
+}
+
+async function loadStates(autoState,autoCity,fallback){
+    const country=$('country-select').value, sSel=$('state-select'); sSel.innerHTML='<option>Loading…</option>'; sSel.disabled=true;
+    try{
+        const res=await fetch(`${API_BASE}/countries/states`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country})});
+        const data=await res.json(); sSel.innerHTML='<option value="">Select state</option>'; sSel.disabled=false;
+        if(!data.error&&data.data?.states?.length){
+            data.data.states.forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; sSel.appendChild(o); });
+            if(autoState){ let found=-1; for(let i=0;i<sSel.options.length;i++) if(sSel.options[i].value===autoState){found=i;break;} if(found===-1) for(let i=0;i<sSel.options.length;i++) if(sSel.options[i].value.includes(autoState)||autoState.includes(sSel.options[i].value)){found=i;break;} if(found>-1){sSel.selectedIndex=found; await loadCities(autoCity,fallback);} }
+        } else sSel.innerHTML='<option value="">N/A</option>';
+    }catch(e){sSel.innerHTML='<option value="">Error</option>';}
+}
+
+async function loadCities(autoCity,fallback){
+    const country=$('country-select').value, state=$('state-select').value, dl=$('cities-datalist'); dl.innerHTML='';
+    try{
+        const res=await fetch(`${API_BASE}/countries/state/cities`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country,state})});
+        const data=await res.json();
+        if(!data.error&&data.data?.length){ data.data.forEach(c=>{ const o=document.createElement('option'); o.value=c; dl.appendChild(o); }); if(autoCity) $('city-input').value=autoCity; else if(fallback) $('city-input').value=data.data[0]; }
+    }catch(e){}
+}
 
 const MECCA={lat:21.4225,lng:39.8262};
-let qiblaData={userLat:null,userLng:null,bearing:null,deviceHeading:null,smoothedHeading:null,mode:'map',map:null,qiblaLine:null,videoStream:null,orientHandler:null,orientAbsHandler:null,animFrame:null,autoMode:false,autoCurrentMode:null,autoOrientHandler:null};
-function calcQiblaBearing(lat1,lng1){const toRad=d=>d*Math.PI/180;const toDeg=r=>r*180/Math.PI;const dLng=toRad(MECCA.lng-lng1);const la1=toRad(lat1);const la2=toRad(MECCA.lat);const y=Math.sin(dLng)*Math.cos(la2);const x=Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLng);return (toDeg(Math.atan2(y,x))+360)%360;}
-function calcDistance(lat1,lng1,lat2,lng2){const R=6371;const toRad=d=>d*Math.PI/180;const dLat=toRad(lat2-lat1);const dLng=toRad(lng2-lng1);const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function destPoint(lat,lng,brng,d){const R=6371;const brngRad=brng*Math.PI/180;const lat1=lat*Math.PI/180;const lng1=lng*Math.PI/180;const lat2=Math.asin(Math.sin(lat1)*Math.cos(d/R)+Math.cos(lat1)*Math.sin(d/R)*Math.cos(brngRad));const lng2=lng1+Math.atan2(Math.sin(brngRad)*Math.sin(d/R)*Math.cos(lat1),Math.cos(d/R)-Math.sin(lat1)*Math.sin(lat2));return [lat2*180/Math.PI,lng2*180/Math.PI];}
-function initQibla(){document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(btn=>{btn.addEventListener('click',()=>{stopAutoMode();document.querySelectorAll('.qibla-mode-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');switchQiblaMode(btn.dataset.mode);});});document.getElementById('qbtn-auto')?.addEventListener('click',()=>{if(qiblaData.autoMode)stopAutoMode();else startAutoMode();});document.getElementById('qibla-retry-btn')?.addEventListener('click',startQiblaLocation);startQiblaLocation();}
-function startAutoMode(){if(!window.DeviceOrientationEvent&&!window.ondeviceorientationabsolute){alert('Sensors not available.');return;}qiblaData.autoMode=true;qiblaData.autoCurrentMode=null;document.getElementById('qbtn-auto')?.classList.add('active');document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.style.opacity='0.4';b.style.pointerEvents='none';});document.getElementById('qibla-auto-pill').style.display='flex';const handler=e=>{if(!qiblaData.autoMode)return;const beta=Math.abs(e.beta||0);let newMode=qiblaData.autoCurrentMode;if(beta<30)newMode='compass';else if(beta>50)newMode='camera';if(newMode&&newMode!==qiblaData.autoCurrentMode){qiblaData.autoCurrentMode=newMode;const label=document.getElementById('qibla-auto-current');if(label)label.textContent=newMode==='compass'?'🧭 Compass':'📷 Camera AR';document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.classList.toggle('active',b.dataset.mode===newMode);});switchQiblaMode(newMode);}};window.addEventListener('deviceorientation',handler,true);qiblaData.autoOrientHandler=handler;setTimeout(()=>{if(qiblaData.autoMode&&qiblaData.autoCurrentMode===null){qiblaData.autoCurrentMode='compass';document.getElementById('qibla-auto-current').textContent='🧭 Compass';document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.classList.toggle('active',b.dataset.mode==='compass');});switchQiblaMode('compass');}},800);}
-function stopAutoMode(){if(!qiblaData.autoMode)return;qiblaData.autoMode=false;qiblaData.autoCurrentMode=null;if(qiblaData.autoOrientHandler){window.removeEventListener('deviceorientation',qiblaData.autoOrientHandler,true);qiblaData.autoOrientHandler=null;}document.getElementById('qbtn-auto')?.classList.remove('active');document.querySelectorAll('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.style.opacity='';b.style.pointerEvents='';});document.getElementById('qibla-auto-pill').style.display='none';}
-function startQiblaLocation(){showQiblaState('loading');if(!navigator.geolocation){showQiblaError('Geolocation not supported.');return;}navigator.geolocation.getCurrentPosition(pos=>{qiblaData.userLat=pos.coords.latitude;qiblaData.userLng=pos.coords.longitude;qiblaData.bearing=calcQiblaBearing(qiblaData.userLat,qiblaData.userLng);document.getElementById('qibla-deg').textContent=Math.round(qiblaData.bearing);document.getElementById('qibla-bearing-badge').style.display='flex';const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);document.getElementById('qibla-mode-row').style.display='flex';const defaultMode=isMob?'compass':'map';document.querySelectorAll('.qibla-mode-btn').forEach(b=>{b.classList.toggle('active',b.dataset.mode===defaultMode);});switchQiblaMode(defaultMode);},err=>{const msgs={1:'Access denied.',2:'Unavailable.',3:'Timeout.'};showQiblaError(msgs[err.code]||'Could not get location.');},{enableHighAccuracy:true,timeout:12000});}
-function showQiblaState(state){const ids=['qibla-loading','qibla-error','qibla-map-wrap','qibla-compass-wrap','qibla-camera-wrap'];ids.forEach(id=>document.getElementById(id)?.classList.add('hidden'));if(state==='loading')document.getElementById('qibla-loading')?.classList.remove('hidden');if(state==='error')document.getElementById('qibla-error')?.classList.remove('hidden');if(state==='map')document.getElementById('qibla-map-wrap')?.classList.remove('hidden');if(state==='compass')document.getElementById('qibla-compass-wrap')?.classList.remove('hidden');if(state==='camera')document.getElementById('qibla-camera-wrap')?.classList.remove('hidden');}
-function showQiblaError(msg){document.getElementById('qibla-error-msg').textContent=msg;document.getElementById('qibla-sub').textContent='Error';showQiblaState('error');}
-function switchQiblaMode(mode){stopQiblaCamera();stopQiblaCompass();if(qiblaData.animFrame){cancelAnimationFrame(qiblaData.animFrame);qiblaData.animFrame=null;}qiblaData.mode=mode;const dist=calcDistance(qiblaData.userLat,qiblaData.userLng,MECCA.lat,MECCA.lng);document.getElementById('qibla-sub').textContent='Bearing '+Math.round(qiblaData.bearing)+'° from North · '+Math.round(dist)+' km to Mecca';if(mode==='map')startQiblaMap();if(mode==='compass')startQiblaCompass();if(mode==='camera')startQiblaCamera();}
-function startQiblaMap(){showQiblaState('map');setTimeout(()=>{if(!qiblaData.map){const isDark=document.documentElement.getAttribute('data-theme')==='dark';qiblaData.map=L.map('qibla-map',{zoomControl:true,attributionControl:true});const tileUrl=isDark?'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png':'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';L.tileLayer(tileUrl,{attribution:'© CARTO',subdomains:'abcd',maxZoom:19}).addTo(qiblaData.map);}const map=qiblaData.map;map.eachLayer(layer=>{if(layer instanceof L.Marker||layer instanceof L.Polyline)map.removeLayer(layer);});const userIcon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:var(--em-light,#2aad7e);border:3px solid white;"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});L.marker([qiblaData.userLat,qiblaData.userLng],{icon:userIcon}).addTo(map).bindPopup('Your location');const meccaIcon=L.divIcon({html:'<div style="font-size:24px;line-height:1;">🕋</div>',className:'',iconSize:[24,24],iconAnchor:[12,12]});L.marker([MECCA.lat,MECCA.lng],{icon:meccaIcon}).addTo(map).bindPopup('Mecca');const rayEnd=destPoint(qiblaData.userLat,qiblaData.userLng,qiblaData.bearing,1500);qiblaData.qiblaLine=L.polyline([[qiblaData.userLat,qiblaData.userLng],rayEnd],{color:'var(--gold)',weight:4,opacity:0.9}).addTo(map);map.fitBounds(qiblaData.qiblaLine.getBounds(),{padding:[40,40]});},100);}
-function startQiblaCompass(){showQiblaState('compass');const canvas=document.getElementById('qibla-compass-canvas');const ctx=canvas.getContext('2d');let currentCompassHeading=0;const isApple=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;if(isApple&&typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const btn=document.createElement('button');btn.className='btn-sm';btn.style.margin='0 auto';btn.textContent='Enable Compass';btn.onclick=()=>{DeviceOrientationEvent.requestPermission().then(state=>{if(state==='granted'){btn.remove();listenCompass();}else{btn.textContent='Permission Denied';btn.disabled=true;}}).catch(console.error);};document.getElementById('qibla-compass-status').innerHTML='';document.getElementById('qibla-compass-status').appendChild(btn);}else{listenCompass();}function listenCompass(){document.getElementById('qibla-compass-status').textContent='Rotate your device to face Qibla.';const handler=e=>{let heading=null;if(e.webkitCompassHeading!=null)heading=e.webkitCompassHeading;else if(e.alpha!=null)heading=360-e.alpha;if(heading!=null)qiblaData.deviceHeading=heading;};window.addEventListener('deviceorientation',handler,true);qiblaData.orientHandler=handler;if('ondeviceorientationabsolute' in window){const absHandler=e=>{if(e.alpha!=null)qiblaData.deviceHeading=360-e.alpha;};window.addEventListener('deviceorientationabsolute',absHandler,true);qiblaData.orientAbsHandler=absHandler;}setTimeout(()=>{if(qiblaData.deviceHeading===null)document.getElementById('qibla-orient-hint').style.display='flex';},3000);}function drawCompass(){const cx=canvas.width/2,cy=canvas.height/2,r=cx-20;ctx.clearRect(0,0,canvas.width,canvas.height);let targetHeading=qiblaData.deviceHeading||0;let diff=targetHeading-currentCompassHeading;if(diff>180)diff-=360;if(diff<-180)diff+=360;currentCompassHeading+=diff*0.15;if(currentCompassHeading<0)currentCompassHeading+=360;currentCompassHeading%=360;ctx.save();ctx.translate(cx,cy);ctx.rotate(-currentCompassHeading*Math.PI/180);ctx.beginPath();ctx.arc(0,0,r,0,2*Math.PI);ctx.lineWidth=4;ctx.strokeStyle='rgba(201,168,76,0.3)';ctx.stroke();for(let i=0;i<360;i+=15){const isMain=i%90===0;const a=i*Math.PI/180;ctx.beginPath();ctx.moveTo(Math.cos(a)*(r-(isMain?15:8)),Math.sin(a)*(r-(isMain?15:8)));ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);ctx.lineWidth=isMain?3:1;ctx.strokeStyle=isMain?'#c9a84c':'rgba(201,168,76,0.5)';ctx.stroke();}ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('N',0,-r+28);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('S',0,r-28);ctx.fillText('E',r-28,0);ctx.fillText('W',-r+28,0);const qRad=qiblaData.bearing*Math.PI/180;const diffQ=Math.abs((currentCompassHeading-qiblaData.bearing+360)%360);const aligned=diffQ<5||diffQ>355;if(aligned){ctx.beginPath();ctx.arc(0,0,r+8,0,2*Math.PI);ctx.lineWidth=4;ctx.strokeStyle='#22c55e';ctx.stroke();document.getElementById('qibla-compass-status').innerHTML='<span style="color:var(--em-light);font-weight:700;">Facing Qibla!</span>';}else{document.getElementById('qibla-compass-status').textContent='Rotate device.';}ctx.save();ctx.rotate(qRad);ctx.beginPath();ctx.moveTo(0,-r-10);ctx.lineTo(15,-r+20);ctx.lineTo(-15,-r+20);ctx.closePath();ctx.fillStyle=aligned?'#4ade80':'#c9a84c';ctx.fill();ctx.font='32px Arial';ctx.fillText('🕋',0,-r+45);ctx.restore();ctx.beginPath();ctx.arc(0,0,6,0,2*Math.PI);ctx.fillStyle='#c9a84c';ctx.fill();ctx.restore();if(qiblaData.mode==='compass')qiblaData.animFrame=requestAnimationFrame(drawCompass);}drawCompass();}
-function stopQiblaCompass(){if(qiblaData.orientHandler){window.removeEventListener('deviceorientation',qiblaData.orientHandler,true);qiblaData.orientHandler=null;}if(qiblaData.orientAbsHandler){window.removeEventListener('deviceorientationabsolute',qiblaData.orientAbsHandler,true);qiblaData.orientAbsHandler=null;}document.getElementById('qibla-orient-hint').style.display='none';}
-function startQiblaCamera(){showQiblaState('camera');const video=document.getElementById('qibla-video');const leftArrow=document.getElementById('qibla-dir-left');const rightArrow=document.getElementById('qibla-dir-right');const kaaba=document.getElementById('qibla-ar-kaaba-fixed');const status=document.getElementById('qibla-ar-status');navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(stream=>{qiblaData.videoStream=stream;video.srcObject=stream;}).catch(()=>{status.textContent='Camera denied.';});qiblaData.smoothedHeading=null;const handler=e=>{let heading=null;if(e.webkitCompassHeading!=null)heading=e.webkitCompassHeading;else if(e.alpha!=null)heading=360-e.alpha;if(heading!=null)qiblaData.deviceHeading=heading;};window.addEventListener('deviceorientation',handler,true);qiblaData.orientHandler=handler;function loop(){if(qiblaData.deviceHeading!==null&&qiblaData.bearing!==null){let raw=qiblaData.deviceHeading;if(qiblaData.smoothedHeading===null){qiblaData.smoothedHeading=raw;}else{let sDiff=raw-qiblaData.smoothedHeading;if(sDiff>180)sDiff-=360;if(sDiff<-180)sDiff+=360;qiblaData.smoothedHeading+=sDiff*0.15;qiblaData.smoothedHeading=(qiblaData.smoothedHeading+360)%360;}const h=qiblaData.smoothedHeading;const b=qiblaData.bearing;let diff=b-h;if(diff>180)diff-=360;if(diff<-180)diff+=360;const TOLERANCE=12;if(Math.abs(diff)<=TOLERANCE){leftArrow.classList.remove('visible');rightArrow.classList.remove('visible');kaaba.classList.add('aligned');status.innerHTML='<span style="color:var(--em-light);font-weight:700;">Facing Qibla!</span>';}else{kaaba.classList.remove('aligned');status.textContent='Rotate phone.';if(diff>0){rightArrow.classList.add('visible');leftArrow.classList.remove('visible');}else{leftArrow.classList.add('visible');rightArrow.classList.remove('visible');}}}if(qiblaData.mode==='camera')qiblaData.animFrame=requestAnimationFrame(loop);}loop();}
-function stopQiblaCamera(){if(qiblaData.videoStream){qiblaData.videoStream.getTracks().forEach(t=>t.stop());qiblaData.videoStream=null;}if(qiblaData.orientHandler){window.removeEventListener('deviceorientation',qiblaData.orientHandler,true);qiblaData.orientHandler=null;}}
+let qiblaData={userLat:null,userLng:null,bearing:null,deviceHeading:null,smoothedHeading:null,mode:'map',map:null,qiblaLine:null,orientHandler:null,orientAbsHandler:null,animFrame:null,autoMode:false,autoCurrentMode:null,autoOrientHandler:null};
+
+function calcQiblaBearing(lat1,lng1){
+    const toRad=d=>d*Math.PI/180; const toDeg=r=>r*180/Math.PI; const dLng=toRad(MECCA.lng-lng1); const la1=toRad(lat1); const la2=toRad(MECCA.lat);
+    const y=Math.sin(dLng)*Math.cos(la2); const x=Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLng); return (toDeg(Math.atan2(y,x))+360)%360;
+}
+function calcDistance(lat1,lng1,lat2,lng2){
+    const R=6371; const toRad=d=>d*Math.PI/180; const dLat=toRad(lat2-lat1); const dLng=toRad(lng2-lng1); const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function destPoint(lat,lng,brng,d){
+    const R=6371; const brngRad=brng*Math.PI/180; const lat1=lat*Math.PI/180; const lng1=lng*Math.PI/180; const lat2=Math.asin(Math.sin(lat1)*Math.cos(d/R)+Math.cos(lat1)*Math.sin(d/R)*Math.cos(brngRad)); const lng2=lng1+Math.atan2(Math.sin(brngRad)*Math.sin(d/R)*Math.cos(lat1),Math.cos(d/R)-Math.sin(lat1)*Math.sin(lat2)); return [lat2*180/Math.PI,lng2*180/Math.PI];
+}
+
+function initQibla(){
+    $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(btn=>{ btn.addEventListener('click',()=>{ stopAutoMode(); $$('.qibla-mode-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); switchQiblaMode(btn.dataset.mode); }); });
+    $('qbtn-auto')?.addEventListener('click',()=>{ if(qiblaData.autoMode) stopAutoMode(); else startAutoMode(); });
+    $('qibla-retry-btn')?.addEventListener('click',startQiblaLocation); startQiblaLocation();
+}
+
+function startAutoMode(){
+    if(!window.DeviceOrientationEvent&&!window.ondeviceorientationabsolute){alert('Sensors not available.');return;}
+    qiblaData.autoMode=true; qiblaData.autoCurrentMode=null; $('qbtn-auto')?.classList.add('active'); $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.style.opacity='0.4';b.style.pointerEvents='none';}); $('qibla-auto-pill').style.display='flex';
+    const handler=e=>{
+        if(!qiblaData.autoMode) return; const beta=Math.abs(e.beta||0); let newMode=qiblaData.autoCurrentMode;
+        if(beta<30) newMode='compass'; else if(beta>50) newMode='camera';
+        if(newMode&&newMode!==qiblaData.autoCurrentMode){ qiblaData.autoCurrentMode=newMode; const label=$('qibla-auto-current'); if(label) label.textContent=newMode==='compass'?'🧭 Compass':'📷 Camera AR'; $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.classList.toggle('active',b.dataset.mode===newMode);}); switchQiblaMode(newMode); }
+    };
+    window.addEventListener('deviceorientation',handler,true); qiblaData.autoOrientHandler=handler;
+    setTimeout(()=>{ if(qiblaData.autoMode&&qiblaData.autoCurrentMode===null){ qiblaData.autoCurrentMode='compass'; $('qibla-auto-current').textContent='🧭 Compass'; $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.classList.toggle('active',b.dataset.mode==='compass');}); switchQiblaMode('compass'); } },800);
+}
+function stopAutoMode(){
+    if(!qiblaData.autoMode) return; qiblaData.autoMode=false; qiblaData.autoCurrentMode=null;
+    if(qiblaData.autoOrientHandler){window.removeEventListener('deviceorientation',qiblaData.autoOrientHandler,true); qiblaData.autoOrientHandler=null;}
+    $('qbtn-auto')?.classList.remove('active'); $$('.qibla-mode-btn:not(#qbtn-auto)').forEach(b=>{b.style.opacity='';b.style.pointerEvents='';}); $('qibla-auto-pill').style.display='none';
+}
+function startQiblaLocation(){
+    showQiblaState('loading');
+    if(!navigator.geolocation){showQiblaError('Geolocation not supported.');return;}
+    navigator.geolocation.getCurrentPosition(pos=>{
+        qiblaData.userLat=pos.coords.latitude; qiblaData.userLng=pos.coords.longitude; qiblaData.bearing=calcQiblaBearing(qiblaData.userLat,qiblaData.userLng);
+        $('qibla-deg').textContent=Math.round(qiblaData.bearing); $('qibla-bearing-badge').style.display='flex';
+        const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent); $('qibla-mode-row').style.display='flex'; const defaultMode=isMob?'compass':'map';
+        $$('.qibla-mode-btn').forEach(b=>{b.classList.toggle('active',b.dataset.mode===defaultMode);}); switchQiblaMode(defaultMode);
+    },err=>{ const msgs={1:'Access denied.',2:'Unavailable.',3:'Timeout.'}; showQiblaError(msgs[err.code]||'Could not get location.'); },{enableHighAccuracy:true,timeout:12000});
+}
+function showQiblaState(state){
+    const ids=['qibla-loading','qibla-error','qibla-map-wrap','qibla-compass-wrap','qibla-camera-wrap'];
+    ids.forEach(id=>$(id)?.classList.add('hidden')); if(state==='loading') $('qibla-loading')?.classList.remove('hidden'); if(state==='error') $('qibla-error')?.classList.remove('hidden'); if(state==='map') $('qibla-map-wrap')?.classList.remove('hidden'); if(state==='compass') $('qibla-compass-wrap')?.classList.remove('hidden'); if(state==='camera') $('qibla-camera-wrap')?.classList.remove('hidden');
+}
+function showQiblaError(msg){ $('qibla-error-msg').textContent=msg; $('qibla-sub').textContent='Error'; showQiblaState('error'); }
+function switchQiblaMode(mode){
+    stopQiblaCamera(); stopQiblaCompass(); if(qiblaData.animFrame){cancelAnimationFrame(qiblaData.animFrame);qiblaData.animFrame=null;} qiblaData.mode=mode;
+    const dist=calcDistance(qiblaData.userLat,qiblaData.userLng,MECCA.lat,MECCA.lng); $('qibla-sub').textContent='Bearing '+Math.round(qiblaData.bearing)+'° from North · '+Math.round(dist)+' km to Mecca';
+    if(mode==='map') startQiblaMap(); if(mode==='compass') startQiblaCompass(); if(mode==='camera') startQiblaCamera();
+}
+
+function startQiblaMap(){
+    showQiblaState('map');
+    setTimeout(()=>{
+        if(!qiblaData.map){
+            const isDark=document.documentElement.getAttribute('data-theme')==='dark'; qiblaData.map=L.map('qibla-map',{zoomControl:true,attributionControl:true});
+            const tileUrl=isDark?'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png':'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+            L.tileLayer(tileUrl,{attribution:'© CARTO',subdomains:'abcd',maxZoom:19}).addTo(qiblaData.map);
+        }
+        const map=qiblaData.map; map.eachLayer(layer=>{if(layer instanceof L.Marker||layer instanceof L.Polyline)map.removeLayer(layer);});
+        
+        const userIcon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:var(--em-light,#2aad7e);border:3px solid white;box-shadow:0 0 8px rgba(42,173,126,0.6)"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});
+        const meccaIcon=L.divIcon({html:'<div style="font-size:24px;line-height:1;">🕋</div>',className:'',iconSize:[24,24],iconAnchor:[12,12]});
+        const userMarker = L.marker([qiblaData.userLat,qiblaData.userLng],{icon:userIcon}).addTo(map).bindPopup('📍 Your location');
+        L.marker([MECCA.lat,MECCA.lng],{icon:meccaIcon}).addTo(map).bindPopup('Mecca');
+        
+        const rayEnd=destPoint(qiblaData.userLat,qiblaData.userLng,qiblaData.bearing,1500);
+        qiblaData.qiblaLine=L.polyline([[qiblaData.userLat,qiblaData.userLng],rayEnd],{color:'var(--gold)',weight:4,opacity:0.9}).addTo(map);
+        map.fitBounds(qiblaData.qiblaLine.getBounds(),{padding:[40,40]});
+
+        const pointer = $('qibla-map-pointer');
+        if(pointer) {
+            pointer.style.display = 'block';
+            const handler = e => {
+                let h = e.webkitCompassHeading != null ? e.webkitCompassHeading : (e.alpha != null ? 360 - e.alpha : null);
+                if (h !== null) {
+                    const pt = map.latLngToContainerPoint(userMarker.getLatLng());
+                    pointer.style.left = (pt.x - 20) + 'px'; pointer.style.top = (pt.y - 20) + 'px'; pointer.style.transform = `rotate(${h}deg)`;
+                }
+            };
+            window.addEventListener('deviceorientation', handler, true); qiblaData.orientHandler = handler;
+            map.on('move', () => { const pt = map.latLngToContainerPoint(userMarker.getLatLng()); pointer.style.left = (pt.x - 20) + 'px'; pointer.style.top = (pt.y - 20) + 'px'; });
+        }
+    },100);
+}
+
+function startQiblaCompass(){
+    showQiblaState('compass'); const canvas=$('qibla-compass-canvas'); const ctx=canvas.getContext('2d'); let currentCompassHeading=0;
+    const handler = e => { let h = null; if (e.webkitCompassHeading != null) h = e.webkitCompassHeading; else if (e.alpha != null) h = 360 - e.alpha; if (h != null) qiblaData.deviceHeading = h; };
+    window.addEventListener('deviceorientation', handler, true); qiblaData.orientHandler = handler;
+    if ('ondeviceorientationabsolute' in window) { const absHandler = e => { if (e.alpha != null) qiblaData.deviceHeading = 360 - e.alpha; }; window.addEventListener('deviceorientationabsolute', absHandler, true); qiblaData.orientAbsHandler = absHandler; }
+    setTimeout(() => { if (qiblaData.deviceHeading === null) $('qibla-orient-hint').style.display = 'flex'; }, 3000);
+
+    function drawCompass() {
+        const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 20; ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let tH = qiblaData.deviceHeading || 0; let diff = tH - currentCompassHeading; if (diff > 180) diff -= 360; if (diff < -180) diff += 360; currentCompassHeading += diff * 0.15; currentCompassHeading = (currentCompassHeading + 360) % 360;
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(-currentCompassHeading * Math.PI / 180);
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, 2 * Math.PI); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(201,168,76,0.3)'; ctx.stroke();
+        for (let i = 0; i < 360; i += 15) { const main = i % 90 === 0; const a = i * Math.PI / 180; ctx.beginPath(); ctx.moveTo(Math.cos(a) * (r - (main ? 15 : 8)), Math.sin(a) * (r - (main ? 15 : 8))); ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); ctx.lineWidth = main ? 3 : 1; ctx.strokeStyle = main ? '#c9a84c' : 'rgba(201,168,76,0.5)'; ctx.stroke(); }
+        ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText('N', 0, -r + 28); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillText('S', 0, r - 28); ctx.fillText('E', r - 28, 0); ctx.fillText('W', -r + 28, 0);
+        const qRad = qiblaData.bearing * Math.PI / 180; const dQ = Math.abs((currentCompassHeading - qiblaData.bearing + 360) % 360); const aligned = dQ < 5 || dQ > 355;
+        if (aligned) { ctx.beginPath(); ctx.arc(0, 0, r + 8, 0, 2 * Math.PI); ctx.lineWidth = 4; ctx.strokeStyle = '#22c55e'; ctx.stroke(); $('qibla-compass-status').innerHTML = '<span style="color:var(--em-light);font-weight:700;">Facing Qibla!</span>'; } else { $('qibla-compass-status').textContent = 'Rotate device.'; }
+        ctx.save(); ctx.rotate(qRad); ctx.beginPath(); ctx.moveTo(0, -r - 10); ctx.lineTo(15, -r + 20); ctx.lineTo(-15, -r + 20); ctx.closePath(); ctx.fillStyle = aligned ? '#4ade80' : '#c9a84c'; ctx.fill(); ctx.font = '32px Arial'; ctx.fillText('🕋', 0, -r + 45); ctx.restore();
+        ctx.beginPath(); ctx.arc(0, 0, 6, 0, 2 * Math.PI); ctx.fillStyle = '#c9a84c'; ctx.fill(); ctx.restore();
+        if (qiblaData.mode === 'compass') qiblaData.animFrame = requestAnimationFrame(drawCompass);
+    }
+    drawCompass();
+}
+
+function stopQiblaCompass() {
+    if (qiblaData.orientHandler) { window.removeEventListener('deviceorientation', qiblaData.orientHandler, true); qiblaData.orientHandler = null; }
+    if (qiblaData.orientAbsHandler) { window.removeEventListener('deviceorientationabsolute', qiblaData.orientAbsHandler, true); qiblaData.orientAbsHandler = null; }
+    if($('qibla-orient-hint')) $('qibla-orient-hint').style.display = 'none';
+    if($('qibla-map-pointer')) $('qibla-map-pointer').style.display = 'none';
+}
+
+function startQiblaCamera() {
+    showQiblaState('camera'); const video = $('qibla-video'); const leftArrow = $('qibla-dir-left'); const rightArrow = $('qibla-dir-right'); const kaaba = $('qibla-ar-kaaba-fixed'); const status = $('qibla-ar-status');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(stream => { qiblaData.videoStream = stream; video.srcObject = stream; }).catch(() => { status.textContent = 'Camera denied.'; });
+    qiblaData.smoothedHeading = null;
+    const handler = e => { let h = null; if (e.webkitCompassHeading != null) h = e.webkitCompassHeading; else if (e.alpha != null) h = 360 - e.alpha; if (h != null) qiblaData.deviceHeading = h; };
+    window.addEventListener('deviceorientation', handler, true); qiblaData.orientHandler = handler;
+    function loop() {
+        if (qiblaData.deviceHeading !== null && qiblaData.bearing !== null) {
+            let raw = qiblaData.deviceHeading; if (qiblaData.smoothedHeading === null) { qiblaData.smoothedHeading = raw; } else { let sDiff = raw - qiblaData.smoothedHeading; if (sDiff > 180) sDiff -= 360; if (sDiff < -180) sDiff += 360; qiblaData.smoothedHeading += sDiff * 0.15; qiblaData.smoothedHeading = (qiblaData.smoothedHeading + 360) % 360; }
+            const h = qiblaData.smoothedHeading; const b = qiblaData.bearing; let diff = b - h; if (diff > 180) diff -= 360; if (diff < -180) diff += 360; const TOLERANCE = 12;
+            if (Math.abs(diff) <= TOLERANCE) { leftArrow.classList.remove('visible'); rightArrow.classList.remove('visible'); kaaba.classList.add('aligned'); status.innerHTML = '<span style="color:var(--em-light);font-weight:700;">Facing Qibla!</span>'; } else { kaaba.classList.remove('aligned'); status.textContent = 'Rotate phone.'; if (diff > 0) { rightArrow.classList.add('visible'); leftArrow.classList.remove('visible'); } else { leftArrow.classList.add('visible'); rightArrow.classList.remove('visible'); } }
+        }
+        if (qiblaData.mode === 'camera') qiblaData.animFrame = requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+function stopQiblaCamera() {
+    if (qiblaData.videoStream) { qiblaData.videoStream.getTracks().forEach(t => t.stop()); qiblaData.videoStream = null; }
+    if (qiblaData.orientHandler) { window.removeEventListener('deviceorientation', qiblaData.orientHandler, true); qiblaData.orientHandler = null; }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const manifest = {name:"Mizan Islamic Dashboard",short_name:"Mizan",display:"standalone",start_url:".",background_color:"#232736",theme_color:"#232736",icons:[{src:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>",sizes:"192x192",type:"image/svg+xml"}]};
-    const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-    document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+    fetchTodayHijri(); initTabs(); initCalPills(); initDayListeners(); initInspiration();
 
-    fetchTodayHijri(); initMobileFullscreen(); initTabs(); initCalPills(); initDayListeners(); initInspiration();
-
-    document.getElementById('btn-gps')?.addEventListener('click', async (e) => {
-        const btn = e.currentTarget; if (!navigator.geolocation) return alert("Geolocation not supported.");
-        btn.classList.add('locating');
+    $('btn-gps')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget; if (!navigator.geolocation) return alert("Geolocation not supported."); btn.classList.add('locating');
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
                 const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=en`);
                 const d = await r.json();
                 if (d.city || d.locality) {
-                    const locName = d.city || d.locality; document.getElementById('city-input').value = locName;
-                    const cSel = document.getElementById('country-select'); let matched = false;
-                    for(let i=0; i<cSel.options.length; i++) {
-                        if(cSel.options[i].value === d.countryName || d.countryName.includes(cSel.options[i].value)) { cSel.selectedIndex = i; matched = true; break; }
-                    }
+                    const locName = d.city || d.locality; $('city-input').value = locName;
+                    const cSel = $('country-select'); let matched = false;
+                    for(let i=0; i<cSel.options.length; i++) { if(cSel.options[i].value === d.countryName || d.countryName.includes(cSel.options[i].value)) { cSel.selectedIndex = i; matched = true; break; } }
                     if(matched) await loadStates(null, locName, false);
-                    saveSettings();
+                    saveSettings(); alert(`Location detected: ${locName}`);
                 }
             } catch(e) {} finally { btn.classList.remove('locating'); }
         }, () => { btn.classList.remove('locating'); }, { enableHighAccuracy: true });
     });
 
-    const cSel = document.getElementById('country-select');
-    try { const res = await fetch(`${API_BASE}/countries`); const data = await res.json(); data.data.forEach(c => { const o = document.createElement('option'); o.value = c.country; o.textContent = c.country; cSel.appendChild(o); }); } catch {}
+    const cSel = $('country-select');
+    try { const res = await fetch(`${API_BASE}/countries`); const data = await res.json(); data.data.forEach(c => { const o = document.createElement('option'); o.value = c.country; o.textContent = c.country; cSel.appendChild(o); }); } catch (e) {}
+    
     cSel.addEventListener('change', () => loadStates(null, null, true));
-    document.getElementById('state-select').addEventListener('change', () => loadCities(null, true));
-    document.getElementById('theme-toggle-btn').addEventListener('click',toggleTheme);
-    document.getElementById('theme-chk').addEventListener('change',toggleTheme);
-    document.getElementById('dismiss-alarm-btn').addEventListener('click',()=>document.getElementById('alarm-modal').classList.remove('show'));
-    document.getElementById('modal-close-x').addEventListener('click',()=>document.getElementById('alarm-modal').classList.remove('show'));
-    document.getElementById('npc-dismiss-btn')?.addEventListener('click',()=>document.getElementById('notif-popup-overlay').classList.remove('show'));
-    document.getElementById('btn-save-settings').addEventListener('click',saveSettings);
-    document.getElementById('load-schedule-btn').addEventListener('click',fetchMonthly);
-    document.getElementById('excel-btn').addEventListener('click',exportExcel);
-    document.getElementById('print-btn').addEventListener('click',doPrint);
-    document.getElementById('btn-add-favorite').addEventListener('click',saveFav);
-    document.getElementById('btn-delete-favorite').addEventListener('click',delFav);
-    document.getElementById('favorites-select').addEventListener('change',e=>{document.getElementById('btn-delete-favorite').disabled=!e.target.value;if(e.target.value)applyFav(e.target.value);});
-    ['top-favorites-select','monthly-favorites-select'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',e=>{if(e.target.value)applyFav(e.target.value);});});
+    $('state-select').addEventListener('change', () => loadCities(null, true));
+    $('theme-toggle-btn').addEventListener('click',toggleTheme);
+    $('theme-chk').addEventListener('change',toggleTheme);
+    $('dismiss-alarm-btn').addEventListener('click',()=>$('alarm-modal').classList.remove('show'));
+    $('modal-close-x').addEventListener('click',()=>$('alarm-modal').classList.remove('show'));
+    $('npc-dismiss-btn')?.addEventListener('click',()=>$('notif-popup-overlay').classList.remove('show'));
+    $('btn-save-settings').addEventListener('click',saveSettings);
+    $('load-schedule-btn').addEventListener('click',fetchMonthly);
+    
+    $('btn-add-favorite').addEventListener('click',saveFav);
+    $('btn-delete-favorite').addEventListener('click',delFav);
+    $('favorites-select').addEventListener('change',e=>{$('btn-delete-favorite').disabled=!e.target.value;if(e.target.value)applyFav(e.target.value);});
+    ['top-favorites-select','monthly-favorites-select'].forEach(id=>{const el=$(id);if(el)el.addEventListener('change',e=>{if(e.target.value)applyFav(e.target.value);});});
 
     updateNotifStatusUI();
-    document.getElementById('notif-master-toggle')?.addEventListener('change', e => { handleMasterToggle(e.target.checked); });
-    document.getElementById('btn-test-notif')?.addEventListener('click', testNotification);
+    $('notif-master-toggle')?.addEventListener('change', e => { handleMasterToggle(e.target.checked); });
+    $('btn-test-notif')?.addEventListener('click', testNotification);
 
     if(loadSettings()){ syncUI(); loadFavs(); await populateLoc(S.country,S.state,S.city); await refreshAll(); }
     else { updateMonthYear(); populateDays(); loadFavs(); applyTheme('dark'); await firstTime(); }
     initColorCustomizer();
-    document.getElementById('app-version-display').textContent = APP_VERSION; document.getElementById('app-date-display').textContent = APP_DATE;
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.dataset.target === 'tab-qibla') btn.addEventListener('click', () => { if (!window._qiblaInited) { window._qiblaInited = true; initQibla(); } });
-    });
+    
+    $$('.nav-btn').forEach(btn => { if (btn.dataset.target === 'tab-qibla') { btn.addEventListener('click', () => { if (!window._qiblaInited) { window._qiblaInited = true; initQibla(); } }); } });
 
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
-        const installSection = document.getElementById('install-section');
-        if(installSection) installSection.style.display = 'block';
+        e.preventDefault(); deferredPrompt = e; const installSection = $('install-section'); if(installSection) installSection.style.display = 'block';
     });
-    document.getElementById('btn-install-app')?.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') document.getElementById('install-section').style.display = 'none';
-            deferredPrompt = null;
-        }
+    $('btn-install-app')?.addEventListener('click', async () => {
+        if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') $('install-section').style.display = 'none'; deferredPrompt = null; }
     });
 });
 </script>
